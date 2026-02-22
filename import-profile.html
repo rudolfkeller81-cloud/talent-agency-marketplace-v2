@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Profile Data</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .storage-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .storage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .storage-title {
+            font-weight: 600;
+            color: #3b82f6;
+        }
+
+        .storage-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-found {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .status-not-found {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .data-preview {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .status-message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .status-message.show {
+            display: block;
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .manual-import {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📥 Import Your Profile Data</h1>
+        <p class="subtitle">Find and import your registration data from browser storage</p>
+        
+        <div id="status-message" class="status-message"></div>
+
+        <!-- Check Local Storage -->
+        <div class="storage-section">
+            <div class="storage-header">
+                <div class="storage-title">📦 Local Storage</div>
+                <div id="localStorage-status" class="storage-status status-not-found">Checking...</div>
+            </div>
+            <div id="localStorage-data" class="data-preview" style="display: none;"></div>
+            <button id="import-local" class="btn btn-primary" style="display: none;" onclick="importFromLocalStorage()">
+                📥 Import from Local Storage
+            </button>
+        </div>
+
+        <!-- Check Session Storage -->
+        <div class="storage-section">
+            <div class="storage-header">
+                <div class="storage-title">🗂️ Session Storage</div>
+                <div id="sessionStorage-status" class="storage-status status-not-found">Checking...</div>
+            </div>
+            <div id="sessionStorage-data" class="data-preview" style="display: none;"></div>
+            <button id="import-session" class="btn btn-primary" style="display: none;" onclick="importFromSessionStorage()">
+                📥 Import from Session Storage
+            </button>
+        </div>
+
+        <!-- Manual Import -->
+        <div class="manual-import">
+            <h3 style="margin-bottom: 1rem;">🔧 Manual Import</h3>
+            <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem;">If you have your data as JSON, paste it here:</p>
+            
+            <div class="form-group">
+                <textarea id="manual-data" class="form-textarea" placeholder='{"first_name": "John", "last_name": "Doe", "email": "john@example.com", ...}'></textarea>
+            </div>
+            
+            <button class="btn btn-success" onclick="importManualData()">
+                📥 Import Manual Data
+            </button>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <a href="/profile" class="btn btn-secondary">← Go to Profile</a>
+            <a href="/check-profile" class="btn btn-secondary">🔍 Check Current Data</a>
+        </div>
+    </div>
+
+    <script>
+        let foundData = {};
+
+        function checkStorage() {
+            // Check localStorage
+            const userProfile = localStorage.getItem('userProfile');
+            const userData = localStorage.getItem('userData');
+            
+            let localData = null;
+            let localKey = null;
+            
+            if (userProfile) {
+                try {
+                    localData = JSON.parse(userProfile);
+                    localKey = 'userProfile';
+                } catch (e) {
+                    console.error('Error parsing userProfile:', e);
+                }
+            }
+            
+            if (!localData && userData) {
+                try {
+                    localData = JSON.parse(userData);
+                    localKey = 'userData';
+                } catch (e) {
+                    console.error('Error parsing userData:', e);
+                }
+            }
+            
+            const localStatus = document.getElementById('localStorage-status');
+            const localDataDiv = document.getElementById('localStorage-data');
+            const importLocalBtn = document.getElementById('import-local');
+            
+            if (localData && localData.first_name) {
+                localStatus.textContent = 'Found data!';
+                localStatus.className = 'storage-status status-found';
+                localDataDiv.textContent = JSON.stringify(localData, null, 2);
+                localDataDiv.style.display = 'block';
+                importLocalBtn.style.display = 'block';
+                foundData.localStorage = localData;
+            } else {
+                localStatus.textContent = 'No valid data';
+                localStatus.className = 'storage-status status-not-found';
+            }
+            
+            // Check sessionStorage
+            const sessionData = sessionStorage.getItem('userData');
+            const sessionStatus = document.getElementById('sessionStorage-status');
+            const sessionDataDiv = document.getElementById('sessionStorage-data');
+            const importSessionBtn = document.getElementById('import-session');
+            
+            if (sessionData) {
+                try {
+                    const parsedSession = JSON.parse(sessionData);
+                    if (parsedSession.first_name) {
+                        sessionStatus.textContent = 'Found data!';
+                        sessionStatus.className = 'storage-status status-found';
+                        sessionDataDiv.textContent = JSON.stringify(parsedSession, null, 2);
+                        sessionDataDiv.style.display = 'block';
+                        importSessionBtn.style.display = 'block';
+                        foundData.sessionStorage = parsedSession;
+                    } else {
+                        sessionStatus.textContent = 'No valid data';
+                        sessionStatus.className = 'storage-status status-not-found';
+                    }
+                } catch (e) {
+                    console.error('Error parsing sessionData:', e);
+                    sessionStatus.textContent = 'Error parsing';
+                    sessionStatus.className = 'storage-status status-not-found';
+                }
+            } else {
+                sessionStatus.textContent = 'No data';
+                sessionStatus.className = 'storage-status status-not-found';
+            }
+        }
+
+        function importFromLocalStorage() {
+            if (foundData.localStorage) {
+                localStorage.setItem('userProfile', JSON.stringify(foundData.localStorage));
+                showStatus('✅ Data imported from localStorage successfully!', 'success');
+                setTimeout(() => {
+                    window.location.href = '/profile';
+                }, 1500);
+            }
+        }
+
+        function importFromSessionStorage() {
+            if (foundData.sessionStorage) {
+                localStorage.setItem('userProfile', JSON.stringify(foundData.sessionStorage));
+                showStatus('✅ Data imported from sessionStorage successfully!', 'success');
+                setTimeout(() => {
+                    window.location.href = '/profile';
+                }, 1500);
+            }
+        }
+
+        function importManualData() {
+            const manualData = document.getElementById('manual-data').value.trim();
+            if (!manualData) {
+                showStatus('❌ Please paste your data first', 'error');
+                return;
+            }
+            
+            try {
+                const parsedData = JSON.parse(manualData);
+                if (parsedData.first_name) {
+                    localStorage.setItem('userProfile', JSON.stringify(parsedData));
+                    showStatus('✅ Manual data imported successfully!', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/profile';
+                    }, 1500);
+                } else {
+                    showStatus('❌ Invalid data format - missing first_name', 'error');
+                }
+            } catch (e) {
+                showStatus('❌ Invalid JSON format: ' + e.message, 'error');
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status-message');
+            statusEl.textContent = message;
+            statusEl.className = `status-message show status-${type}`;
+            
+            setTimeout(() => {
+                statusEl.classList.remove('show');
+            }, 5000);
+        }
+
+        // Check storage on page load
+        window.addEventListener('DOMContentLoaded', checkStorage);
+    </script>
+</body>
+</html>

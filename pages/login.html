@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings - Talent & Agency</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1e293b;
+            --primary-dark: #0f172a;
+            --secondary: #475569;
+            --accent: #64748b;
+            --accent-blue: #1e3a8a;
+            --accent-blue-light: #3b82f6;
+            --accent-blue-subtle: rgba(59, 130, 246, 0.08);
+            --accent-blue-border: rgba(59, 130, 246, 0.15);
+            --accent-blue-glow: rgba(59, 130, 246, 0.25);
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            --bg-tertiary: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-tertiary: #666666;
+            --border: #2a2a2a;
+            --border-hover: #3a3a3a;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-blue-light);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.875rem;
+        }
+
+        .nav-btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .nav-btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        /* Settings Container */
+        .settings-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar */
+        .settings-sidebar {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar-item {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-secondary);
+            border: none;
+            background: none;
+            text-align: left;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .sidebar-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .sidebar-item.active {
+            background: var(--accent-blue-subtle);
+            color: var(--accent-blue-light);
+            border: 1px solid var(--accent-blue-border);
+        }
+
+        /* Settings Content */
+        .settings-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 2rem;
+        }
+
+        .settings-section {
+            display: none;
+        }
+
+        .settings-section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue-border);
+            box-shadow: 0 0 0 3px var(--accent-blue-subtle);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-select {
+            cursor: pointer;
+        }
+
+        .microcopy {
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            margin-top: 0.25rem;
+        }
+
+        /* Checkbox Groups */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .checkbox-label:hover {
+            color: var(--text-primary);
+        }
+
+        .checkbox-input {
+            margin-right: 0.5rem;
+            accent-color: var(--accent-blue);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--accent-blue-glow);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--border-hover);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: rgba(59, 130, 246, 0.8);
+        }
+
+        .footer-bottom {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .settings-container {
+                grid-template-columns: 1fr;
+            }
+
+            .settings-sidebar {
+                order: 2;
+            }
+
+            .sidebar-nav {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="logo">Talent & Agency</div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="discover.html" class="nav-link">Discover</a>
+                <a href="/favorites" class="nav-link">Favorites</a>
+                <a href="/messages" class="nav-link">Messages</a>
+            </div>
+            <div class="nav-actions">
+                <button class="nav-btn nav-btn-secondary" onclick="window.location.href='/messages'">💬 Messages</button>
+                <button class="nav-btn nav-btn-primary" onclick="logout()">🚪 Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Profile Settings</h1>
+            <p class="page-subtitle">Manage your profile information and preferences</p>
+        </div>
+
+        <div class="settings-container">
+            <!-- Sidebar -->
+            <div class="settings-sidebar">
+                <div class="sidebar-nav">
+                    <button class="sidebar-item active" onclick="showSection('basic')">Basic Info</button>
+                    <button class="sidebar-item" onclick="showSection('content')">Content Types</button>
+                    <button class="sidebar-item" onclick="showSection('schedule')">Work Schedule</button>
+                    <button class="sidebar-item" onclick="showSection('social')">Social Media</button>
+                    <button class="sidebar-item" onclick="showSection('media')">Media</button>
+                    <button class="sidebar-item" onclick="showSection('privacy')">Privacy</button>
+                </div>
+            </div>
+
+            <!-- Settings Content -->
+            <div class="settings-content">
+                <!-- Basic Information -->
+                <div id="basic" class="settings-section active">
+                    <h2 class="section-title">Basic Information</h2>
+                    <p class="section-description">Update your basic profile information</p>
+
+                    <form id="basicForm">
+                        <div class="form-group">
+                            <label class="form-label" for="firstName">First Name</label>
+                            <input type="text" id="firstName" name="firstName" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="lastName">Last Name</label>
+                            <input type="text" id="lastName" name="lastName" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="displayName">Display Name</label>
+                            <input type="text" id="displayName" name="displayName" class="form-input" required>
+                            <div class="microcopy">This name will be displayed on your profile</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="age">Age</label>
+                            <input type="number" id="age" name="age" class="form-input" min="18" max="100" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="country">Country</label>
+                            <select id="country" name="country" class="form-input form-select">
+                                <option value="">Select a country</option>
+                                <option value="france">France</option>
+                                <option value="usa">USA</option>
+                                <option value="uk">UK</option>
+                                <option value="canada">Canada</option>
+                                <option value="belgium">Belgium</option>
+                                <option value="switzerland">Switzerland</option>
+                                <option value="spain">Spain</option>
+                                <option value="italy">Italy</option>
+                                <option value="germany">Germany</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="bio">Bio / Description</label>
+                            <textarea id="bio" name="bio" class="form-input form-textarea" rows="4"></textarea>
+                            <div class="microcopy">Tell us about yourself and your content</div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm('basic')">Reset</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Content Types -->
+                <div id="content" class="settings-section">
+                    <h2 class="section-title">Content Types</h2>
+                    <p class="section-description">Select all content types you're comfortable creating</p>
+
+                    <form id="contentForm">
+                        <div class="form-group">
+                            <label class="form-label">Content Types You Create</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="contentTypes" value="lingerie" class="checkbox-input">
+                                    Lingerie
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="contentTypes" value="ass" class="checkbox-input">
+                                    Ass Content
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="contentTypes" value="boobs" class="checkbox-input">
+                                    Boobs Content
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="contentTypes" value="full_nude" class="checkbox-input">
+                                    Full Nude Pics/Videos
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="contentTypes" value="anal" class="checkbox-input">
+                                    Anal Content
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="contentTypes" value="masturbation" class="checkbox-input">
+                                    Masturbation Content
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="contentTypes" value="boy_girl" class="checkbox-input">
+                                    Boy-Girl Content
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="contentTypes" value="girl_girl" class="checkbox-input">
+                                    Girl-Girl Content
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="contentTypes" value="pussy" class="checkbox-input">
+                                    Pussy Pics
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="contentTypes" value="voice_notes" class="checkbox-input">
+                                    Voice Notes
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="contentTypes" value="twerk" class="checkbox-input">
+                                    Twerk Videos
+                                </label>
+                            </div>
+                            <div class="microcopy">You can update these at any time</div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm('content')">Reset</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Work Schedule -->
+                <div id="schedule" class="settings-section">
+                    <h2 class="section-title">Work Schedule</h2>
+                    <p class="section-description">Set your working hours and availability</p>
+
+                    <form id="scheduleForm">
+                        <div class="form-group">
+                            <label class="form-label" for="workingHours">Working hours per day</label>
+                            <select id="workingHours" name="workingHours" class="form-input form-select">
+                                <option value="">Select working hours</option>
+                                <option value="1-2">1-2 hours</option>
+                                <option value="3-4">3-4 hours</option>
+                                <option value="5-6">5-6 hours</option>
+                                <option value="7-8">7-8 hours</option>
+                                <option value="9-10">9-10 hours</option>
+                                <option value="11-12">11-12 hours</option>
+                                <option value="12+">12+ hours</option>
+                                <option value="flexible">Flexible schedule</option>
+                            </select>
+                            <div class="microcopy">How many hours per day do you dedicate to content creation?</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Available Days</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="availableDays" value="monday" class="checkbox-input">
+                                    Monday
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="availableDays" value="tuesday" class="checkbox-input">
+                                    Tuesday
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="availableDays" value="wednesday" class="checkbox-input">
+                                    Wednesday
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="availableDays" value="thursday" class="checkbox-input">
+                                    Thursday
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="availableDays" value="friday" class="checkbox-input">
+                                    Friday
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="availableDays" value="saturday" class="checkbox-input">
+                                    Saturday
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="availableDays" value="sunday" class="checkbox-input">
+                                    Sunday
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm('schedule')">Reset</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Social Media -->
+                <div id="social" class="settings-section">
+                    <h2 class="section-title">Social Media</h2>
+                    <p class="section-description">Connect your social media accounts</p>
+
+                    <form id="socialForm">
+                        <div class="form-group">
+                            <label class="form-label">Platforms</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="platforms" value="onlyfans" class="checkbox-input">
+                                    OnlyFans
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="platforms" value="fanvue" class="checkbox-input">
+                                    Fanvue
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="platforms" value="fansly" class="checkbox-input">
+                                    Fansly
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="platforms" value="mym" class="checkbox-input">
+                                    MYM
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Social Media Accounts</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="socialMedia" value="instagram" class="checkbox-input">
+                                    Instagram
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="socialMedia" value="tiktok" class="checkbox-input">
+                                    TikTok
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="socialMedia" value="twitter" class="checkbox-input">
+                                    Twitter
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="socialMedia" value="snapchat" class="checkbox-input">
+                                    Snapchat
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="socialMedia" value="threads" class="checkbox-input">
+                                    Threads
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="totalFollowers">Total number of followers</label>
+                            <input type="number" id="totalFollowers" name="totalFollowers" class="form-input" min="0">
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm('social')">Reset</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Media -->
+                <div id="media" class="settings-section">
+                    <h2 class="section-title">Media</h2>
+                    <p class="section-description">Update your profile photos and portfolio</p>
+
+                    <form id="mediaForm">
+                        <div class="form-group">
+                            <label class="form-label">Profile Photo</label>
+                            <input type="file" id="profilePhoto" name="profilePhoto" class="form-input" accept="image/*">
+                            <div class="microcopy">Upload your profile photo</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Portfolio Photos</label>
+                            <input type="file" id="portfolioPhotos" name="portfolioPhotos" class="form-input" accept="image/*" multiple>
+                            <div class="microcopy">Upload up to 5 portfolio photos</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Demo Video</label>
+                            <input type="file" id="demoVideo" name="demoVideo" class="form-input" accept="video/*">
+                            <div class="microcopy">Upload a demo video (max 50MB)</div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm('media')">Reset</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Privacy -->
+                <div id="privacy" class="settings-section">
+                    <h2 class="section-title">Privacy Settings</h2>
+                    <p class="section-description">Manage your privacy and visibility preferences</p>
+
+                    <form id="privacyForm">
+                        <div class="form-group">
+                            <label class="form-label">Profile Visibility</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="visibility" value="public" class="checkbox-input">
+                                    Public Profile
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="visibility" value="searchable" class="checkbox-input">
+                                    Searchable
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="visibility" value="contactable" class="checkbox-input">
+                                    Allow Messages
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Data Sharing</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="dataSharing" value="analytics" class="checkbox-input">
+                                    Share Analytics Data
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="dataSharing" value="marketing" class="checkbox-input">
+                                    Marketing Communications
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm('privacy')">Reset</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="discover.html">Discover</a>
+                <a href="terms.html">Terms of Service</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="contact.html">Contact</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Talent & Agency. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProfileData();
+            setupFormListeners();
+        });
+
+        // Show section
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.settings-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all sidebar items
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked sidebar item
+            event.target.classList.add('active');
+        }
+
+        // Load profile data
+        async function loadProfileData() {
+            try {
+                const sessionId = localStorage.getItem('sessionId') || sessionStorage.getItem('sessionId');
+                if (!sessionId) {
+                    window.location.href = '../login.html';
+                    return;
+                }
+
+                const response = await fetch('/api/user/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${sessionId}`
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    populateForms(result.data);
+                } else {
+                    console.error('Error loading profile data:', result.error);
+                }
+            } catch (error) {
+                console.error('Error loading profile data:', error);
+            }
+        }
+
+        // Populate forms with data
+        function populateForms(data) {
+            // Basic info
+            if (data.first_name) document.getElementById('firstName').value = data.first_name;
+            if (data.last_name) document.getElementById('lastName').value = data.last_name;
+            if (data.display_name) document.getElementById('displayName').value = data.display_name;
+            if (data.age) document.getElementById('age').value = data.age;
+            if (data.country) document.getElementById('country').value = data.country;
+            if (data.bio) document.getElementById('bio').value = data.bio;
+
+            // Working hours
+            if (data.working_hours) document.getElementById('workingHours').value = data.working_hours;
+
+            // Content types
+            if (data.content_types) {
+                data.content_types.forEach(type => {
+                    const checkbox = document.querySelector(`input[name="contentTypes"][value="${type}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+
+            // Available days
+            if (data.available_days) {
+                data.available_days.forEach(day => {
+                    const checkbox = document.querySelector(`input[name="availableDays"][value="${day}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+
+            // Platforms
+            if (data.platforms) {
+                data.platforms.forEach(platform => {
+                    const checkbox = document.querySelector(`input[name="platforms"][value="${platform}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+
+            // Social media
+            if (data.social_media) {
+                data.social_media.forEach(social => {
+                    const checkbox = document.querySelector(`input[name="socialMedia"][value="${social}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+
+            // Total followers
+            if (data.total_followers) document.getElementById('totalFollowers').value = data.total_followers;
+        }
+
+        // Setup form listeners
+        function setupFormListeners() {
+            const forms = ['basic', 'content', 'schedule', 'social', 'media', 'privacy'];
+            
+            forms.forEach(formId => {
+                const form = document.getElementById(`${formId}Form`);
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        saveForm(formId);
+                    });
+                }
+            });
+        }
+
+        // Save form data
+        async function saveForm(formId) {
+            try {
+                const sessionId = localStorage.getItem('sessionId') || sessionStorage.getItem('sessionId');
+                const formData = new FormData(document.getElementById(`${formId}Form`));
+                
+                // Convert FormData to JSON
+                const data = {};
+                for (let [key, value] of formData.entries()) {
+                    if (data[key]) {
+                        // Handle multiple checkboxes
+                        if (Array.isArray(data[key])) {
+                            data[key].push(value);
+                        } else {
+                            data[key] = [data[key], value];
+                        }
+                    } else {
+                        data[key] = value;
+                    }
+                }
+
+                const response = await fetch(`/api/user/profile/${formId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionId}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Settings saved successfully!');
+                } else {
+                    alert('Error saving settings: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                alert('Error saving settings');
+            }
+        }
+
+        // Reset form
+        function resetForm(formId) {
+            if (confirm('Are you sure you want to reset this form?')) {
+                document.getElementById(`${formId}Form`).reset();
+                loadProfileData(); // Reload original data
+            }
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('sessionId');
+                sessionStorage.removeItem('sessionId');
+                window.location.href = '../login.html';
+            }
+        }
+    </script>
+</body>
+</html>

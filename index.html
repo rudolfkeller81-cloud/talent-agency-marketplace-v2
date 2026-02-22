@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talent & Agency - Professional Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/auth-utils.js"></script>
+    <style>
+        /* === Base === */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        a { color: inherit; text-decoration: none; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+        /* === Layout === */
+        .container { min-height: 100vh; display: flex; flex-direction: column; }
+
+        /* === Header === */
+        .header {
+            position: fixed; top: 0; width: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+            z-index: 1000;
+        }
+        .nav {
+            max-width: 1200px; margin: 0 auto; padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center; position: relative;
+        }
+        .nav-brand { font-size: 1.25rem; font-weight: 700; color: #fff; flex-shrink: 0; }
+        .nav-links {
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            display: flex; gap: 2rem; list-style: none; align-items: center;
+        }
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.8); font-size: 0.95rem; font-weight: 500;
+            transition: color 0.3s; padding: 0.25rem 0;
+        }
+        .nav-links a:hover { color: rgba(59, 130, 246, 0.9); }
+        .nav-actions { display: flex; align-items: center; gap: 1rem; }
+        .sign-in-btn {
+            background: transparent; color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem; border-radius: 6px;
+            cursor: pointer; transition: all 0.3s;
+            font-size: 0.9rem; font-weight: 500; text-decoration: none;
+        }
+        .sign-in-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.3); }
+
+        /* === Buttons === */
+        .btn-primary {
+            background: rgba(59, 130, 246, 0.15); color: #fff;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 0.85rem 2rem; border-radius: 8px;
+            font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s;
+            text-decoration: none; display: inline-block;
+        }
+        .btn-primary:hover { background: rgba(59, 130, 246, 0.25); border-color: rgba(59, 130, 246, 0.5); transform: translateY(-1px); }
+        .btn-secondary {
+            background: transparent; color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.85rem 2rem; border-radius: 8px;
+            font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s;
+            text-decoration: none; display: inline-block;
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.4); }
+
+        /* === Section === */
+        .section { padding: 6rem 2rem; max-width: 1200px; margin: 0 auto; }
+        .section-title { text-align: center; font-size: 2.5rem; font-weight: 700; margin-bottom: 3rem; color: #fff; }
+
+        /* === Footer === */
+        .footer {
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 2rem; margin-top: auto; text-align: center;
+            color: rgba(255, 255, 255, 0.5); font-size: 0.85rem;
+        }
+        .footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1rem; }
+        .footer-link { color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; transition: color 0.3s; }
+        .footer-link:hover { color: rgba(59, 130, 246, 0.8); }
+
+        @media (max-width: 768px) {
+            .nav { padding: 0.75rem 1rem; }
+            .nav-links { display: none; }
+            .section { padding: 3rem 1rem; }
+            .section-title { font-size: 2rem; }
+            .footer-links { gap: 1rem; }
+        }
+
+        /* === Cookie Banner === */
+        .cookie-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 1.5rem;
+            z-index: 99999;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            max-width: 500px;
+            width: 90%;
+            display: none;
+        }
+        .cookie-banner.show { display: block; animation: slideUp 0.5s ease; }
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+        .cookie-content { text-align: center; }
+        .cookie-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: #fff; }
+        .cookie-text { font-size: 0.9rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 1rem; line-height: 1.4; }
+        .cookie-buttons { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+        .cookie-btn { padding: 0.5rem 1rem; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .cookie-btn-accept { background: rgba(59, 130, 246, 0.2); color: white; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .cookie-btn-accept:hover { background: rgba(59, 130, 246, 0.3); }
+        .cookie-btn-reject { background: rgba(255, 255, 255, 0.05); color: #fff; border: 1px solid rgba(255, 255, 255, 0.15); }
+        .cookie-btn-reject:hover { background: rgba(255, 255, 255, 0.1); }
+        .cookie-btn-customize { background: transparent; color: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .cookie-btn-customize:hover { color: #fff; border-color: rgba(255, 255, 255, 0.2); }
+
+        /* === Cookie Modal === */
+        .cookie-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 10001; display: none; align-items: center; justify-content: center; padding: 2rem; }
+        .cookie-modal.show { display: flex; }
+        .cookie-modal-content { background: rgba(0, 0, 0, 0.95); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; padding: 2rem; }
+        .cookie-modal-header { margin-bottom: 2rem; }
+        .cookie-modal-title { font-size: 1.5rem; font-weight: 600; color: #fff; margin-bottom: 0.5rem; }
+        .cookie-modal-subtitle { color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; }
+        .cookie-category { margin-bottom: 2rem; }
+        .cookie-category-title { font-size: 1.1rem; font-weight: 500; color: #fff; margin-bottom: 0.5rem; }
+        .cookie-category-description { font-size: 0.9rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 1rem; line-height: 1.5; }
+        .cookie-toggle { display: flex; align-items: center; gap: 1rem; }
+        .toggle-switch { position: relative; width: 50px; height: 26px; background: rgba(255, 255, 255, 0.2); border-radius: 13px; cursor: pointer; transition: background 0.3s; }
+        .toggle-switch.active { background: #3b82f6; }
+        .toggle-switch.disabled { opacity: 0.5; cursor: not-allowed; }
+        .toggle-slider { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; background: #fff; border-radius: 50%; transition: transform 0.3s; }
+        .toggle-switch.active .toggle-slider { transform: translateX(24px); }
+        .cookie-modal-footer { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+
+        /* === Hero Section === */
+        .hero {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            max-width: 1200px;
+            text-align: center;
+            padding: 2rem;
+        }
+        .hero-content { position: relative; z-index: 1; }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 600px;
+            background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            line-height: 1.3;
+            background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .title-line { display: block; margin-bottom: 0.5rem; }
+        .hero-subtitle {
+            font-size: 1.4rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 3rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+        .hero-buttons { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
+
+        .hero-wrapper { position: relative; min-height: 100vh; }
+
+        /* === How it works === */
+        .how-it-works {
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; }
+        .step-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .step-card:hover { border-color: rgba(59, 130, 246, 0.2); background: rgba(255, 255, 255, 0.05); }
+        .step-number {
+            width: 50px; height: 50px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.2rem; font-weight: 600; color: rgba(59, 130, 246, 0.9);
+        }
+        .step-card h3 { font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem; color: #fff; }
+        .step-card p { color: rgba(255, 255, 255, 0.6); line-height: 1.6; }
+
+        /* === Who it's for === */
+        .who-for { padding: 6rem 2rem; }
+        .audience-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; max-width: 1000px; margin: 0 auto; }
+        .audience-block {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 3rem;
+        }
+        .audience-block h3 { font-size: 1.5rem; font-weight: 600; margin-bottom: 2rem; color: #fff; }
+        .audience-block ul { list-style: none; }
+        .audience-block li { color: rgba(255, 255, 255, 0.7); margin-bottom: 1rem; padding-left: 1.5rem; position: relative; }
+        .audience-block li::before { content: '•'; position: absolute; left: 0; color: rgba(59, 130, 246, 0.8); }
+
+        /* === Philosophy === */
+        .philosophy {
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            padding: 6rem 2rem;
+        }
+        .philosophy-content { max-width: 700px; margin: 0 auto; }
+        .philosophy h2 { font-size: 2rem; font-weight: 600; margin-bottom: 2rem; color: #fff; }
+        .philosophy p { font-size: 1.1rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 2rem; line-height: 1.8; }
+        .not-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin: 3rem 0; }
+        .not-item { padding: 1.5rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; }
+        .not-item h4 { color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+        .philosophy-final { font-size: 1.2rem; color: rgba(59, 130, 246, 0.8); font-weight: 500; margin-top: 2rem; }
+
+        /* === Discover (inline section for logged-in) === */
+        .discover-container { max-width: 800px; margin: 0 auto; }
+        .discover-toggle { display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: center; }
+        .toggle-btn {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .toggle-btn.active { background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3); color: #fff; }
+        .toggle-btn:hover { background: rgba(255, 255, 255, 0.05); }
+        .toggle-btn.active:hover { background: rgba(59, 130, 246, 0.2); }
+        .search-btn {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .search-btn:hover { background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.5); }
+        .filters-section { margin-bottom: 2rem; }
+        .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
+        .filter-group { display: flex; flex-direction: column; }
+        .filter-group label { color: rgba(255, 255, 255, 0.9); margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 500; }
+
+        /* === Locked Section === */
+        .locked-content { max-width: 600px; margin: 0 auto; text-align: center; }
+        .locked-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+        }
+        .locked-icon { font-size: 3rem; margin-bottom: 1.5rem; }
+        .locked-card h3 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #fff; }
+        .locked-card p { color: rgba(255, 255, 255, 0.7); margin-bottom: 2rem; line-height: 1.6; }
+        .locked-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+        /* === Responsive === */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1.1rem; }
+            .hero-buttons { flex-direction: column; align-items: center; }
+            .audience-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .cookie-modal-footer { flex-direction: column; }
+            .cookie-modal-footer .cookie-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="nav">
+                <div class="nav-brand">Talent & Agency</div>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="#how-it-works">How it works</a></li>
+                        <li><a href="#who-for">Who it's for</a></li>
+                        <li><a href="#philosophy">Philosophy</a></li>
+                    </ul>
+                </nav>
+                <div class="nav-actions">
+                    <a href="/signup" class="sign-in-btn">Sign up</a>
+                    <a href="/login" class="sign-in-btn">Sign in</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Hero Section -->
+            <div class="hero-wrapper">
+            <section class="hero">
+                <div class="hero-content">
+                    <h1>
+                        <span class="title-line">Discover talent from private platforms</span>
+                        <span class="title-line">and management agencies all in one place</span>
+                    </h1>
+                    <div class="hero-buttons">
+                        <a href="/signup" class="btn-primary">Sign Up</a>
+                        <a href="/login" class="btn-secondary">Sign In</a>
+                    </div>
+                </div>
+            </section>
+            </div>
+
+            <!-- How it works Section -->
+            <section id="how-it-works" class="section how-it-works">
+                <h2 class="section-title">How it works</h2>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3>Discover</h3>
+                        <p>Browse all profiles immediately after signup. Visibility is always open.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3>Create & Review</h3>
+                        <p>Create your profile. All profiles are reviewed by the platform to maintain quality.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3>Connect</h3>
+                        <p>Talents request contact. Agencies connect after subscription.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Who it's for Section -->
+            <section id="who-for" class="who-for">
+                <h2 class="section-title">Who it's for</h2>
+                <div class="audience-grid">
+                    <div class="audience-block">
+                        <h3>For Talents</h3>
+                        <ul>
+                            <li>Free to join</li>
+                            <li>Create a professional profile</li>
+                            <li>Get discovered by agencies</li>
+                            <li>No visibility restrictions</li>
+                        </ul>
+                    </div>
+                    <div class="audience-block">
+                        <h3>For Agencies</h3>
+                        <ul>
+                            <li>Access verified talent profiles</li>
+                            <li>Subscribe to unlock messaging</li>
+                            <li>Centralized discovery</li>
+                            <li>Time-saving and professional</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Product Philosophy Section -->
+            <section id="philosophy" class="philosophy">
+                <div class="philosophy-content">
+                    <h2>Product Philosophy</h2>
+                    <p>This is not a social network. This is not a CRM. This is not a training platform.</p>
+                    
+                    <div class="not-list">
+                        <div class="not-item">
+                            <h4>Not a social network</h4>
+                        </div>
+                        <div class="not-item">
+                            <h4>Not a CRM</h4>
+                        </div>
+                        <div class="not-item">
+                            <h4>Not a training platform</h4>
+                        </div>
+                    </div>
+                    
+                    <p class="philosophy-final">Talent & Agency is a discovery-first marketplace built for professionals.</p>
+                </div>
+            </section>
+
+            <!-- Discover Section (uniquement pour connectés) -->
+            <section id="discover" class="section" style="display: none;">
+                <h2 class="section-title">Discover</h2>
+                <div class="discover-container">
+                    <div class="discover-toggle">
+                        <button class="toggle-btn active" onclick="setDiscoverType('talent')">Trouver un Talent</button>
+                        <button class="toggle-btn" onclick="setDiscoverType('agency')">Trouver une Agence</button>
+                    </div>
+                    
+                    <div class="search-section">
+                        <input type="text" class="search-input" placeholder="Rechercher..." id="discoverSearch">
+                    </div>
+                    
+                    <!-- Talent Filters -->
+                    <div id="talentFilters" class="filters-section">
+                        <div class="filter-grid">
+                            <div class="filter-group">
+                                <label>Plateformes</label>
+                                <select class="filter-select">
+                                    <option value="">Toutes</option>
+                                    <option value="onlyfans">OnlyFans</option>
+                                    <option value="fanvue">Fanvue</option>
+                                    <option value="fansly">Fansly</option>
+                                    <option value="mym">MYM</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label>Pays</label>
+                                <select class="filter-select">
+                                    <option value="">Tous</option>
+                                    <option value="france">France</option>
+                                    <option value="usa">USA</option>
+                                    <option value="uk">UK</option>
+                                    <option value="canada">Canada</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label>Langues</label>
+                                <select class="filter-select">
+                                    <option value="">Toutes</option>
+                                    <option value="fr">Français</option>
+                                    <option value="en">Anglais</option>
+                                    <option value="es">Espagnol</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label>Manager</label>
+                                <select class="filter-select">
+                                    <option value="">Tous</option>
+                                    <option value="yes">Avec manager</option>
+                                    <option value="no">Sans manager</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Agency Filters -->
+                    <div id="agencyFilters" class="filters-section" style="display: none;">
+                        <div class="filter-grid">
+                            <div class="filter-group">
+                                <label>Plateformes gérées</label>
+                                <select class="filter-select">
+                                    <option value="">Toutes</option>
+                                    <option value="onlyfans">OnlyFans</option>
+                                    <option value="fanvue">Fanvue</option>
+                                    <option value="fansly">Fansly</option>
+                                    <option value="mym">MYM</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label>Nombre de talents</label>
+                                <select class="filter-select">
+                                    <option value="">Tous</option>
+                                    <option value="1-10">1-10</option>
+                                    <option value="11-50">11-50</option>
+                                    <option value="51+">51+</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label>Revenus totaux</label>
+                                <select class="filter-select">
+                                    <option value="">Tous</option>
+                                    <option value="0-50k">0-50k$</option>
+                                    <option value="50k-200k">50k-200k$</option>
+                                    <option value="200k+">200k+$</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="search-btn">Rechercher</button>
+                </div>
+            </section>
+
+            <!-- Section pour les non connectés -->
+            <section id="discover-locked" class="section">
+                <div class="locked-content">
+                    <h2 class="section-title">Discover</h2>
+                    <div class="locked-card">
+                        <div class="locked-icon">🔒</div>
+                        <h3>Connectez-vous pour accéder à Discover</h3>
+                        <p>Rejoignez Talent & Agency pour découvrir et contacter des talents et agences professionnelles.</p>
+                        <div class="locked-buttons">
+                            <a href="/signup" class="btn-primary">Sign Up</a>
+                            <a href="/login" class="btn-secondary">Sign In</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+    <script>
+        // Vérifier si l'utilisateur est connecté
+        async function checkAuth() {
+            const sessionId = localStorage.getItem('sessionId') || 
+                             sessionStorage.getItem('sessionId') || 
+                             getCookie('sessionId');
+            
+            if (!sessionId) {
+                return false;
+            }
+            
+            try {
+                const response = await fetch('/api/auth/verify', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${sessionId}`
+                    }
+                });
+                
+                return response.ok;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        // Afficher/masquer la section Discover selon l'auth
+        async function updateDiscoverSection() {
+            const isAuthenticated = await checkAuth();
+            const discoverSection = document.getElementById('discover');
+            const discoverLocked = document.getElementById('discover-locked');
+            
+            if (!isAuthenticated) {
+                discoverSection.style.display = 'none';
+                discoverLocked.style.display = 'block';
+            } else {
+                discoverSection.style.display = 'block';
+                discoverLocked.style.display = 'none';
+            }
+        }
+
+        function setDiscoverType(type) {
+            // Update toggle buttons
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show/hide filters
+            const talentFilters = document.getElementById('talentFilters');
+            const agencyFilters = document.getElementById('agencyFilters');
+            
+            if (type === 'talent') {
+                talentFilters.style.display = 'block';
+                agencyFilters.style.display = 'none';
+            } else {
+                talentFilters.style.display = 'none';
+                agencyFilters.style.display = 'block';
+            }
+        }
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // HERO SCROLL EFFECT - NEW ANIMATION
+        window.addEventListener('scroll', () => {
+            const hero = document.querySelector('.hero');
+            const heroContent = hero.querySelector('.hero-content'); // Le contenu principal du hero
+            const scrolled = window.pageYOffset;
+            const heroHeight = hero.offsetHeight;
+            
+            // Fade out
+            const opacity = Math.max(0, 1 - (scrolled / heroHeight));
+            hero.style.opacity = opacity;
+            
+            // Translation légère vers le haut
+            const translateY = scrolled * 0.5;
+            heroContent.style.transform = `translateY(${translateY}px)`;
+        });
+
+        // HERO SCROLL EFFECT - BACKUP (To restore if needed):
+        /*
+        // Original hero section without scroll effect
+        window.addEventListener('scroll', () => {
+            // No scroll effect - hero remains static
+        });
+        */
+
+        // Initialiser au chargement de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDiscoverSection();
+            
+            // FAQ Functionality
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                
+                question.addEventListener('click', () => {
+                    // Close other items
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('active');
+                        }
+                    });
+                    
+                    // Toggle current item
+                    item.classList.toggle('active');
+                });
+            });
+
+            // Initialize Cookie Banner
+            initCookieBanner();
+            
+            // Debug: Forcer l'affichage des cookies pour test
+            setTimeout(() => {
+                if (!localStorage.getItem('cookieConsent')) {
+                    console.log('🍪 No consent found, showing cookie banner');
+                    showCookieBanner();
+                } else {
+                    console.log('🍪 Cookie consent already exists:', localStorage.getItem('cookieConsent'));
+                }
+                
+                // Ajouter un bouton de test dans la console
+                window.resetCookies = function() {
+                    localStorage.removeItem('cookieConsent');
+                    localStorage.removeItem('cookieConsentDate');
+                    console.log('🗑️ Cookies reset - reload the page to see the banner');
+                    location.reload();
+                };
+                
+                console.log('💡 Tapez resetCookies() dans la console pour réinitialiser les cookies');
+            }, 500);
+        });
+
+        // Cookie System Simple
+        function showCookieBanner() {
+            const banner = document.getElementById('cookieBanner');
+            if (banner) {
+                banner.classList.add('show');
+                console.log('🍪 Cookie banner visible');
+            }
+        }
+        
+        function hideCookieBanner() {
+            const banner = document.getElementById('cookieBanner');
+            if (banner) {
+                banner.classList.remove('show');
+                console.log('🍪 Cookie banner hidden');
+            }
+        }
+        
+        function acceptCookies() {
+            localStorage.setItem('cookieConsent', 'accepted');
+            hideCookieBanner();
+            console.log('✅ Cookies accepted');
+        }
+        
+        function rejectCookies() {
+            localStorage.setItem('cookieConsent', 'rejected');
+            hideCookieBanner();
+            console.log('❌ Cookies rejected');
+        }
+        
+        function customizeCookies() {
+            // Rediriger vers la page settings pour les préférences détaillées
+            window.location.href = 'pages/settings.html';
+        }
+        
+        // Initialize Cookie Banner
+        function initCookieBanner() {
+            const consent = localStorage.getItem('cookieConsent');
+            
+            if (!consent) {
+                // Show banner after 1 second
+                setTimeout(() => {
+                    showCookieBanner();
+                }, 1000);
+            } else {
+                console.log('🍪 Cookie consent already exists:', consent);
+            }
+        }
+    </script>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <h2 class="faq-title">Frequently Asked Questions</h2>
+        
+        <div class="faq-grid">
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>What payment methods do you accept?</span>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    We accept all major credit cards and debit cards through our secure payment processor Stripe. All payments are processed securely and we never store your card details.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Can I cancel my subscription anytime?</span>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    Yes, you can cancel your Agency subscription at any time. Your access will continue until the end of your current billing period.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Is my data secure?</span>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    Absolutely! We use industry-standard encryption and security measures to protect your data. Read our Privacy Policy for more information about how we handle your information.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>How do I get started as a Talent on the platform?</span>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    Simply create an account, complete your profile with your portfolio and social media links, and start applying to agency opportunities. Our team will review your profile within 24-48 hours.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Are there any hidden fees or additional charges?</span>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    No hidden fees. Agencies pay their monthly subscription, and talents use the platform completely free. All pricing is transparent and clearly displayed.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>How is my personal and professional information protected?</span>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    We use bank-level encryption, comply with GDPR and CCPA regulations, and never share your data with third parties without explicit consent.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Can I delete my account and data at any time?</span>
+                    <span class="faq-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    Yes, you have full control over your data. You can delete your account anytime, and we'll permanently remove all your information within 30 days.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="index.html" class="footer-link">Home</a>
+            <a href="/terms" class="footer-link">Terms of Service</a>
+            <a href="/privacy" class="footer-link">Privacy Policy</a>
+            <a href="/contact" class="footer-link">Contact</a>
+            <a href="/signup" class="footer-link">Sign Up</a>
+            <a href="/login" class="footer-link">Sign In</a>
+        </div>
+        <p>&copy; 2026 Talent & Agency. All rights reserved.</p>
+    </footer>
+
+    <style>
+        /* FAQ Styles */
+        .faq-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .faq-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: #fff;
+        }
+
+        .faq-grid {
+            display: grid;
+            gap: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .faq-item:hover {
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            color: #fff;
+            transition: all 0.3s;
+        }
+
+        .faq-question:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .faq-icon {
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 0 1.5rem 1.5rem;
+            max-height: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .faq-section {
+                padding: 3rem 1rem;
+            }
+
+            .faq-title {
+                font-size: 2rem;
+            }
+
+            .faq-question {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+
+    <!-- Cookie Banner Simple -->
+    <div class="cookie-banner" id="cookieBanner">
+        <div class="cookie-content">
+            <div class="cookie-title">🍪 Cookies</div>
+            <div class="cookie-text">
+                We use cookies to enhance your experience. By continuing, you accept our use of cookies.
+            </div>
+            <div class="cookie-buttons">
+                <button class="cookie-btn cookie-btn-accept" onclick="acceptCookies()">Accept All</button>
+                <button class="cookie-btn cookie-btn-reject" onclick="rejectCookies()">Reject</button>
+                <button class="cookie-btn cookie-btn-customize" onclick="customizeCookies()">Learn More</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cookie Preferences Modal -->
+    <div class="cookie-modal" id="cookieModal">
+        <div class="cookie-modal-content">
+            <div class="cookie-modal-header">
+                <h2 class="cookie-modal-title">Cookie Preferences</h2>
+                <p class="cookie-modal-subtitle">Manage your cookie preferences below</p>
+            </div>
+
+            <div class="cookie-category">
+                <div class="cookie-category-title">Essential Cookies</div>
+                <div class="cookie-category-description">
+                    These cookies are necessary for the website to function and cannot be switched off in our systems.
+                </div>
+                <div class="cookie-toggle">
+                    <div class="toggle-switch active disabled" id="essential-toggle">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <span>Always Active</span>
+                </div>
+            </div>
+
+            <div class="cookie-category">
+                <div class="cookie-category-title">Analytics Cookies</div>
+                <div class="cookie-category-description">
+                    These cookies allow us to count visits and traffic sources so we can measure and improve the performance of our site.
+                </div>
+                <div class="cookie-toggle">
+                    <div class="toggle-switch" id="analytics-toggle" onclick="toggleCookie('analytics')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <span>Enabled</span>
+                </div>
+            </div>
+
+            <div class="cookie-category">
+                <div class="cookie-category-title">Marketing Cookies</div>
+                <div class="cookie-category-description">
+                    These cookies may be set through our site by our advertising partners to build a profile of your interests.
+                </div>
+                <div class="cookie-toggle">
+                    <div class="toggle-switch" id="marketing-toggle" onclick="toggleCookie('marketing')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <span>Enabled</span>
+                </div>
+            </div>
+
+            <div class="cookie-category">
+                <div class="cookie-category-title">Personalization Cookies</div>
+                <div class="cookie-category-description">
+                    These cookies enable the website to provide enhanced functionality and personalization.
+                </div>
+                <div class="cookie-toggle">
+                    <div class="toggle-switch" id="personalization-toggle" onclick="toggleCookie('personalization')">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <span>Enabled</span>
+                </div>
+            </div>
+
+            <div class="cookie-modal-footer">
+                <button class="cookie-btn cookie-btn-reject" onclick="rejectAllFromModal()">Reject All</button>
+                <button class="cookie-btn cookie-btn-customize" onclick="saveCookiePreferences()">Save Preferences</button>
+                <button class="cookie-btn cookie-btn-accept" onclick="acceptAllFromModal()">Accept All</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Navigation scroll effect
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+</script>
+</html>

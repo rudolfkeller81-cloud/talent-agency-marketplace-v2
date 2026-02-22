@@ -1,0 +1,48 @@
+{
+  "name": "talent-agency-marketplace",
+  "version": "1.0.0",
+  "description": "Marketplace connecting talents and agencies",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'Build completed - No build steps needed'",
+    "test": "echo 'Tests to be implemented with Jest'",
+    "test:watch": "echo 'Watch tests to be implemented'",
+    "lint": "echo 'Linting to be implemented with ESLint'",
+    "lint:fix": "echo 'Lint fix to be implemented'",
+    "logs": "tail -f logs/app.log",
+    "db:migrate": "echo 'Database migrations to be implemented'",
+    "db:seed": "echo 'Database seeding to be implemented'",
+    "clean": "rm -rf logs/* uploads/* *.sqlite",
+    "setup": "npm install && mkdir -p logs uploads",
+    "prod:start": "NODE_ENV=production node server.js",
+    "health": "curl -f http://localhost:3001/health || exit 1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^1.41.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
+    "google-auth-library": "^10.5.0",
+    "helmet": "^8.1.0",
+    "moment": "^2.30.1",
+    "multer": "^2.0.2",
+    "multer-storage-cloudinary": "^4.0.0",
+    "pdfkit": "^0.17.2",
+    "pg": "^8.18.0",
+    "socket.io": "^4.8.3",
+    "sqlite3": "^5.1.7",
+    "stripe": "^20.1.2",
+    "uuid": "^13.0.0",
+    "validator": "^13.15.26",
+    "xss": "^1.0.15"
+  }
+}

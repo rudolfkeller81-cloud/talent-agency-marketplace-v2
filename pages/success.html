@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement Réussi - Talent & Agency</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .success-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+        }
+        
+        h1 {
+            color: #1f2937;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        
+        p {
+            color: #6b7280;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            background: #1e3a8a;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        .btn:hover {
+            background: #1e40af;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .details {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .details h3 {
+            color: #1f2937;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .details p {
+            color: #6b7280;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">✓</div>
+        <h1>🎉 Paiement Réussi !</h1>
+        <p>Félicitations ! Votre abonnement Premium a été activé avec succès.</p>
+        
+        <div class="details">
+            <h3>📋 Détails de l'abonnement</h3>
+            <p><strong>Plan:</strong> Premium</p>
+            <p><strong>Prix:</strong> 9.99€/mois</p>
+            <p><strong>Statut:</strong> Actif</p>
+            <p><strong>Prochain paiement:</strong> Dans 30 jours</p>
+        </div>
+        
+        <p>Vous pouvez maintenant profiter de toutes les fonctionnalités Premium :</p>
+        <ul style="text-align: left; color: #6b7280; margin-bottom: 30px;">
+            <li>Accès illimité aux profils</li>
+            <li>Messagerie prioritaire</li>
+            <li>Visibilité accrue</li>
+            <li>Support premium</li>
+        </ul>
+        
+        <a href="/discover" class="btn">🚀 Explorer les talents</a>
+        <a href="/favorites" class="btn btn-secondary">❤️ Mes favoris</a>
+        
+        <p style="margin-top: 30px; font-size: 14px;">
+            Un email de confirmation a été envoyé à votre adresse.
+        </p>
+    </div>
+    
+    <script>
+        // Récupérer les paramètres de l'URL si besoin
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+        
+        if (sessionId) {
+            console.log('Session ID:', sessionId);
+            // Ici vous pourriez valider la session avec votre backend
+        }
+        
+        // Animation de succès
+        setTimeout(() => {
+            document.querySelector('.success-icon').style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                document.querySelector('.success-icon').style.transform = 'scale(1)';
+            }, 200);
+        }, 500);
+    </script>
+</body>
+</html>

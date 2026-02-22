@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Avatar - Talent & Agency</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #1f2937;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #6b7280;
+            font-size: 1rem;
+        }
+
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: #f9fafb;
+        }
+
+        .upload-area:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            color: #374151;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .preview-section {
+            display: none;
+            margin-bottom: 30px;
+        }
+
+        .preview-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .preview-image {
+            text-align: center;
+        }
+
+        .preview-image img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .preview-info {
+            padding: 20px;
+        }
+
+        .preview-info h3 {
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .info-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            color: #1f2937;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .progress-bar {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .navigation {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .nav-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .preview-container {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📸 Upload Avatar</h1>
+            <p>Choisissez votre photo de profil</p>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📷</div>
+            <div class="upload-text">Cliquez ou glissez-déposez une image</div>
+            <div class="upload-subtext">Formats supportés: JPG, PNG, GIF (max 5MB)</div>
+            <input type="file" id="fileInput" class="file-input" accept="image/*">
+        </div>
+
+        <div class="preview-section" id="previewSection">
+            <div class="preview-container">
+                <div class="preview-image">
+                    <img id="previewImage" src="" alt="Aperçu de l'avatar">
+                </div>
+                <div class="preview-info">
+                    <h3>📋 Informations sur l'image</h3>
+                    <div class="info-item">
+                        <span class="info-label">Nom du fichier:</span>
+                        <span class="info-value" id="fileName">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Taille:</span>
+                        <span class="info-value" id="fileSize">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Type:</span>
+                        <span class="info-value" id="fileType">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Dimensions:</span>
+                        <span class="info-value" id="fileDimensions">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="actions" id="actions">
+            <button class="btn btn-primary" id="uploadBtn">💾 Upload Avatar</button>
+            <button class="btn btn-secondary" id="cancelBtn">❌ Annuler</button>
+        </div>
+
+        <div class="navigation">
+            <a href="/profile-settings" class="nav-link">← Retour aux paramètres du profil</a>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let selectedFile = null;
+        let currentAvatarUrl = null;
+
+        // Éléments DOM
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const previewSection = document.getElementById('previewSection');
+        const previewImage = document.getElementById('previewImage');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const fileType = document.getElementById('fileType');
+        const fileDimensions = document.getElementById('fileDimensions');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const message = document.getElementById('message');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const actions = document.getElementById('actions');
+
+        // Événements
+        uploadArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+        uploadBtn.addEventListener('click', uploadAvatar);
+        cancelBtn.addEventListener('click', resetUpload);
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        // Gestion de la sélection de fichier
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        // Gestion du fichier
+        function handleFile(file) {
+            // Validation
+            if (!file.type.startsWith('image/')) {
+                showMessage('❌ Veuillez sélectionner une image valide', 'error');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                showMessage('❌ L\'image ne doit pas dépasser 5MB', 'error');
+                return;
+            }
+
+            selectedFile = file;
+            displayPreview(file);
+        }
+
+        // Afficher l'aperçu
+        function displayPreview(file) {
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                fileType.textContent = file.type;
+                
+                // Obtenir les dimensions
+                previewImage.onload = () => {
+                    fileDimensions.textContent = `${previewImage.naturalWidth} × ${previewImage.naturalHeight}px`;
+                };
+                
+                previewSection.style.display = 'block';
+                actions.style.display = 'flex';
+                uploadArea.style.display = 'none';
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        // Upload de l'avatar
+        async function uploadAvatar() {
+            if (!selectedFile) {
+                showMessage('❌ Veuillez sélectionner une image', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('avatar', selectedFile);
+
+            // Afficher la progression
+            progressBar.style.display = 'block';
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '⏳ Upload en cours...';
+
+            try {
+                // Récupérer le token
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    throw new Error('Token d\'authentification non trouvé');
+                }
+
+                const xhr = new XMLHttpRequest();
+                
+                // Progression
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        progressFill.style.width = percentComplete + '%';
+                    }
+                });
+
+                // Completion
+                xhr.addEventListener('load', () => {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        showMessage('✅ Avatar uploadé avec succès!', 'success');
+                        
+                        // Mettre à jour l'URL de l'avatar
+                        if (response.avatar_url) {
+                            currentAvatarUrl = response.avatar_url;
+                            setTimeout(() => {
+                                window.location.href = '/profile-settings';
+                            }, 2000);
+                        }
+                    } else {
+                        const error = JSON.parse(xhr.responseText);
+                        showMessage(`❌ Erreur: ${error.error || 'Erreur lors de l\'upload'}`, 'error');
+                    }
+                    
+                    resetUploadState();
+                });
+
+                // Erreur
+                xhr.addEventListener('error', () => {
+                    showMessage('❌ Erreur réseau lors de l\'upload', 'error');
+                    resetUploadState();
+                });
+
+                // Envoyer la requête
+                xhr.open('POST', '/api/profile/avatar');
+                xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+                xhr.send(formData);
+
+            } catch (error) {
+                showMessage(`❌ Erreur: ${error.message}`, 'error');
+                resetUploadState();
+            }
+        }
+
+        // Réinitialiser l'upload
+        function resetUpload() {
+            resetUploadState();
+        }
+
+        function resetUploadState() {
+            selectedFile = null;
+            fileInput.value = '';
+            previewSection.style.display = 'none';
+            uploadArea.style.display = 'block';
+            progressBar.style.display = 'none';
+            progressFill.style.width = '0%';
+            actions.style.display = 'none';
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = '💾 Upload Avatar';
+            hideMessage();
+        }
+
+        // Afficher un message
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.style.display = 'block';
+        }
+
+        function hideMessage() {
+            message.style.display = 'none';
+        }
+
+        // Formater la taille du fichier
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Vérifier l'authentification au chargement
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showMessage('⚠️ Veuillez vous connecter pour uploader un avatar', 'error');
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = '🔐 Connectez-vous d\'abord';
+            }
+        });
+    </script>
+</body>
+</html>

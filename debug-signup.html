@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Signup Data</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #3b82f6;
+        }
+
+        .data-display {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .status {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .field-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .field-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .field-name {
+            font-weight: 600;
+            color: #3b82f6;
+            margin-bottom: 0.25rem;
+        }
+
+        .field-value {
+            color: rgba(255, 255, 255, 0.8);
+            word-break: break-all;
+        }
+
+        .empty {
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug Signup & Profile Data</h1>
+
+        <div class="section">
+            <h2>📊 Current Storage Status</h2>
+            <div id="storage-status"></div>
+            <button class="btn btn-primary" onclick="checkStorage()">🔄 Check Storage</button>
+        </div>
+
+        <div class="section">
+            <h2>📝 Simulate Signup</h2>
+            <p style="margin-bottom: 1rem; color: rgba(255,255,255,0.7);">
+                This will simulate the signup process and save test data to see if it appears in profile.
+            </p>
+            
+            <div class="field-list">
+                <div class="field-item">
+                    <div class="field-name">First Name:</div>
+                    <input type="text" id="test-first-name" value="Test" style="width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.5rem; border-radius: 4px;">
+                </div>
+                <div class="field-item">
+                    <div class="field-name">Last Name:</div>
+                    <input type="text" id="test-last-name" value="User" style="width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.5rem; border-radius: 4px;">
+                </div>
+                <div class="field-item">
+                    <div class="field-name">Email:</div>
+                    <input type="email" id="test-email" value="test@example.com" style="width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.5rem; border-radius: 4px;">
+                </div>
+                <div class="field-item">
+                    <div class="field-name">Role:</div>
+                    <select id="test-role" style="width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.5rem; border-radius: 4px;">
+                        <option value="talent">Talent</option>
+                        <option value="agency">Agency</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="margin: 1rem 0;">
+                <label style="display: block; margin-bottom: 0.5rem;">Bio:</label>
+                <textarea id="test-bio" style="width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.5rem; border-radius: 4px; min-height: 80px;">This is a test bio for debugging purposes.</textarea>
+            </div>
+            
+            <button class="btn btn-success" onclick="simulateSignup()">🧪 Simulate Signup</button>
+            <button class="btn btn-secondary" onclick="goToSignup()">📝 Go to Real Signup</button>
+        </div>
+
+        <div class="section">
+            <h2>👤 Profile Data</h2>
+            <div id="profile-data" class="data-display">Click "Check Storage" to see profile data...</div>
+            <button class="btn btn-primary" onclick="checkProfile()">🔄 Check Profile Data</button>
+            <button class="btn btn-secondary" onclick="goToProfile()">👤 Go to Profile</button>
+        </div>
+
+        <div class="section">
+            <h2>🔧 Actions</h2>
+            <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Data</button>
+            <button class="btn btn-secondary" onclick="goToImport()">📥 Import Data</button>
+            <button class="btn btn-secondary" onclick="goToCheck()">🔍 Check Profile</button>
+        </div>
+    </div>
+
+    <script>
+        function checkStorage() {
+            const statusDiv = document.getElementById('storage-status');
+            let html = '';
+            
+            // Check localStorage
+            const userProfile = localStorage.getItem('userProfile');
+            const userData = localStorage.getItem('userData');
+            
+            html += '<div class="status status-success">📦 Local Storage:</div>';
+            html += userProfile ? '<div style="margin-left: 1rem;">✅ userProfile: found</div>' : '<div style="margin-left: 1rem;">❌ userProfile: not found</div>';
+            html += userData ? '<div style="margin-left: 1rem;">✅ userData: found</div>' : '<div style="margin-left: 1rem;">❌ userData: not found</div>';
+            
+            // Check sessionStorage
+            const sessionData = sessionStorage.getItem('userData');
+            html += '<div class="status status-success">🗂️ Session Storage:</div>';
+            html += sessionData ? '<div style="margin-left: 1rem;">✅ userData: found</div>' : '<div style="margin-left: 1rem;">❌ userData: not found</div>';
+            
+            statusDiv.innerHTML = html;
+        }
+
+        function simulateSignup() {
+            const firstName = document.getElementById('test-first-name').value;
+            const lastName = document.getElementById('test-last-name').value;
+            const email = document.getElementById('test-email').value;
+            const role = document.getElementById('test-role').value;
+            const bio = document.getElementById('test-bio').value;
+            
+            // Create profile data exactly like in signup.html
+            const profileData = {
+                first_name: firstName,
+                last_name: lastName,
+                email: email,
+                role: role,
+                posts: []
+            };
+            
+            // Add talent-specific fields
+            if (role === 'talent') {
+                profileData.display_name = firstName + ' ' + lastName;
+                profileData.portfolio = '';
+                profileData.age = '';
+                profileData.country = '';
+                profileData.languages = '';
+                profileData.instagram = '';
+                profileData.twitter = '';
+                profileData.tiktok = '';
+                profileData.monthly_revenue = '';
+                profileData.has_manager = 'no';
+                profileData.bio = bio;
+            }
+            
+            // Add agency-specific fields
+            if (role === 'agency') {
+                profileData.agency_name = firstName + ' ' + lastName + ' Agency';
+                profileData.agency_type = '';
+                profileData.talent_count = '';
+                profileData.agency_revenue = '';
+                profileData.total_revenue = '';
+                profileData.agency_country = '';
+                profileData.agency_description = bio;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('userProfile', JSON.stringify(profileData));
+            console.log('✅ Simulated signup data saved:', profileData);
+            
+            alert('✅ Simulated signup completed! Data saved to localStorage.');
+            checkProfile();
+        }
+
+        function checkProfile() {
+            const profileDataDiv = document.getElementById('profile-data');
+            const savedProfile = localStorage.getItem('userProfile');
+            
+            if (savedProfile) {
+                try {
+                    const profileData = JSON.parse(savedProfile);
+                    profileDataDiv.textContent = JSON.stringify(profileData, null, 2);
+                    
+                    // Check if data has required fields
+                    const hasRequired = profileData.first_name && profileData.last_name && profileData.email;
+                    if (hasRequired) {
+                        profileDataDiv.style.border = '1px solid #10b981';
+                    } else {
+                        profileDataDiv.style.border = '1px solid #f59e0b';
+                    }
+                } catch (e) {
+                    profileDataDiv.textContent = 'Error parsing profile data: ' + e.message;
+                    profileDataDiv.style.border = '1px solid #ef4444';
+                }
+            } else {
+                profileDataDiv.textContent = 'No profile data found in localStorage';
+                profileDataDiv.style.border = '1px solid #ef4444';
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Clear all localStorage and sessionStorage data?')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                alert('✅ All data cleared!');
+                checkStorage();
+                checkProfile();
+            }
+        }
+
+        function goToSignup() {
+            window.location.href = '/signup';
+        }
+
+        function goToProfile() {
+            window.location.href = '/profile';
+        }
+
+        function goToImport() {
+            window.location.href = '/import-profile';
+        }
+
+        function goToCheck() {
+            window.location.href = '/check-profile';
+        }
+
+        // Check storage on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            checkStorage();
+            checkProfile();
+        });
+    </script>
+</body>
+</html>

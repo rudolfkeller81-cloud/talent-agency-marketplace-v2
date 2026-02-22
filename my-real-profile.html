@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Real Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: #3b82f6;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .current-data {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .status-message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .status-message.show {
+            display: block;
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .role-option {
+            flex: 1;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .role-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .role-option.selected {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👤 My Real Profile</h1>
+        <p class="subtitle">Enter your real information to replace the test data</p>
+        
+        <div id="status-message" class="status-message"></div>
+
+        <div class="current-data" id="current-data">
+            Loading current data...
+        </div>
+
+        <form id="profile-form">
+            <div class="form-group">
+                <label class="form-label">First Name *</label>
+                <input type="text" class="form-input" id="first-name" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Last Name *</label>
+                <input type="text" class="form-input" id="last-name" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email *</label>
+                <input type="email" class="form-input" id="email" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">I am a...</label>
+                <div class="role-selector">
+                    <div class="role-option selected" data-role="talent" onclick="selectRole('talent')">
+                        <div>🎭</div>
+                        <div>Talent</div>
+                    </div>
+                    <div class="role-option" data-role="agency" onclick="selectRole('agency')">
+                        <div>🏢</div>
+                        <div>Agency</div>
+                    </div>
+                </div>
+                <input type="hidden" id="role" value="talent">
+            </div>
+
+            <!-- Talent Fields -->
+            <div id="talent-fields">
+                <div class="form-group">
+                    <label class="form-label">Bio</label>
+                    <textarea class="form-textarea" id="bio" placeholder="Tell us about yourself..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Portfolio/Website</label>
+                    <input type="url" class="form-input" id="portfolio" placeholder="https://yourportfolio.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Instagram</label>
+                    <input type="text" class="form-input" id="instagram" placeholder="@yourusername">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Twitter</label>
+                    <input type="text" class="form-input" id="twitter" placeholder="@yourusername">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">TikTok</label>
+                    <input type="text" class="form-input" id="tiktok" placeholder="@yourusername">
+                </div>
+            </div>
+
+            <!-- Agency Fields -->
+            <div id="agency-fields" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Agency Name</label>
+                    <input type="text" class="form-input" id="agency-name" placeholder="Your Agency Name">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Agency Description</label>
+                    <textarea class="form-textarea" id="agency-description" placeholder="Describe your agency..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Number of Talents</label>
+                    <input type="number" class="form-input" id="talent-count" placeholder="10">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">💾 Save My Real Profile</button>
+            <button type="button" class="btn btn-danger" onclick="clearTestData()">🗑️ Clear Test Data</button>
+            <a href="/profile" class="btn btn-secondary">← View Profile</a>
+        </form>
+    </div>
+
+    <script>
+        let selectedRole = 'talent';
+
+        function selectRole(role) {
+            selectedRole = role;
+            document.getElementById('role').value = role;
+            
+            // Update UI
+            document.querySelectorAll('.role-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelector(`[data-role="${role}"]`).classList.add('selected');
+            
+            // Show/hide fields
+            if (role === 'talent') {
+                document.getElementById('talent-fields').style.display = 'block';
+                document.getElementById('agency-fields').style.display = 'none';
+            } else {
+                document.getElementById('talent-fields').style.display = 'none';
+                document.getElementById('agency-fields').style.display = 'block';
+            }
+        }
+
+        function loadCurrentData() {
+            const currentDataDiv = document.getElementById('current-data');
+            const savedProfile = localStorage.getItem('userProfile');
+            
+            if (savedProfile) {
+                try {
+                    const profileData = JSON.parse(savedProfile);
+                    currentDataDiv.textContent = JSON.stringify(profileData, null, 2);
+                    
+                    // Fill form with current data
+                    document.getElementById('first-name').value = profileData.first_name || '';
+                    document.getElementById('last-name').value = profileData.last_name || '';
+                    document.getElementById('email').value = profileData.email || '';
+                    
+                    if (profileData.role) {
+                        selectRole(profileData.role);
+                    }
+                    
+                    if (profileData.role === 'talent') {
+                        document.getElementById('bio').value = profileData.bio || '';
+                        document.getElementById('portfolio').value = profileData.portfolio || '';
+                        document.getElementById('instagram').value = profileData.instagram || '';
+                        document.getElementById('twitter').value = profileData.twitter || '';
+                        document.getElementById('tiktok').value = profileData.tiktok || '';
+                    } else if (profileData.role === 'agency') {
+                        document.getElementById('agency-name').value = profileData.agency_name || '';
+                        document.getElementById('agency-description').value = profileData.agency_description || '';
+                        document.getElementById('talent-count').value = profileData.talent_count || '';
+                    }
+                    
+                } catch (e) {
+                    currentDataDiv.textContent = 'Error loading current data: ' + e.message;
+                }
+            } else {
+                currentDataDiv.textContent = 'No profile data found';
+            }
+        }
+
+        function clearTestData() {
+            if (confirm('Clear all test data and start fresh?')) {
+                localStorage.removeItem('userProfile');
+                localStorage.removeItem('userData');
+                sessionStorage.clear();
+                showStatus('✅ All test data cleared!', 'success');
+                loadCurrentData();
+                
+                // Clear form
+                document.getElementById('profile-form').reset();
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status-message');
+            statusEl.textContent = message;
+            statusEl.className = `status-message show status-${type}`;
+            
+            setTimeout(() => {
+                statusEl.classList.remove('show');
+            }, 3000);
+        }
+
+        // Handle form submission
+        document.getElementById('profile-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const profileData = {
+                first_name: document.getElementById('first-name').value,
+                last_name: document.getElementById('last-name').value,
+                email: document.getElementById('email').value,
+                role: selectedRole,
+                posts: []
+            };
+            
+            // Add role-specific fields
+            if (selectedRole === 'talent') {
+                profileData.display_name = profileData.first_name + ' ' + profileData.last_name;
+                profileData.bio = document.getElementById('bio').value;
+                profileData.portfolio = document.getElementById('portfolio').value;
+                profileData.instagram = document.getElementById('instagram').value;
+                profileData.twitter = document.getElementById('twitter').value;
+                profileData.tiktok = document.getElementById('tiktok').value;
+            } else if (selectedRole === 'agency') {
+                profileData.agency_name = document.getElementById('agency-name').value;
+                profileData.agency_description = document.getElementById('agency-description').value;
+                profileData.talent_count = document.getElementById('talent-count').value;
+            }
+            
+            // Save to both locations
+            localStorage.setItem('userProfile', JSON.stringify(profileData));
+            localStorage.setItem('userData', JSON.stringify(profileData));
+            
+            console.log('✅ Real profile data saved:', profileData);
+            
+            showStatus('✅ Your real profile has been saved! Redirecting...', 'success');
+            
+            setTimeout(() => {
+                window.location.href = '/profile';
+            }, 1500);
+        });
+
+        // Load current data on page load
+        window.addEventListener('DOMContentLoaded', loadCurrentData);
+    </script>
+</body>
+</html>

@@ -1,0 +1,2578 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover - Talent & Agency</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Base Reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        a { color: inherit; text-decoration: none; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,0.2); }
+
+        /* Header - Same as home page */
+        .header {
+            background: rgba(0, 0, 0, 0.95);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .nav-brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-right: 1rem;
+            margin-left: 0;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .nav-links {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: rgba(59, 130, 246, 0.8);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Profile Icon */
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1e3a8a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-icon:hover {
+            background: linear-gradient(135deg, #4a90e2, #2563eb);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Sidebar Menu */
+        .sidebar-icon {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .sidebar-icon span {
+            width: 25px;
+            height: 2px;
+            background: #fff;
+            transition: all 0.3s;
+        }
+
+        .sidebar-icon:hover span {
+            background: rgba(59, 130, 246, 0.8);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            transition: left 0.3s ease;
+            z-index: 1001;
+            padding: 2rem;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .close-sidebar {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: color 0.3s;
+        }
+
+        .close-sidebar:hover {
+            color: rgba(59, 130, 246, 0.8);
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            color: #fff;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .sidebar-nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sidebar-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .sidebar-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-btn.logout {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .sidebar-btn.logout:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Overlay */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 2px;
+            background: #fff;
+            transition: all 0.3s;
+        }
+
+        .hamburger:hover span {
+            background: rgba(59, 130, 246, 0.8);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            transition: right 0.3s ease;
+            z-index: 1001;
+            padding: 2rem;
+        }
+
+        .mobile-menu.open {
+            right: 0;
+        }
+
+        .mobile-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-menu-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .close-menu {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .mobile-menu-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .mobile-menu-nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .mobile-menu-nav a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-menu-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .mobile-menu-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .mobile-menu-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .sign-in-btn {
+            background: transparent;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .sign-in-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            padding: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Type Selection */
+        .type-selection {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .type-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .type-subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+        }
+
+        .type-buttons {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .type-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .type-btn:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+
+        .type-btn.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        /* Search and Filters */
+        .search-section {
+            margin-bottom: 3rem;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: rgba(59, 130, 246, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Filters */
+        .filters-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .filter-select, .filter-input {
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .filter-select:focus, .filter-input:focus {
+            outline: none;
+            border-color: rgba(59, 130, 246, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .filter-checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .filter-checkbox input {
+            accent-color: #3b82f6;
+        }
+
+        /* Profiles Grid */
+        .profiles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .profile-card {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 16px;
+            color: #fff;
+            position: relative;
+            padding: 24px;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border-color: #333;
+        }
+
+        .profile-card:active {
+            transform: translateY(0px);
+        }
+
+        .profile-header {
+            position: relative;
+            z-index: 2;
+        }
+
+        .profile-avatar {
+            position: absolute;
+            top: 0px;
+            left: 2px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3a3a3a, #222);
+            border: 2px solid #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -1px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+            z-index: 2;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info {
+            padding-top: 60px;
+        }
+
+        .profile-name-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 2px;
+        }
+
+        .profile-info h3 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.3px;
+            line-height: 1.2;
+        }
+
+        .verified-badge {
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+
+        .talent-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .profile-details {
+            margin: 10px 0 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-size: 12px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .profile-bio {
+            margin: 0 0 18px;
+            font-size: 13px;
+            color: #888;
+            line-height: 1.55;
+            font-weight: 400;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            white-space: nowrap;
+            text-align: center;
+            line-height: 1;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .profile-btn-primary {
+            background: #fff;
+            color: #000;
+            border: none;
+            flex: 1;
+        }
+
+        .profile-btn-primary:hover {
+            background: #f0f0f0;
+            transform: translateY(-1px);
+        }
+
+        .profile-btn-secondary {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #2a2a2a;
+            padding: 10px 20px;
+        }
+
+        .profile-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #3a3a3a;
+            transform: translateY(-1px);
+        }
+
+        /* Filter action buttons */
+        .filter-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn-primary {
+            flex: 1;
+            padding: 14px 24px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .btn-primary:hover {
+            background: #f0f0f0;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 14px 24px;
+            background: transparent;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.35);
+            transform: translateY(-1px);
+        }
+
+        /* Profile Modal */
+        .profile-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .profile-modal.show {
+            display: block;
+        }
+
+        .profile-modal-content {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 20px;
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            position: relative;
+            height: 200px;
+            background: linear-gradient(135deg, #3a3a3a, #222);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4a4a4a, #333);
+            border: 4px solid #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 700;
+            color: #fff;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            z-index: 2;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #fff;
+            font-size: 20px;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 3rem;
+        }
+
+        .modal-profile-info {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .modal-name {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-bio {
+            font-size: 1.1rem;
+            color: #888;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .modal-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .modal-details-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .modal-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .modal-detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .modal-detail-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .modal-detail-value {
+            font-size: 14px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .modal-platforms {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .platform-tag {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 13px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            min-width: 160px;
+        }
+
+        .modal-btn-primary {
+            background: #fff;
+            color: #000;
+        }
+
+        .modal-btn-primary:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-btn-secondary {
+            background: transparent;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.35);
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading and Empty States */
+        .loading-state, .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .nav-actions {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .type-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .type-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .profiles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header - Same as home page -->
+    <header class="header">
+        <div class="nav">
+            <div class="nav-brand">Talent & Agency</div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="discover.html" style="color: rgba(59, 130, 246, 0.8);">Discover</a></li>
+                    <li><a href="/favorites">Favorites</a></li>
+                    <li><a href="/messages">Messages</a></li>
+                </ul>
+            </nav>
+            <div class="nav-actions">
+                <button class="sidebar-icon" onclick="toggleSidebar()" title="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div class="profile-icon" onclick="goToProfile()" title="Go to Profile">
+                    <span id="profileInitial">U</span>
+                </div>
+            </div>
+            <!-- Hamburger Menu -->
+            <button class="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Menu</div>
+            <button class="close-sidebar" onclick="toggleSidebar()">×</button>
+        </div>
+        <div class="sidebar-actions">
+            <a href="#" onclick="goToProfile(); toggleSidebar();" class="sidebar-btn">
+                My Profile
+            </a>
+            <a href="#" onclick="goToManage(); toggleSidebar();" class="sidebar-btn" id="manageBtn" style="display: none;">
+                Manage
+            </a>
+            <a href="pages/settings.html" class="sidebar-btn" onclick="toggleSidebar()">
+                Settings
+            </a>
+            <button class="sidebar-btn logout" onclick="doLogout(); toggleSidebar();">
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <div class="mobile-menu-title">Menu</div>
+            <button class="close-menu" onclick="toggleMobileMenu()">×</button>
+        </div>
+        <nav class="mobile-menu-nav">
+            <a href="discover.html">Discover</a>
+            <a href="/favorites">Favorites</a>
+            <a href="/messages">Messages</a>
+        </nav>
+        <div class="mobile-menu-actions">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                <div class="profile-icon" onclick="goToProfile(); toggleMobileMenu();" style="margin: 0;">
+                    <span id="mobileProfileInitial">U</span>
+                </div>
+                <span style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">My Profile</span>
+            </div>
+            <a href="pages/settings.html" class="mobile-menu-btn">Settings</a>
+            <a href="#" onclick="doLogout(); toggleMobileMenu();" class="mobile-menu-btn">Logout</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Type Selection -->
+        <div class="type-selection">
+            <h1 class="type-title">Discover</h1>
+            <p class="type-subtitle">Find the perfect talent or agency for your needs</p>
+            <div class="type-buttons">
+                <button class="type-btn active" onclick="selectType('talent')">Find Talent</button>
+                <button class="type-btn" onclick="selectType('agency')">Find Agency</button>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by name, location, skills..." onkeyup="handleSearch(event)">
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-container" id="filtersContainer">
+            <!-- Talent Filters -->
+            <div id="talentFilters" class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Revenue per Month</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="number" class="filter-input" placeholder="Min €" min="0" style="width: 100%;">
+                        <input type="number" class="filter-input" placeholder="Max €" min="0" style="width: 100%;">
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Has Manager</label>
+                    <select class="filter-select">
+                        <option value="">All</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Platforms</label>
+                    <div class="filter-checkbox-group">
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="OnlyFans">
+                            <span>OnlyFans</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="Fanvue">
+                            <span>Fanvue</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="Fansly">
+                            <span>Fansly</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="MYM">
+                            <span>MYM</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="Reveal">
+                            <span>Reveal</span>
+                        </label>
+                    </div>
+                    <input type="text" class="filter-input" placeholder="Other platforms..." style="margin-top: 0.5rem;">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Country</label>
+                    <select class="filter-select">
+                        <option value="">All Countries</option>
+                        <option value="France">France</option>
+                        <option value="Belgium">Belgium</option>
+                        <option value="Switzerland">Switzerland</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Spain">Spain</option>
+                        <option value="Italy">Italy</option>
+                        <option value="Germany">Germany</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="United States">United States</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Language</label>
+                    <select class="filter-select">
+                        <option value="">All Languages</option>
+                        <option value="French">French</option>
+                        <option value="English">English</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="Italian">Italian</option>
+                        <option value="German">German</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">English Level</label>
+                    <select class="filter-select">
+                        <option value="">All Levels</option>
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="fluent">Fluent</option>
+                        <option value="native">Native</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Age (18+)</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="number" class="filter-input" placeholder="Min Age" min="18" max="100" style="width: 100%;">
+                        <input type="number" class="filter-input" placeholder="Max Age" min="18" max="100" style="width: 100%;">
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Social Networks</label>
+                    <div class="filter-checkbox-group">
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="TikTok">
+                            <span>TikTok</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="Instagram">
+                            <span>Instagram</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="Twitter">
+                            <span>Twitter</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="Snapchat">
+                            <span>Snapchat</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="Threads">
+                            <span>Threads</span>
+                        </label>
+                    </div>
+                    <input type="text" class="filter-input" placeholder="Other social networks..." style="margin-top: 0.5rem;">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Social Media Followers</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="number" class="filter-input" placeholder="Min followers" min="0" style="width: 100%;">
+                        <input type="number" class="filter-input" placeholder="Max followers" min="0" style="width: 100%;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agency Filters (Hidden by default) -->
+            <div id="agencyFilters" class="filters-grid" style="display: none;">
+                <div class="filter-group">
+                    <label class="filter-label">Managed Platforms</label>
+                    <div class="filter-checkbox-group">
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="OnlyFans">
+                            <span>OnlyFans</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="Fanvue">
+                            <span>Fanvue</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="Fansly">
+                            <span>Fansly</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="MYM">
+                            <span>MYM</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="Reveal">
+                            <span>Reveal</span>
+                        </label>
+                    </div>
+                    <input type="text" class="filter-input" placeholder="Other platforms..." style="margin-top: 0.5rem;">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Number of Active Talents</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="number" class="filter-input" placeholder="Min talents" min="0" style="width: 100%;">
+                        <input type="number" class="filter-input" placeholder="Max talents" min="0" style="width: 100%;">
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Total Agency Revenue</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="number" class="filter-input" placeholder="Min €/month" min="0" style="width: 100%;">
+                        <input type="number" class="filter-input" placeholder="Max €/month" min="0" style="width: 100%;">
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Agency Age</label>
+                    <select class="filter-select">
+                        <option value="">All Ages</option>
+                        <option value="0-1">0-1 year</option>
+                        <option value="1-3">1-3 years</option>
+                        <option value="3-5">3-5 years</option>
+                        <option value="5-10">5-10 years</option>
+                        <option value="10+">10+ years</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Country</label>
+                    <select class="filter-select">
+                        <option value="">All Countries</option>
+                        <option value="France">France</option>
+                        <option value="Belgium">Belgium</option>
+                        <option value="Switzerland">Switzerland</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Spain">Spain</option>
+                        <option value="Italy">Italy</option>
+                        <option value="Germany">Germany</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="United States">United States</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Agency Languages</label>
+                    <div class="filter-checkbox-group">
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="French">
+                            <span>French</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="English">
+                            <span>English</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="Spanish">
+                            <span>Spanish</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="Italian">
+                            <span>Italian</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" value="German">
+                            <span>German</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Search Button -->
+            <div class="filter-actions">
+                <button id="applyFiltersBtn" class="btn-primary">
+                    🔍 Search with Filters
+                </button>
+                <button id="clearFiltersBtn" class="btn-secondary">
+                    ✖ Clear Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- Profiles Grid -->
+        <div id="profilesContainer">
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <h3>Loading profiles...</h3>
+            </div>
+        </div>
+    </main>
+
+    <script src="/auth-utils.js"></script>
+    <script>
+        // Global variables
+        let currentType = 'talent';
+        let profiles = [];
+        let filteredProfiles = [];
+
+        // NOTE: main initialization is in the second DOMContentLoaded below
+
+        // API pour les profils
+        const profilesAPI = {
+            async getProfiles(type) {
+                try {
+                    const endpoint = type === 'agency' ? '/api/discover/agencies' : '/api/discover/talents';
+                    const response = await Auth.apiFetch(endpoint);
+                    
+                    if (!response.ok) return [];
+                    
+                    const data = await response.json();
+                    if (!data.success || !data.data) return [];
+                    
+                    // Mapper les données du backend vers le format attendu par le frontend
+                    return data.data.map(p => {
+                        // Gérer les valeurs nulles et vides
+                        const firstName = p.first_name || p.firstName || '';
+                        const lastName = p.last_name || p.lastName || '';
+                        const stageName = p.display_name || `${firstName} ${lastName}`.trim() || 'Profile';
+                        const platforms = p.platforms || p.talent_platforms || '';
+                        const platformsArray = platforms ? platforms.split(',').map(s => s.trim()).filter(Boolean) : ['OnlyFans']; // Valeur par défaut
+                        
+                        return {
+                            id: p.id,
+                            firstName: firstName,
+                            lastName: lastName,
+                            stageName: stageName,
+                            location: p.country || p.talent_country || 'France', // Valeur par défaut
+                            platforms: platformsArray,
+                            age: p.age || '25', // Valeur par défaut
+                            revenue: p.revenue || p.talent_revenue || p.total_revenue || '€5,000/mois', // Valeur par défaut
+                            hasManager: p.has_manager || 'No', // Valeur par défaut
+                            bio: p.bio || p.talent_bio || p.description || p.agency_description || 'Professional content creator with expertise in digital platforms.',
+                            avatar: firstName ? firstName.charAt(0).toUpperCase() : 'P',
+                            talentCount: p.talent_count || Math.floor(Math.random() * 50) + 10, // Valeur par défaut pour agences
+                            totalRevenue: p.total_revenue || '€50,000/mois' // Valeur par défaut
+                        };
+                    });
+                } catch (error) {
+                    console.error('Error loading profiles:', error);
+                    return [];
+                }
+            }
+        };
+
+        // Navigation functions
+        function doLogout() {
+            Auth.logout();
+        }
+
+        function goToProfile() {
+            window.location.href = '/profile';
+        }
+
+        function goToManage() {
+            const user = Auth.getUser();
+            if (user && user.role === 'agency') {
+                window.location.href = '/manage-agency';
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('open');
+        }
+
+        // Set profile initial from user data
+        function setProfileInitial() {
+            console.log('🔍 setProfileInitial appelé');
+            
+            const userData = localStorage.getItem('userData');
+            const userType = localStorage.getItem('userType');
+            console.log('🔍 userData:', userData);
+            console.log('🔍 userType:', userType);
+            
+            const profileInitial = document.getElementById('profileInitial');
+            const mobileProfileInitial = document.getElementById('mobileProfileInitial');
+            const sidebarProfileInitial = document.getElementById('sidebarProfileInitial');
+            
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    const initial = user.firstName ? user.firstName.charAt(0).toUpperCase() : 
+                                   user.email ? user.email.charAt(0).toUpperCase() : 'U';
+                    
+                    if (profileInitial) profileInitial.textContent = initial;
+                    if (mobileProfileInitial) mobileProfileInitial.textContent = initial;
+                    if (sidebarProfileInitial) sidebarProfileInitial.textContent = initial;
+                    
+                    console.log('🔍 Initial définie:', initial);
+                } catch (error) {
+                    console.log('Error parsing user data:', error);
+                }
+            }
+
+            // Show/hide Manage button based on user type
+            const manageBtn = document.getElementById('manageBtn');
+            
+            if (manageBtn) {
+                console.log('🔍 Vérification du bouton Manage pour userType:', userType);
+                if (userType === 'AGENCY' || userType === 'agency') {
+                    manageBtn.style.display = 'block';
+                    console.log('🔍 Bouton Manage AFFICHÉ pour AGENCY');
+                } else {
+                    manageBtn.style.display = 'none';
+                    console.log('🔍 Bouton Manage MASQUÉ pour userType:', userType);
+                }
+            } else {
+                console.log('🔍 Bouton Manage non trouvé dans le DOM');
+            }
+        }
+
+        // Type selection
+        function selectType(type) {
+            currentType = type;
+            
+            // Update button states
+            document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show/hide filters
+            if (type === 'talent') {
+                document.getElementById('talentFilters').style.display = 'grid';
+                document.getElementById('agencyFilters').style.display = 'none';
+            } else {
+                document.getElementById('talentFilters').style.display = 'none';
+                document.getElementById('agencyFilters').style.display = 'grid';
+            }
+            
+            // Re-setup filter listeners for the new type
+            setupFilterListeners();
+            
+            // Load profiles
+            loadProfiles();
+        }
+
+        // Search functionality
+        function handleSearch(event) {
+            const searchTerm = event.target.value.toLowerCase();
+            filterProfiles(searchTerm);
+        }
+
+        // Ajouter les écouteurs d'événements pour les filtres
+        function setupFilterListeners() {
+            // Filtres pour les talents
+            const talentFilters = document.querySelectorAll('#talentFilters input, #talentFilters select');
+            talentFilters.forEach(filter => {
+                filter.addEventListener('change', () => filterProfiles());
+                filter.addEventListener('input', () => filterProfiles());
+            });
+
+            // Filtres pour les agences
+            const agencyFilters = document.querySelectorAll('#agencyFilters input, #agencyFilters select');
+            agencyFilters.forEach(filter => {
+                filter.addEventListener('change', () => filterProfiles());
+                filter.addEventListener('input', () => filterProfiles());
+            });
+
+            console.log('✅ Écouteurs de filtres configurés');
+        }
+
+        function filterProfiles(searchTerm = '') {
+            console.log('🔍 Filtrage des profils avec:', { searchTerm, currentType });
+            
+            filteredProfiles = profiles.filter(profile => {
+                // Search filter - recherche dans tous les champs pertinents
+                if (searchTerm) {
+                    const searchFields = [
+                        profile.firstName || '',
+                        profile.lastName || '',
+                        profile.stageName || '',
+                        profile.companyName || '', // Pour les agences
+                        profile.location || '',
+                        profile.bio || '',
+                        profile.description || '', // Pour les agences
+                        ...(profile.skills || [])
+                    ].join(' ').toLowerCase();
+                    
+                    if (!searchFields.includes(searchTerm)) {
+                        return false;
+                    }
+                }
+                
+                // Filtres spécifiques aux talents
+                if (currentType === 'talent') {
+                    // Filtre par âge
+                    const minAge = document.querySelector('#talentFilters input[placeholder="Min Age"]')?.value;
+                    const maxAge = document.querySelector('#talentFilters input[placeholder="Max Age"]')?.value;
+                    
+                    if (minAge && profile.age && parseInt(profile.age) < parseInt(minAge)) {
+                        return false;
+                    }
+                    if (maxAge && profile.age && parseInt(profile.age) > parseInt(maxAge)) {
+                        return false;
+                    }
+                    
+                    // Filtre par réseaux sociaux (skills)
+                    const checkedSkills = Array.from(document.querySelectorAll('#talentFilters input[type="checkbox"]:checked')).map(cb => cb.value);
+                    if (checkedSkills.length > 0) {
+                        const profileSkills = profile.skills || [];
+                        const hasMatchingSkill = checkedSkills.some(skill => 
+                            profileSkills.some(profileSkill => 
+                                profileSkill.toLowerCase().includes(skill.toLowerCase())
+                            )
+                        );
+                        if (!hasMatchingSkill) {
+                            return false;
+                        }
+                    }
+                    
+                    // Filtre par pays
+                    const selectedCountry = document.querySelector('#talentFilters select')?.value;
+                    if (selectedCountry && selectedCountry !== 'All Countries' && profile.location !== selectedCountry) {
+                        return false;
+                    }
+                }
+                
+                // Filtres spécifiques aux agences
+                if (currentType === 'agency') {
+                    // Filtre par plateformes gérées
+                    const checkedPlatforms = Array.from(document.querySelectorAll('#agencyFilters input[type="checkbox"]:checked')).map(cb => cb.value);
+                    if (checkedPlatforms.length > 0) {
+                        const profilePlatforms = profile.skills || profile.specialization || [];
+                        const hasMatchingPlatform = checkedPlatforms.some(platform => 
+                            profilePlatforms.some(profilePlatform => 
+                                profilePlatform.toLowerCase().includes(platform.toLowerCase())
+                            )
+                        );
+                        if (!hasMatchingPlatform) {
+                            return false;
+                        }
+                    }
+                    
+                    // Filtre par pays
+                    const selectedCountry = document.querySelector('#agencyFilters select')?.value;
+                    if (selectedCountry && selectedCountry !== 'All Countries' && profile.location !== selectedCountry) {
+                        return false;
+                    }
+                    
+                    // Filtre par taille d'équipe
+                    const teamSize = document.querySelector('#agencyFilters select[placeholder="Team Size"]')?.value;
+                    if (teamSize && profile.teamSize !== teamSize) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
+            
+            displayProfiles(filteredProfiles);
+            console.log(`✅ ${filteredProfiles.length} profils filtrés sur ${profiles.length} total`);
+        }
+
+        // Load profiles
+        async function loadProfiles() {
+            const container = document.getElementById('profilesContainer');
+            
+            console.log(`🔄 Loading ${currentType} profiles...`);
+            
+            // Show loading
+            container.innerHTML = `
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <h3>Loading profiles...</h3>
+                </div>
+            `;
+            
+            try {
+                // Try to load from API first
+                profiles = await profilesAPI.getProfiles(currentType);
+                console.log(`📊 API returned ${profiles.length} profiles`);
+                
+                // If no profiles from API, use demo data
+                if (profiles.length === 0) {
+                    console.log('⚠️ No profiles from API, using demo data');
+                    profiles = getDemoProfiles(currentType);
+                }
+                
+                filteredProfiles = profiles;
+                
+                if (profiles.length === 0) {
+                    console.log('❌ No profiles available');
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <h3>No ${currentType}s found</h3>
+                            <p>Check back later for new profiles</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                console.log(`🎯 Displaying ${profiles.length} profiles`);
+                displayProfiles(profiles);
+                console.log(`✅ ${profiles.length} ${currentType}s chargés`);
+                
+            } catch (error) {
+                console.error('❌ Error loading profiles:', error);
+                // Fallback to demo data
+                profiles = getDemoProfiles(currentType);
+                filteredProfiles = profiles;
+                displayProfiles(profiles);
+            }
+        }
+
+        // Demo profiles for testing
+        function getDemoProfiles(type) {
+            if (type === 'talent') {
+                return [
+                    {
+                        id: 1,
+                        firstName: 'Emma',
+                        lastName: 'Wilson',
+                        stageName: 'Emma Creator',
+                        location: 'France',
+                        platforms: ['OnlyFans', 'Fanvue'],
+                        age: 25,
+                        revenue: '€5,000/month',
+                        hasManager: 'Yes',
+                        bio: 'Professional content creator with 5 years of experience. Specialized in lifestyle and fashion content.',
+                        avatar: 'E'
+                    },
+                    {
+                        id: 2,
+                        firstName: 'Lucas',
+                        lastName: 'Martin',
+                        stageName: 'Lucas M',
+                        location: 'France',
+                        platforms: ['OnlyFans', 'MYM'],
+                        age: 28,
+                        revenue: '€3,500/month',
+                        hasManager: 'No',
+                        bio: 'Fitness enthusiast and wellness coach. Creating premium content for health-conscious audience.',
+                        avatar: 'L'
+                    },
+                    {
+                        id: 3,
+                        firstName: 'Sophie',
+                        lastName: 'Dubois',
+                        stageName: 'Sophie D',
+                        location: 'France',
+                        platforms: ['Fanvue', 'Reveal'],
+                        age: 23,
+                        revenue: '€4,200/month',
+                        hasManager: 'Yes',
+                        bio: 'Artist and creative director. Specializing in artistic photography and digital content.',
+                        avatar: 'S'
+                    }
+                ];
+            } else {
+                return [
+                    {
+                        id: 101,
+                        firstName: 'Elite',
+                        lastName: 'Management',
+                        stageName: 'Elite Agency',
+                        platforms: ['OnlyFans', 'Fanvue', 'MYM'],
+                        talentCount: 25,
+                        totalRevenue: '€125,000/month',
+                        bio: 'Top-tier management agency representing the best talents in the industry. Full-service support.',
+                        avatar: 'E'
+                    },
+                    {
+                        id: 102,
+                        firstName: 'Creative',
+                        lastName: 'Studio',
+                        stageName: 'Creative Studio',
+                        platforms: ['Fanvue', 'Reveal'],
+                        talentCount: 8,
+                        totalRevenue: '€45,000/month',
+                        bio: 'Boutique agency focused on creative talents and artistic content creation.',
+                        avatar: 'C'
+                    }
+                ];
+            }
+        }
+
+        // Display profiles
+        function displayProfiles(profilesToDisplay) {
+            const container = document.getElementById('profilesContainer');
+            
+            container.innerHTML = '<div class="profiles-grid">' + profilesToDisplay.map(profile => {
+                const initial = profile.avatar || (profile.firstName ? profile.firstName.charAt(0).toUpperCase() : 'U');
+                const displayName = profile.stageName || `${profile.firstName} ${profile.lastName}`.trim();
+                const badgeLabel = currentType === 'talent' ? 'Talent' : 'Agency';
+
+                if (currentType === 'talent') {
+                    return `
+                        <div class="profile-card" onclick="showProfileModal(${JSON.stringify(profile).replace(/"/g, '&quot;')})">
+                            <div class="profile-header">
+                                <div class="profile-avatar">${initial}</div>
+                                <div class="profile-info">
+                                    <div class="profile-name-row">
+                                        <h3>${displayName}</h3>
+                                        <svg class="verified-badge" viewBox="0 0 16 16" fill="none">
+                                            <circle cx="8" cy="8" r="8" fill="#fff"/>
+                                            <path d="M4.8 8.4L6.6 10.2L11.2 5.6" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                    <div class="talent-badge">${badgeLabel}</div>
+                                    <div class="profile-details">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Pays:</span>
+                                            <span class="detail-value">${profile.location || 'N/A'}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Plateforme:</span>
+                                            <span class="detail-value">${profile.platforms.join(', ') || 'N/A'}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Âge:</span>
+                                            <span class="detail-value">${profile.age ? profile.age + ' ans' : 'N/A'}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Revenus:</span>
+                                            <span class="detail-value">${profile.revenue || 'N/A'}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Manager:</span>
+                                            <span class="detail-value">${profile.hasManager || 'N/A'}</span>
+                                        </div>
+                                    </div>
+                                    <div class="profile-bio">${profile.bio || ''}</div>
+                                </div>
+                            </div>
+                            <div class="profile-actions" onclick="event.stopPropagation()">
+                                <button class="profile-btn profile-btn-primary" onclick="toggleFavorite('${displayName.replace(/'/g, "\\'")}', ${profile.id}, this)">
+                                    <span class="btn-text">Add to favorites</span>
+                                </button>
+                                <button class="profile-btn profile-btn-secondary" onclick="sendMessage(${profile.id}, '${displayName.replace(/'/g, "\\'")}')">
+                                    <span class="btn-text">Message</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="profile-card" onclick="showProfileModal(${JSON.stringify(profile).replace(/"/g, '&quot;')})">
+                            <div class="profile-header">
+                                <div class="profile-avatar">${initial}</div>
+                                <div class="profile-info">
+                                    <div class="profile-name-row">
+                                        <h3>${displayName}</h3>
+                                        <svg class="verified-badge" viewBox="0 0 16 16" fill="none">
+                                            <circle cx="8" cy="8" r="8" fill="#fff"/>
+                                            <path d="M4.8 8.4L6.6 10.2L11.2 5.6" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                    <div class="talent-badge">${badgeLabel}</div>
+                                    <div class="profile-details">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Plateformes:</span>
+                                            <span class="detail-value">${profile.platforms.join(', ') || 'N/A'}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Talents:</span>
+                                            <span class="detail-value">${profile.talentCount} actifs</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Revenus totaux:</span>
+                                            <span class="detail-value">${profile.totalRevenue || 'N/A'}</span>
+                                        </div>
+                                    </div>
+                                    <div class="profile-bio">${profile.bio || ''}</div>
+                                </div>
+                            </div>
+                            <div class="profile-actions" onclick="event.stopPropagation()">
+                                <button class="profile-btn profile-btn-primary" onclick="toggleFavorite('${displayName.replace(/'/g, "\\'")}', ${profile.id}, this)">
+                                    <span class="btn-text">Add to favorites</span>
+                                </button>
+                                <button class="profile-btn profile-btn-secondary" onclick="sendMessage(${profile.id}, '${displayName.replace(/'/g, "\\'")}')">
+                                    <span class="btn-text">Contact</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('') + '</div>';
+        }
+
+        // Profile actions
+        async function toggleFavorite(name, profileId, button) {
+            const btnText = button.querySelector('.btn-text');
+            const isAdded = btnText && btnText.textContent === 'Added ✓';
+            
+            try {
+                if (isAdded) {
+                    // Remove from favorites
+                    const token = localStorage.getItem('authToken');
+                    const response = await fetch(`/api/favorites/${profileId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    
+                    if (response.ok) {
+                        btnText.textContent = 'Add to favorites';
+                        button.classList.remove('profile-btn-secondary');
+                        button.classList.add('profile-btn-primary');
+                        console.log(`${name} retiré des favoris`);
+                    }
+                } else {
+                    // Add to favorites
+                    const token = localStorage.getItem('authToken');
+                    const response = await fetch('/api/favorites', {
+                        method: 'POST',
+                        headers: { 
+                            'Authorization': 'Bearer ' + token,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ favoritedUserId: profileId })
+                    });
+                    
+                    if (response.ok) {
+                        if (btnText) btnText.textContent = 'Added ✓';
+                        button.classList.remove('profile-btn-primary');
+                        button.classList.add('profile-btn-secondary');
+                        console.log(`${name} ajouté aux favoris!`);
+                    }
+                }
+            } catch (error) {
+                console.error('Error toggling favorite:', error);
+                alert('Erreur lors de la gestion des favoris');
+            }
+        }
+
+        async function sendMessage(profileId, name) {
+            openChatInterface(profileId, name);
+        }
+
+        async function openChatInterface(profileId, name) {
+            // Ouvrir l'interface de chat directe avec ce profil
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.8);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(10px);
+            `;
+            
+            modal.innerHTML = `
+                <div style="
+                    width: 90%;
+                    max-width: 800px;
+                    height: 80vh;
+                    max-height: 600px;
+                    background: #0a0a0a;
+                    border-radius: 1rem;
+                    border: 1px solid #2a2a2a;
+                    display: flex;
+                    flex-direction: column;
+                    overflow: hidden;
+                ">
+                    <!-- Header -->
+                    <div style="
+                        padding: 1rem 1.5rem;
+                        background: #111111;
+                        border-bottom: 1px solid #2a2a2a;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                    ">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="
+                                width: 40px;
+                                height: 40px;
+                                border-radius: 50%;
+                                background: #3b82f6;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                color: white;
+                                font-weight: 600;
+                            ">${name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}</div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 1rem; font-weight: 600;">${name}</h3>
+                                <p style="margin: 0; font-size: 0.85rem; color: #a0a0a0;">Active now</p>
+                            </div>
+                        </div>
+                        <button onclick="closeChatModal()" style="
+                            background: none;
+                            border: none;
+                            color: #a0a0a0;
+                            font-size: 1.5rem;
+                            cursor: pointer;
+                            padding: 0.5rem;
+                            border-radius: 0.5rem;
+                            transition: all 0.2s;
+                        " onmouseover="this.style.background='#1a1a1a'; this.style.color='#ffffff';" 
+                           onmouseout="this.style.background='none'; this.style.color='#a0a0a0';">×</button>
+                    </div>
+                    
+                    <!-- Messages Container -->
+                    <div id="chatMessages" style="
+                        flex: 1;
+                        padding: 1.5rem;
+                        overflow-y: auto;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 1rem;
+                    ">
+                        <div style="text-align: center; color: #a0a0a0; padding: 2rem;">
+                            <i class="fas fa-comment-dots" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                            <p>Start the conversation with ${name}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Input -->
+                    <div style="
+                        padding: 1rem 1.5rem;
+                        background: #111111;
+                        border-top: 1px solid #2a2a2a;
+                    ">
+                        <div style="display: flex; gap: 0.75rem; align-items: flex-end;">
+                            <button style="
+                                width: 44px;
+                                height: 44px;
+                                border-radius: 50%;
+                                border: none;
+                                background: #1a1a1a;
+                                color: #a0a0a0;
+                                cursor: pointer;
+                                transition: all 0.2s;
+                            " onmouseover="this.style.background='#2a2a2a'; this.style.color='#ffffff';" 
+                               onmouseout="this.style.background='#1a1a1a'; this.style.color='#a0a0a0';">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <textarea id="chatInput" style="
+                                flex: 1;
+                                padding: 0.75rem 1rem;
+                                background: #1a1a1a;
+                                border: 1px solid #2a2a2a;
+                                border-radius: 1.5rem;
+                                color: #ffffff;
+                                font-size: 0.9rem;
+                                resize: none;
+                                min-height: 44px;
+                                max-height: 120px;
+                                font-family: inherit;
+                            " placeholder="Type a message..." rows="1"></textarea>
+                            <button id="sendChatBtn" onclick="sendChatMessage(${profileId})" style="
+                                width: 44px;
+                                height: 44px;
+                                border-radius: 50%;
+                                border: none;
+                                background: #3b82f6;
+                                color: white;
+                                cursor: pointer;
+                                transition: all 0.2s;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                            " onmouseover="this.style.background='#60a5fa';" 
+                               onmouseout="this.style.background='#3b82f6';">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: block;">
+                                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Setup event listeners
+            const input = document.getElementById('chatInput');
+            const sendBtn = document.getElementById('sendChatBtn');
+            
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendChatMessage(profileId);
+                }
+            });
+            
+            input.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+            
+            // Focus input
+            input.focus();
+            
+            // Load existing messages
+            loadChatMessages(profileId);
+        }
+
+        function closeChatModal() {
+            const modal = document.querySelector('div[style*="position: fixed"]');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        async function loadChatMessages(profileId) {
+            try {
+                const response = await fetch('/api/messages', {
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    const messages = result.data || [];
+                    
+                    // Filter messages for this conversation (Alice 22 <-> profileId)
+                    const conversationMessages = messages.filter(msg => 
+                        (msg.sender_id == 22 && msg.receiver_id == profileId) ||
+                        (msg.sender_id == profileId && msg.receiver_id == 22)
+                    );
+                    
+                    conversationMessages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                    
+                    displayChatMessages(conversationMessages);
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+            }
+        }
+
+        function displayChatMessages(messages) {
+            const container = document.getElementById('chatMessages');
+            
+            // Get current user ID
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            const currentUserId = userData.id;
+            
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: #a0a0a0; padding: 2rem;">
+                        <i class="fas fa-comment-dots" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p>Start the conversation!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = messages.map(msg => {
+                const isSent = msg.sender_id == currentUserId;
+                const senderName = msg.sender_first_name || 'Unknown';
+                
+                return `
+                    <div style="
+                        display: flex;
+                        gap: 0.75rem;
+                        max-width: 70%;
+                        ${isSent ? 'align-self: flex-end; flex-direction: row-reverse;' : ''}
+                    ">
+                        <div style="
+                            width: 32px;
+                            height: 32px;
+                            border-radius: 50%;
+                            background: #3b82f6;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 0.75rem;
+                            font-weight: 600;
+                            color: white;
+                            flex-shrink: 0;
+                        ">${senderName[0]?.toUpperCase() || '?'}</div>
+                        <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                            <div style="
+                                padding: 0.75rem 1rem;
+                                border-radius: 1rem;
+                                font-size: 0.9rem;
+                                line-height: 1.4;
+                                word-wrap: break-word;
+                                ${isSent ? 
+                                    'background: #3b82f6; color: white; border-bottom-right-radius: 0.25rem;' : 
+                                    'background: #1a1a1a; border: 1px solid #2a2a2a; border-bottom-left-radius: 0.25rem;'
+                                }
+                            ">${msg.content}</div>
+                            <div style="
+                                font-size: 0.7rem;
+                                color: #a0a0a0;
+                                padding: 0 0.5rem;
+                                ${isSent ? 'text-align: right;' : ''}
+                            ">${formatChatTime(new Date(msg.created_at))}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendChatMessage(profileId) {
+                const input = document.getElementById('chatInput');
+                const content = input.value.trim();
+                
+                if (!content) return;
+                
+                const sendBtn = document.getElementById('sendChatBtn');
+                sendBtn.disabled = true;
+                
+                try {
+                    const response = await fetch('/api/messages/conversations', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ 
+                            participantId: profileId, 
+                            content: content,
+                            senderId: 22 // Alice's ID
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        // Clear input
+                        input.value = '';
+                        input.style.height = 'auto';
+                        
+                        // Add message immediately to UI for instant feedback
+                        const container = document.getElementById('chatMessages');
+                        const messageHtml = `
+                            <div style="
+                                display: flex;
+                                gap: 0.75rem;
+                                max-width: 70%;
+                                align-self: flex-end;
+                                flex-direction: row-reverse;
+                                margin-bottom: 1rem;
+                            ">
+                                <div style="
+                                    width: 32px;
+                                    height: 32px;
+                                    border-radius: 50%;
+                                    background: #3b82f6;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-size: 0.75rem;
+                                    font-weight: 600;
+                                    color: white;
+                                    flex-shrink: 0;
+                                ">A</div>
+                                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                                    <div style="
+                                        padding: 0.75rem 1rem;
+                                        border-radius: 1rem;
+                                        font-size: 0.9rem;
+                                        line-height: 1.4;
+                                        word-wrap: break-word;
+                                        background: #3b82f6; color: white; border-bottom-right-radius: 0.25rem;
+                                    ">${content}</div>
+                                    <div style="
+                                        font-size: 0.7rem;
+                                        color: #a0a0a0;
+                                        padding: 0 0.5rem;
+                                        text-align: right;
+                                    ">just now</div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Remove empty state if exists
+                        if (container.innerHTML.includes('Start the conversation')) {
+                            container.innerHTML = '';
+                        }
+                        
+                        // Add new message
+                        container.innerHTML += messageHtml;
+                        
+                        // Scroll to bottom
+                        setTimeout(() => {
+                            container.scrollTop = container.scrollHeight;
+                        }, 100);
+                        
+                        // Reload conversations after sending to update the list
+                        setTimeout(() => {
+                            if (typeof loadConversations === 'function') {
+                                loadConversations();
+                            }
+                        }, 1000);
+                    } else {
+                        const result = await response.json();
+                        alert('Error sending message: ' + (result.error || 'Unknown error'));
+                    }
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    alert('Error sending message: ' + error.message);
+                } finally {
+                    sendBtn.disabled = false;
+                }
+            }
+
+        function formatChatTime(date) {
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return 'just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days < 7) return `${days}d ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        // Profile Modal Functions
+        let currentModalProfile = null;
+
+        function showProfileModal(profile) {
+            currentModalProfile = profile;
+            
+            // Update modal content
+            const initial = profile.avatar || (profile.firstName ? profile.firstName.charAt(0).toUpperCase() : 'U');
+            const displayName = profile.stageName || `${profile.firstName} ${profile.lastName}`.trim();
+            const badgeLabel = currentType === 'talent' ? 'TALENT' : 'AGENCY';
+            
+            document.getElementById('modalAvatar').textContent = initial;
+            document.getElementById('modalName').textContent = displayName;
+            document.getElementById('modalBadge').textContent = badgeLabel;
+            document.getElementById('modalBio').textContent = profile.bio || 'Aucune biographie disponible';
+            
+            // Update details
+            document.getElementById('modalCountry').textContent = profile.location || 'N/A';
+            document.getElementById('modalAge').textContent = profile.age ? `${profile.age} ans` : 'N/A';
+            document.getElementById('modalRevenue').textContent = profile.revenue || 'N/A';
+            document.getElementById('modalTotalRevenue').textContent = profile.totalRevenue || 'N/A';
+            
+            // Show/hide talent-specific vs agency-specific fields
+            const managerRow = document.getElementById('modalManagerRow');
+            const talentCountRow = document.getElementById('modalTalentCountRow');
+            const totalRevenueRow = document.getElementById('modalTotalRevenueRow');
+            
+            if (currentType === 'talent') {
+                managerRow.style.display = 'flex';
+                talentCountRow.style.display = 'none';
+                totalRevenueRow.style.display = 'none';
+                document.getElementById('modalManager').textContent = profile.hasManager || 'N/A';
+            } else {
+                managerRow.style.display = 'none';
+                talentCountRow.style.display = 'flex';
+                totalRevenueRow.style.display = 'flex';
+                document.getElementById('modalTalentCount').textContent = profile.talentCount ? `${profile.talentCount} actifs` : 'N/A';
+            }
+            
+            // Update platforms
+            const platformsContainer = document.getElementById('modalPlatforms');
+            if (profile.platforms && profile.platforms.length > 0) {
+                platformsContainer.innerHTML = profile.platforms
+                    .filter(p => p && p.trim())
+                    .map(p => `<span class="platform-tag">${p}</span>`)
+                    .join('');
+            } else {
+                platformsContainer.innerHTML = '<span class="platform-tag">Aucune plateforme</span>';
+            }
+            
+            // Show modal
+            document.getElementById('profileModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+            currentModalProfile = null;
+        }
+
+        function modalAddToFavorites() {
+            if (currentModalProfile) {
+                const btn = document.querySelector('.modal-btn-primary');
+                const isAdded = btn.textContent.includes('Added');
+                
+                if (isAdded) {
+                    btn.innerHTML = '⭐ Add to favorites';
+                    console.log(`${currentModalProfile.stageName} retiré des favoris`);
+                } else {
+                    btn.innerHTML = '⭐ Added ✓';
+                    console.log(`${currentModalProfile.stageName} ajouté aux favoris!`);
+                }
+            }
+        }
+
+        function modalSendMessage() {
+            if (currentModalProfile) {
+                const displayName = currentModalProfile.stageName || `${currentModalProfile.firstName} ${currentModalProfile.lastName}`.trim();
+                console.log(`💬 Ouverture du chat avec ${displayName}`);
+                closeProfileModal();
+                openChatInterface(currentModalProfile.id, displayName);
+            }
+        }
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeProfileModal();
+            }
+        });
+
+        // Filter functions
+        function applyFilters() {
+            console.log('🔍 Applying filters...');
+            
+            // Get all filter values
+            const filters = collectFilterValues();
+            
+            // Show loading state
+            showLoadingState();
+            
+            // Reload profiles with filters
+            loadProfilesWithFilters(filters);
+        }
+
+        function clearFilters() {
+            console.log('🧹 Clearing filters...');
+            
+            // Reset all filter inputs
+            const allInputs = document.querySelectorAll('.filter-input, .filter-select');
+            const allCheckboxes = document.querySelectorAll('.filter-checkbox input');
+            
+            allInputs.forEach(input => input.value = '');
+            allCheckboxes.forEach(checkbox => checkbox.checked = false);
+            
+            // Reload profiles without filters
+            loadProfiles();
+        }
+
+        function collectFilterValues() {
+            const filters = {};
+            const currentFilterSection = currentType === 'talent' ? 'talentFilters' : 'agencyFilters';
+            const filterSection = document.getElementById(currentFilterSection);
+            
+            // Collect text inputs
+            filterSection.querySelectorAll('.filter-input').forEach(input => {
+                if (input.value) {
+                    filters[input.placeholder] = input.value;
+                }
+            });
+            
+            // Collect selects
+            filterSection.querySelectorAll('.filter-select').forEach(select => {
+                if (select.value) {
+                    filters[select.previousElementSibling.textContent] = select.value;
+                }
+            });
+            
+            // Collect checkboxes
+            filterSection.querySelectorAll('.filter-checkbox-group').forEach(group => {
+                const checkedBoxes = group.querySelectorAll('input:checked');
+                if (checkedBoxes.length > 0) {
+                    const label = group.previousElementSibling.textContent;
+                    filters[label] = Array.from(checkedBoxes).map(cb => cb.value);
+                }
+            });
+            
+            console.log('📋 Collected filters:', filters);
+            return filters;
+        }
+
+        function loadProfilesWithFilters(filters) {
+            // For now, just reload profiles (backend doesn't support complex filters yet)
+            console.log('🔄 Loading profiles with filters (basic implementation)');
+            loadProfiles();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Set profile initial
+            setProfileInitial();
+            
+            // Set up search listener
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.addEventListener('input', handleSearch);
+            
+            // Set up filter listeners
+            setupFilterListeners();
+            
+            // Add filter button listeners
+            const applyBtn = document.getElementById('applyFiltersBtn');
+            const clearBtn = document.getElementById('clearFiltersBtn');
+            if (applyBtn) applyBtn.addEventListener('click', applyFilters);
+            if (clearBtn) clearBtn.addEventListener('click', clearFilters);
+            
+            // Close modal on background click
+            const profileModal = document.getElementById('profileModal');
+            if (profileModal) {
+                profileModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeProfileModal();
+                    }
+                });
+            }
+            
+            // Load profiles
+            await loadProfiles();
+        });
+    </script>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="profile-modal">
+        <div class="profile-modal-content">
+            <div class="modal-header">
+                <div class="modal-avatar" id="modalAvatar">U</div>
+                <button class="modal-close" onclick="closeProfileModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-profile-info">
+                    <h2 class="modal-name" id="modalName">Profile Name</h2>
+                    <div class="modal-badge" id="modalBadge">TALENT</div>
+                    <p class="modal-bio" id="modalBio">Profile bio information</p>
+                </div>
+                
+                <div class="modal-details-grid">
+                    <div class="modal-details-section">
+                        <h3 class="modal-section-title">📍 Informations</h3>
+                        <div class="modal-detail-item">
+                            <span class="modal-detail-label">Pays:</span>
+                            <span class="modal-detail-value" id="modalCountry">France</span>
+                        </div>
+                        <div class="modal-detail-item">
+                            <span class="modal-detail-label">Âge:</span>
+                            <span class="modal-detail-value" id="modalAge">25 ans</span>
+                        </div>
+                        <div class="modal-detail-item" id="modalManagerRow">
+                            <span class="modal-detail-label">Manager:</span>
+                            <span class="modal-detail-value" id="modalManager">Oui</span>
+                        </div>
+                        <div class="modal-detail-item" id="modalTalentCountRow" style="display: none;">
+                            <span class="modal-detail-label">Talents actifs:</span>
+                            <span class="modal-detail-value" id="modalTalentCount">25</span>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-details-section">
+                        <h3 class="modal-section-title">💰 Revenus</h3>
+                        <div class="modal-detail-item">
+                            <span class="modal-detail-label">Revenus mensuels:</span>
+                            <span class="modal-detail-value" id="modalRevenue">€5,000</span>
+                        </div>
+                        <div class="modal-detail-item" id="modalTotalRevenueRow" style="display: none;">
+                            <span class="modal-detail-label">Revenus totaux:</span>
+                            <span class="modal-detail-value" id="modalTotalRevenue">€125,000</span>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-details-section">
+                        <h3 class="modal-section-title">📱 Plateformes</h3>
+                        <div class="modal-platforms" id="modalPlatforms">
+                            <span class="platform-tag">OnlyFans</span>
+                            <span class="platform-tag">Fanvue</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="modal-btn modal-btn-primary" onclick="modalAddToFavorites()">
+                        ⭐ Add to favorites
+                    </button>
+                    <button class="modal-btn modal-btn-secondary" onclick="modalSendMessage()">
+                        💬 Message
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

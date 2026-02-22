@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Posts with Media</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .test-result {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background: rgba(34,197,94,0.2); color: #22c55e; }
+        .error { background: rgba(239,68,68,0.2); color: #ef4444; }
+        .info { background: rgba(59,130,246,0.2); color: #3b82f6; }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #2563eb; }
+        .post-preview {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .post-media img, .post-media video {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Posts with Media</h1>
+    
+    <div class="test-section">
+        <h2>📋 Test localStorage Data</h2>
+        <button onclick="checkLocalStorage()">Check localStorage</button>
+        <button onclick="clearLocalStorage()">Clear localStorage</button>
+        <div id="localStorage-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🖼️ Create Test Post with Image</h2>
+        <input type="text" id="test-text" placeholder="Enter post text..." style="width: 100%; padding: 10px; margin: 10px 0; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 5px;">
+        <input type="file" id="test-image" accept="image/*" style="margin: 10px 0;">
+        <button onclick="createTestPost()">Create Test Post</button>
+        <div id="create-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📄 Display Posts</h2>
+        <button onclick="displayTestPosts()">Display All Posts</button>
+        <div id="posts-display"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Debug Info</h2>
+        <button onclick="showDebugInfo()">Show Debug Info</button>
+        <div id="debug-info"></div>
+    </div>
+
+    <script>
+        function checkLocalStorage() {
+            const result = document.getElementById('localStorage-result');
+            try {
+                const profileData = localStorage.getItem('userProfile');
+                if (profileData) {
+                    const data = JSON.parse(profileData);
+                    const postsCount = data.posts ? data.posts.length : 0;
+                    const postsWithMedia = data.posts ? data.posts.filter(p => p.media).length : 0;
+                    
+                    result.innerHTML = `
+                        <div class="test-result success">
+                            ✅ Profile data found in localStorage<br>
+                            📝 Total posts: ${postsCount}<br>
+                            🖼️ Posts with media: ${postsWithMedia}<br>
+                            📊 Posts: ${JSON.stringify(data.posts || [], null, 2)}
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="test-result error">
+                            ❌ No profile data found in localStorage
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="test-result error">
+                        ❌ Error reading localStorage: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function clearLocalStorage() {
+            localStorage.removeItem('userProfile');
+            document.getElementById('localStorage-result').innerHTML = `
+                <div class="test-result info">
+                    🗑️ localStorage cleared
+                </div>
+            `;
+        }
+
+        function createTestPost() {
+            const text = document.getElementById('test-text').value;
+            const imageFile = document.getElementById('test-image').files[0];
+            const result = document.getElementById('create-result');
+
+            if (!text && !imageFile) {
+                result.innerHTML = `
+                    <div class="test-result error">
+                        ❌ Please enter text or select an image
+                    </div>
+                `;
+                return;
+            }
+
+            // Get existing profile data or create new
+            let profileData = {};
+            try {
+                const existing = localStorage.getItem('userProfile');
+                if (existing) {
+                    profileData = JSON.parse(existing);
+                }
+            } catch (error) {
+                console.log('Creating new profile data');
+            }
+
+            // Initialize posts array
+            if (!profileData.posts) {
+                profileData.posts = [];
+            }
+
+            // Create new post
+            const newPost = {
+                id: Date.now(),
+                content: text,
+                type: 'mixed', // Will be updated based on content
+                media: null,
+                createdAt: new Date().toISOString(),
+                likes: 0,
+                comments: 0,
+                shares: 0
+            };
+
+            // Auto-detect post type
+            if (text && imageFile) {
+                newPost.type = 'mixed';
+            } else if (imageFile) {
+                newPost.type = 'photo';
+            } else {
+                newPost.type = 'text';
+            }
+
+            // Handle image
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    newPost.media = {
+                        type: 'image',
+                        url: e.target.result,
+                        name: imageFile.name
+                    };
+
+                    // Save post
+                    profileData.posts.unshift(newPost);
+                    localStorage.setItem('userProfile', JSON.stringify(profileData));
+
+                    result.innerHTML = `
+                        <div class="test-result success">
+                            ✅ Test post created successfully!<br>
+                            📝 Type: ${newPost.type}<br>
+                            🖼️ Media: ${newPost.media ? 'Yes' : 'No'}<br>
+                            📊 Post ID: ${newPost.id}
+                        </div>
+                    `;
+
+                    // Clear form
+                    document.getElementById('test-text').value = '';
+                    document.getElementById('test-image').value = '';
+                };
+                reader.readAsDataURL(imageFile);
+            } else {
+                // Save text-only post
+                profileData.posts.unshift(newPost);
+                localStorage.setItem('userProfile', JSON.stringify(profileData));
+
+                result.innerHTML = `
+                    <div class="test-result success">
+                        ✅ Text-only post created successfully!<br>
+                        📝 Type: ${newPost.type}<br>
+                        📊 Post ID: ${newPost.id}
+                    </div>
+                `;
+
+                // Clear form
+                document.getElementById('test-text').value = '';
+            }
+        }
+
+        function displayTestPosts() {
+            const display = document.getElementById('posts-display');
+            
+            try {
+                const profileData = JSON.parse(localStorage.getItem('userProfile') || '{}');
+                const posts = profileData.posts || [];
+
+                if (posts.length === 0) {
+                    display.innerHTML = `
+                        <div class="test-result info">
+                            📝 No posts found. Create a test post first!
+                        </div>
+                    `;
+                    return;
+                }
+
+                let postsHtml = `<h3>📄 Found ${posts.length} posts:</h3>`;
+                
+                posts.forEach((post, index) => {
+                    const date = new Date(post.createdAt).toLocaleString('fr-FR');
+                    
+                    postsHtml += `
+                        <div class="post-preview">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span style="font-weight: bold;">Post #${index + 1} - ${post.type}</span>
+                                <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">${date}</span>
+                            </div>
+                            
+                            ${post.content ? `<div style="margin-bottom: 10px;">${post.content}</div>` : ''}
+                            
+                            ${post.media ? `
+                                <div class="post-media">
+                                    ${post.media.type === 'image' 
+                                        ? `<img src="${post.media.url}" alt="${post.media.name}">`
+                                        : `<video src="${post.media.url}" controls></video>`
+                                    }
+                                </div>
+                            ` : ''}
+                            
+                            <div style="margin-top: 10px; font-size: 0.8rem; color: rgba(255,255,255,0.5);">
+                                ❤️ ${post.likes || 0} | 💬 ${post.comments || 0} | 🔄 ${post.shares || 0}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                display.innerHTML = postsHtml;
+
+            } catch (error) {
+                display.innerHTML = `
+                    <div class="test-result error">
+                        ❌ Error displaying posts: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function showDebugInfo() {
+            const debug = document.getElementById('debug-info');
+            
+            try {
+                const profileData = JSON.parse(localStorage.getItem('userProfile') || '{}');
+                const posts = profileData.posts || [];
+                
+                let debugHtml = `
+                    <h3>🔍 Debug Information</h3>
+                    <div class="test-result info">
+                        📊 Profile Data Keys: ${Object.keys(profileData).join(', ')}<br>
+                        📝 Posts Array Length: ${posts.length}<br>
+                        🖼️ Posts with Media: ${posts.filter(p => p.media).length}<br>
+                        📄 Posts with Content: ${posts.filter(p => p.content).length}<br>
+                    </div>
+                `;
+
+                // Show first post structure
+                if (posts.length > 0) {
+                    const firstPost = posts[0];
+                    debugHtml += `
+                        <h4>First Post Structure:</h4>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; overflow-x: auto;">
+${JSON.stringify(firstPost, null, 2)}
+                        </pre>
+                    `;
+                }
+
+                debug.innerHTML = debugHtml;
+
+            } catch (error) {
+                debug.innerHTML = `
+                    <div class="test-result error">
+                        ❌ Debug error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-check localStorage on load
+        window.addEventListener('load', function() {
+            checkLocalStorage();
+        });
+    </script>
+</body>
+</html>

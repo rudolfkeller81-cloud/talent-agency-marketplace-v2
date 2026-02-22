@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Force Update Profile Data</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: #f59e0b;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #f59e0b;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .current-data {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .status-message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .status-message.show {
+            display: block;
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            color: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Force Update Profile Data</h1>
+        <p class="subtitle">Override the static test data with your real information</p>
+        
+        <div id="status-message" class="status-message"></div>
+
+        <div class="warning-box">
+            ⚠️ <strong>ATTENTION:</strong> Cette page va écraser les données de test ("test", "test") avec tes vraies informations. 
+            Le profile semble être "statique" - on va forcer la mise à jour.
+        </div>
+
+        <div class="current-data" id="current-data">
+            Loading current data...
+        </div>
+
+        <form id="force-update-form">
+            <div class="form-group">
+                <label class="form-label">First Name *</label>
+                <input type="text" class="form-input" id="first-name" required placeholder="Ton vrai prénom">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Last Name *</label>
+                <input type="text" class="form-input" id="last-name" required placeholder="Ton vrai nom">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email *</label>
+                <input type="email" class="form-input" id="email" required placeholder="ton.email@example.com">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Age</label>
+                <input type="number" class="form-input" id="age" placeholder="25">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Country</label>
+                <input type="text" class="form-input" id="country" placeholder="FR">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Bio / Description</label>
+                <textarea class="form-textarea" id="bio" placeholder="Parle-toi un peu..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Instagram</label>
+                <input type="text" class="form-input" id="instagram" placeholder="@toncompte">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Twitter</label>
+                <input type="text" class="form-input" id="twitter" placeholder="@toncompte">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Portfolio/Website</label>
+                <input type="url" class="form-input" id="portfolio" placeholder="https://tonsite.com">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Monthly Revenue</label>
+                <select class="form-input" id="monthly-revenue">
+                    <option value="">Select revenue range</option>
+                    <option value="0-1k">0 - 1k</option>
+                    <option value="1k-5k">1k - 5k</option>
+                    <option value="5k-10k">5k - 10k</option>
+                    <option value="10k-25k">10k - 25k</option>
+                    <option value="25k-50k">25k - 50k</option>
+                    <option value="50k+">50k+</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Do you have a manager?</label>
+                <select class="form-input" id="has-manager">
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-warning">🔄 FORCE UPDATE PROFILE</button>
+            <button type="button" class="btn btn-danger" onclick="clearAllData()">🗑️ CLEAR ALL</button>
+            <a href="/profile" class="btn btn-secondary">👤 CHECK PROFILE</a>
+        </form>
+    </div>
+
+    <script>
+        function loadCurrentData() {
+            const currentDataDiv = document.getElementById('current-data');
+            const userProfile = localStorage.getItem('userProfile');
+            const userData = localStorage.getItem('userData');
+            
+            let html = '<strong>Current localStorage data:</strong><br><br>';
+            
+            if (userProfile) {
+                try {
+                    const profile = JSON.parse(userProfile);
+                    html += '<strong>userProfile:</strong><br>';
+                    html += JSON.stringify(profile, null, 2) + '<br><br>';
+                } catch (e) {
+                    html += '<strong>userProfile:</strong> Error parsing<br><br>';
+                }
+            } else {
+                html += '<strong>userProfile:</strong> Not found<br><br>';
+            }
+            
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    html += '<strong>userData:</strong><br>';
+                    html += JSON.stringify(user, null, 2);
+                } catch (e) {
+                    html += '<strong>userData:</strong> Error parsing';
+                }
+            } else {
+                html += '<strong>userData:</strong> Not found';
+            }
+            
+            currentDataDiv.innerHTML = html;
+        }
+
+        function forceUpdateProfile() {
+            const profileData = {
+                first_name: document.getElementById('first-name').value,
+                last_name: document.getElementById('last-name').value,
+                email: document.getElementById('email').value,
+                role: 'talent',
+                posts: []
+            };
+            
+            // Add all optional fields
+            profileData.age = document.getElementById('age').value;
+            profileData.country = document.getElementById('country').value;
+            profileData.bio = document.getElementById('bio').value;
+            profileData.instagram = document.getElementById('instagram').value;
+            profileData.twitter = document.getElementById('twitter').value;
+            profileData.portfolio = document.getElementById('portfolio').value;
+            profileData.monthly_revenue = document.getElementById('monthly-revenue').value;
+            profileData.has_manager = document.getElementById('has-manager').value;
+            profileData.display_name = profileData.first_name + ' ' + profileData.last_name;
+            
+            // Force save to both locations
+            localStorage.setItem('userProfile', JSON.stringify(profileData));
+            localStorage.setItem('userData', JSON.stringify(profileData));
+            
+            console.log('🔄 FORCE UPDATE - New profile data:', profileData);
+            
+            showStatus('✅ Profile data force updated! Check profile page.', 'success');
+            
+            // Update display
+            setTimeout(() => {
+                loadCurrentData();
+            }, 500);
+        }
+
+        function clearAllData() {
+            if (confirm('Clear ALL data and start fresh?')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                showStatus('🗑️ All data cleared!', 'warning');
+                setTimeout(() => {
+                    loadCurrentData();
+                }, 500);
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status-message');
+            statusEl.textContent = message;
+            statusEl.className = `status-message show status-${type}`;
+            
+            setTimeout(() => {
+                statusEl.classList.remove('show');
+            }, 3000);
+        }
+
+        // Handle form submission
+        document.getElementById('force-update-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            forceUpdateProfile();
+        });
+
+        // Load current data on page load
+        window.addEventListener('DOMContentLoaded', loadCurrentData);
+    </script>
+</body>
+</html>

@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Talent & Agency</title>
+    <script src="/auth-utils.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+
+        .profile-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            height: fit-content;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-role {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .content-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-button {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-button.active {
+            color: white;
+            border-bottom-color: #3b82f6;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-label {
+            display: block;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-upload-label:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .post-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .post-type {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .post-content {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .post-media img, .post-media video {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .post-action {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .post-action:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .status-message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .status-message.show {
+            display: block;
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .checkbox-group, .radio-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-label, .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .profile-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Profile</h1>
+        </header>
+
+        <div class="profile-layout">
+            <!-- Profile Card -->
+            <aside class="profile-card">
+                <div class="profile-avatar" id="profile-avatar">👤</div>
+                <h2 class="profile-name" id="profile-name">Loading...</h2>
+                <p class="profile-role" id="profile-role">Talent</p>
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="posts-count">0</div>
+                        <div class="stat-label">Posts</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%;" onclick="saveProfile()">Save Profile</button>
+            </aside>
+
+            <!-- Profile Content -->
+            <main class="profile-content">
+                <div id="status-message" class="status-message"></div>
+
+                <!-- Content Tabs -->
+                <div class="content-tabs">
+                    <button class="tab-button active" onclick="switchTab('edit')">Edit Profile</button>
+                    <button class="tab-button" onclick="switchTab('media')">Publish New Post</button>
+                    <button class="tab-button" onclick="switchTab('posts')">Posts</button>
+                </div>
+
+                <!-- Edit Profile Tab -->
+                <div id="edit-tab" class="tab-content active">
+                    <h3 style="margin-bottom: 1.5rem;">Edit Profile Information</h3>
+                    
+                    <!-- Basic Info -->
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-input" id="first-name" placeholder="First name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-input" id="last-name" placeholder="Last name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="email" placeholder="your.email@example.com" readonly style="opacity:0.6;">
+                    </div>
+
+                    <!-- Talent-specific fields -->
+                    <div id="talent-fields" style="display:none;">
+                        <h4 style="margin: 2rem 0 1rem; color: rgba(255,255,255,0.7);">Talent Information</h4>
+
+                        <div class="form-group">
+                            <label class="form-label">Stage Name / Display Name</label>
+                            <input type="text" class="form-input" id="display-name" placeholder="Your stage name">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">What type of talent are you?</label>
+                            <select class="form-select" id="talent-type">
+                                <option value="">Select your talent type</option>
+                                <option value="actor">Actor</option>
+                                <option value="model">Model</option>
+                                <option value="musician">Musician</option>
+                                <option value="dancer">Dancer</option>
+                                <option value="photographer">Photographer</option>
+                                <option value="videographer">Videographer</option>
+                                <option value="content-creator">Content Creator</option>
+                                <option value="influencer">Influencer</option>
+                                <option value="artist">Artist</option>
+                                <option value="writer">Writer</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Years of Experience</label>
+                            <select class="form-select" id="experience">
+                                <option value="">Select experience level</option>
+                                <option value="beginner">Beginner (0-2 years)</option>
+                                <option value="intermediate">Intermediate (2-5 years)</option>
+                                <option value="experienced">Experienced (5-10 years)</option>
+                                <option value="expert">Expert (10+ years)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Portfolio/Website URL (optional)</label>
+                            <input type="url" class="form-input" id="portfolio" placeholder="https://yourportfolio.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Age</label>
+                            <input type="number" class="form-input" id="age" placeholder="25" min="18" max="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Country</label>
+                            <select class="form-select" id="country">
+                                <option value="">Select your country</option>
+                                <option value="US">United States</option>
+                                <option value="UK">United Kingdom</option>
+                                <option value="CA">Canada</option>
+                                <option value="AU">Australia</option>
+                                <option value="FR">France</option>
+                                <option value="DE">Germany</option>
+                                <option value="IT">Italy</option>
+                                <option value="ES">Spain</option>
+                                <option value="NL">Netherlands</option>
+                                <option value="BR">Brazil</option>
+                                <option value="MX">Mexico</option>
+                                <option value="JP">Japan</option>
+                                <option value="KR">South Korea</option>
+                                <option value="IN">India</option>
+                                <option value="OTHER">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Languages you speak</label>
+                            <textarea class="form-textarea" id="languages" placeholder="List the languages you speak (e.g., English, French, Spanish, Italian...)"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Platforms</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="platforms" value="onlyfans">
+                                    OnlyFans
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="platforms" value="fansly">
+                                    Fansly
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="platforms" value="admireme">
+                                    AdmireMe
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="platforms" value="other">
+                                    Other
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Social Media Networks</label>
+                            <input type="text" class="form-input" id="instagram" placeholder="Instagram username">
+                            <input type="text" class="form-input" id="twitter" placeholder="Twitter username" style="margin-top: 0.5rem;">
+                            <input type="text" class="form-input" id="tiktok" placeholder="TikTok username" style="margin-top: 0.5rem;">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Monthly Revenue ($)</label>
+                            <select class="form-select" id="monthly-revenue">
+                                <option value="">Select revenue range</option>
+                                <option value="less-10k">Less than $10,000</option>
+                                <option value="10k-25k">$10,000 - $25,000</option>
+                                <option value="25k-50k">$25,000 - $50,000</option>
+                                <option value="50k-100k">$50,000 - $100,000</option>
+                                <option value="100k-250k">$100,000 - $250,000</option>
+                                <option value="250k-500k">$250,000 - $500,000</option>
+                                <option value="500k+">More than $500,000</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Do you currently have a manager?</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="has-manager" value="yes">
+                                    Yes
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="has-manager" value="no">
+                                    No
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Bio / Description</label>
+                            <textarea class="form-textarea" id="bio" placeholder="Tell us about yourself..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Agency-specific fields -->
+                    <div id="agency-fields" style="display:none;">
+                        <h4 style="margin: 2rem 0 1rem; color: rgba(255,255,255,0.7);">Agency Information</h4>
+
+                        <div class="form-group">
+                            <label class="form-label">Agency Name</label>
+                            <input type="text" class="form-input" id="agency-name" placeholder="Your agency name">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Agency Type</label>
+                            <select class="form-select" id="agency-type">
+                                <option value="">Select agency type</option>
+                                <option value="talent-agency">Talent Agency</option>
+                                <option value="modeling-agency">Modeling Agency</option>
+                                <option value="digital-agency">Digital Agency</option>
+                                <option value="management-agency">Management Agency</option>
+                                <option value="production-company">Production Company</option>
+                                <option value="pr-agency">PR Agency</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Platforms you manage</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="agency-platforms" value="OnlyFans"> OnlyFans
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="agency-platforms" value="Fanvue"> Fanvue
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="agency-platforms" value="MYM"> MYM
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="agency-platforms" value="Fansly"> Fansly
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Number of Talents</label>
+                            <input type="number" class="form-input" id="talent-count" placeholder="e.g., 25" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Monthly Revenue ($)</label>
+                            <input type="number" class="form-input" id="agency-monthly-revenue" placeholder="e.g., 50000" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Total Revenue ($)</label>
+                            <input type="number" class="form-input" id="total-revenue" placeholder="e.g., 500000" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Country</label>
+                            <input type="text" class="form-input" id="agency-country" placeholder="e.g., France">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-textarea" id="agency-description" placeholder="Describe your agency..."></textarea>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+                </div>
+
+                <!-- Publish New Post Tab -->
+                <div id="media-tab" class="tab-content">
+                    <h3 style="margin-bottom: 1.5rem;">Publish New Post</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Post Content</label>
+                        <textarea class="form-textarea" id="new-post-content" placeholder="What's on your mind? Share your thoughts..." rows="4"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Add Photo or Video (Optional)</label>
+                        <div class="file-upload">
+                            <input type="file" id="new-post-media" accept="image/*,video/*" onchange="handleNewPostMedia(event)">
+                            <label for="new-post-media" class="file-upload-label">
+                                <span>📷 Add Photo or Video</span>
+                            </label>
+                        </div>
+                        <div id="new-post-media-preview" style="margin-top: 1rem; display: none;"></div>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="publishNewPost()">Publish Post</button>
+                </div>
+
+                <!-- Posts Tab -->
+                <div id="posts-tab" class="tab-content">
+                    <h3 style="margin-bottom: 1.5rem;">My Posts</h3>
+                    <div id="posts-list">
+                        <div style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📝</div>
+                            <p>No posts yet. Create your first post in the "Publish New Post" tab!</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        let profileData = {};
+        let userRole = 'talent';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProfile();
+            loadPosts();
+        });
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+
+        // Status messages
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status-message');
+            statusEl.textContent = message;
+            statusEl.className = `status-message show status-${type}`;
+            
+            setTimeout(() => {
+                statusEl.classList.remove('show');
+            }, 3000);
+        }
+
+        // Load profile (demo mode)
+        function loadProfile() {
+            // Try to load from localStorage first
+            const savedProfile = localStorage.getItem('userProfile');
+            if (savedProfile) {
+                try {
+                    profileData = JSON.parse(savedProfile);
+                    userRole = profileData.role || 'talent';
+                    console.log('Loaded profile from localStorage');
+                } catch (e) {
+                    console.error('Error loading profile:', e);
+                }
+            }
+
+            // Create demo profile if none exists
+            if (!profileData || !profileData.first_name) {
+                profileData = {
+                    first_name: 'John',
+                    last_name: 'Doe',
+                    email: 'john.doe@example.com',
+                    role: 'talent',
+                    talent_type: 'content-creator',
+                    experience: 'intermediate',
+                    portfolio: '',
+                    age: '25',
+                    country: 'FR',
+                    languages: 'English, French',
+                    instagram: '',
+                    twitter: '',
+                    tiktok: '',
+                    monthly_revenue: '25k-50k',
+                    has_manager: 'no',
+                    bio: 'Passionate content creator with expertise in digital media.',
+                    posts: []
+                };
+                userRole = 'talent';
+                console.log('Created demo profile');
+            }
+
+            // Load fields
+            document.getElementById('first-name').value = profileData.first_name || '';
+            document.getElementById('last-name').value = profileData.last_name || '';
+            document.getElementById('email').value = profileData.email || '';
+            document.getElementById('profile-name').textContent = (profileData.first_name || '') + ' ' + (profileData.last_name || '');
+            document.getElementById('profile-role').textContent = userRole.charAt(0).toUpperCase() + userRole.slice(1);
+
+            // Show role-specific fields
+            if (userRole === 'talent') {
+                document.getElementById('talent-fields').style.display = 'block';
+                document.getElementById('agency-fields').style.display = 'none';
+                
+                // Load talent fields
+                document.getElementById('display-name').value = profileData.first_name + ' ' + profileData.last_name;
+                document.getElementById('talent-type').value = profileData.talent_type || '';
+                document.getElementById('experience').value = profileData.experience || '';
+                document.getElementById('portfolio').value = profileData.portfolio || '';
+                document.getElementById('age').value = profileData.age || '';
+                document.getElementById('country').value = profileData.country || '';
+                document.getElementById('languages').value = profileData.languages || '';
+                document.getElementById('instagram').value = profileData.instagram || '';
+                document.getElementById('twitter').value = profileData.twitter || '';
+                document.getElementById('tiktok').value = profileData.tiktok || '';
+                document.getElementById('monthly-revenue').value = profileData.monthly_revenue || '';
+                
+                // Set radio button for has-manager
+                const hasManagerRadio = document.querySelector(`input[name="has-manager"][value="${profileData.has_manager || 'no'}"]`);
+                if (hasManagerRadio) hasManagerRadio.checked = true;
+                
+                document.getElementById('bio').value = profileData.bio || '';
+            } else if (userRole === 'agency') {
+                document.getElementById('talent-fields').style.display = 'none';
+                document.getElementById('agency-fields').style.display = 'block';
+                
+                // Load agency fields
+                document.getElementById('agency-name').value = profileData.agency_name || '';
+                document.getElementById('agency-type').value = profileData.agency_type || '';
+                document.getElementById('talent-count').value = profileData.talent_count || '';
+                document.getElementById('agency-monthly-revenue').value = profileData.agency_revenue || '';
+                document.getElementById('total-revenue').value = profileData.total_revenue || '';
+                document.getElementById('agency-country').value = profileData.agency_country || '';
+                document.getElementById('agency-description').value = profileData.agency_description || '';
+            }
+
+            showStatus('Profile loaded successfully', 'success');
+        }
+
+        // Save profile
+        function saveProfile() {
+            // Update profileData
+            profileData.first_name = document.getElementById('first-name').value;
+            profileData.last_name = document.getElementById('last-name').value;
+            profileData.email = document.getElementById('email').value;
+
+            if (userRole === 'talent') {
+                profileData.talent_type = document.getElementById('talent-type').value;
+                profileData.experience = document.getElementById('experience').value;
+                profileData.portfolio = document.getElementById('portfolio').value;
+                profileData.age = document.getElementById('age').value;
+                profileData.country = document.getElementById('country').value;
+                profileData.languages = document.getElementById('languages').value;
+                profileData.instagram = document.getElementById('instagram').value;
+                profileData.twitter = document.getElementById('twitter').value;
+                profileData.tiktok = document.getElementById('tiktok').value;
+                profileData.monthly_revenue = document.getElementById('monthly-revenue').value;
+                profileData.has_manager = document.querySelector('input[name="has-manager"]:checked')?.value || 'no';
+                profileData.bio = document.getElementById('bio').value;
+            } else if (userRole === 'agency') {
+                profileData.agency_name = document.getElementById('agency-name').value;
+                profileData.agency_type = document.getElementById('agency-type').value;
+                profileData.talent_count = document.getElementById('talent-count').value;
+                profileData.agency_revenue = document.getElementById('agency-monthly-revenue').value;
+                profileData.total_revenue = document.getElementById('total-revenue').value;
+                profileData.agency_country = document.getElementById('agency-country').value;
+                profileData.agency_description = document.getElementById('agency-description').value;
+            }
+
+            // Save to localStorage
+            localStorage.setItem('userProfile', JSON.stringify(profileData));
+            
+            // Update display
+            document.getElementById('profile-name').textContent = profileData.first_name + ' ' + profileData.last_name;
+            
+            showStatus('Profile saved successfully!', 'success');
+        }
+
+        // Handle new post media
+        function handleNewPostMedia(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                const preview = document.getElementById('new-post-media-preview');
+                
+                reader.onload = function(e) {
+                    let mediaHtml = '';
+                    if (file.type.startsWith('image/')) {
+                        mediaHtml = `<img src="${e.target.result}" alt="Preview" style="max-width: 100%; border-radius: 8px;">`;
+                    } else if (file.type.startsWith('video/')) {
+                        mediaHtml = `<video src="${e.target.result}" controls style="max-width: 100%; border-radius: 8px;"></video>`;
+                    }
+                    
+                    preview.innerHTML = mediaHtml;
+                    preview.style.display = 'block';
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Publish new post
+        function publishNewPost() {
+            const content = document.getElementById('new-post-content').value.trim();
+            const mediaFile = document.getElementById('new-post-media').files[0];
+            
+            if (!content && !mediaFile) {
+                showStatus('Please add content or media to your post', 'error');
+                return;
+            }
+
+            const newPost = {
+                id: Date.now(),
+                content: content,
+                type: 'text',
+                media: null,
+                createdAt: new Date().toISOString(),
+                likes: 0,
+                comments: 0,
+                shares: 0
+            };
+
+            // Auto-detect post type
+            if (content && mediaFile) {
+                newPost.type = 'mixed';
+            } else if (mediaFile) {
+                newPost.type = mediaFile.type.startsWith('image/') ? 'photo' : 'video';
+            }
+
+            // Handle media
+            if (mediaFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    newPost.media = {
+                        type: mediaFile.type.startsWith('image/') ? 'image' : 'video',
+                        url: e.target.result,
+                        name: mediaFile.name
+                    };
+                    
+                    saveAndDisplayPost(newPost);
+                };
+                reader.readAsDataURL(mediaFile);
+            } else {
+                saveAndDisplayPost(newPost);
+            }
+        }
+
+        // Save and display post
+        function saveAndDisplayPost(post) {
+            // Initialize posts array if needed
+            if (!profileData.posts) {
+                profileData.posts = [];
+            }
+            
+            // Add post to beginning
+            profileData.posts.unshift(post);
+            
+            // Save to localStorage
+            localStorage.setItem('userProfile', JSON.stringify(profileData));
+            
+            // Update posts count
+            document.getElementById('posts-count').textContent = profileData.posts.length;
+            
+            // Clear form
+            document.getElementById('new-post-content').value = '';
+            document.getElementById('new-post-media').value = '';
+            document.getElementById('new-post-media-preview').style.display = 'none';
+            document.getElementById('new-post-media-preview').innerHTML = '';
+            
+            showStatus('Post published successfully!', 'success');
+            
+            // Switch to posts tab
+            setTimeout(() => {
+                // Switch tabs
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                const postsTabBtn = Array.from(document.querySelectorAll('.tab-button')).find(btn => btn.textContent.includes('Posts'));
+                const postsTabContent = document.getElementById('posts-tab');
+                
+                if (postsTabBtn) postsTabBtn.classList.add('active');
+                if (postsTabContent) postsTabContent.classList.add('active');
+                
+                // Load posts
+                loadPosts();
+            }, 500);
+        }
+
+        // Load posts
+        function loadPosts() {
+            const posts = profileData.posts || [];
+            const postsList = document.getElementById('posts-list');
+            
+            if (posts.length === 0) {
+                postsList.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">📝</div>
+                        <p>No posts yet. Create your first post in the "Publish New Post" tab!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let postsHtml = '';
+            posts.forEach(post => {
+                const typeClass = post.type || 'text';
+                const typeName = {
+                    'text': '📄 Text',
+                    'photo': '📷 Photo', 
+                    'video': '🎥 Video',
+                    'mixed': '🎨 Mixed'
+                }[typeClass] || '📄 Text';
+                
+                const date = new Date(post.createdAt).toLocaleDateString('fr-FR', {
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                postsHtml += `
+                    <div class="post-item">
+                        <div class="post-header">
+                            <span class="post-type ${typeClass}">${typeName}</span>
+                            <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">${date}</span>
+                        </div>
+                        
+                        ${post.content ? `<div class="post-content">${post.content}</div>` : ''}
+                        
+                        ${post.media ? `
+                            <div class="post-media">
+                                ${post.media.type === 'image' 
+                                    ? `<img src="${post.media.url}" alt="${post.media.name}">`
+                                    : `<video src="${post.media.url}" controls></video>`
+                                }
+                            </div>
+                        ` : ''}
+                        
+                        <div class="post-footer">
+                            <div class="post-actions">
+                                <button class="post-action">❤️ ${post.likes || 0}</button>
+                                <button class="post-action">💬 ${post.comments || 0}</button>
+                                <button class="post-action">🔄 ${post.shares || 0}</button>
+                            </div>
+                            <button class="post-action" onclick="deletePost(${post.id})">🗑️ Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            postsList.innerHTML = postsHtml;
+        }
+
+        // Delete post
+        function deletePost(postId) {
+            if (confirm('Are you sure you want to delete this post?')) {
+                profileData.posts = profileData.posts.filter(post => post.id !== postId);
+                localStorage.setItem('userProfile', JSON.stringify(profileData));
+                document.getElementById('posts-count').textContent = profileData.posts.length;
+                loadPosts();
+                showStatus('Post deleted', 'success');
+            }
+        }
+    </script>
+</body>
+</html>

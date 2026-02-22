@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talent Registration - Talent & Agency</title>
+    <script src="/auth-utils.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            position: relative;
+            line-height: 1.6;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+            z-index: 0;
+        }
+        a { color: inherit; text-decoration: none; }
+
+        .reg-card {
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
+        }
+        .reg-card::-webkit-scrollbar { width: 4px; }
+        .reg-card::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+        .card-header { text-align: center; margin-bottom: 3rem; }
+        .card-title { font-size: 1.75rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
+        .card-description { color: rgba(255, 255, 255, 0.6); font-size: 0.95rem; }
+
+        .card-content { display: flex; flex-direction: column; gap: 4rem; }
+
+        .form-group { display: flex; flex-direction: column; gap: 1.25rem; }
+        .label { 
+            font-size: 0.875rem; 
+            font-weight: 500; 
+            color: rgba(255, 255, 255, 0.85); 
+            margin-bottom: 0.5rem;
+            margin-top: 0.5rem;
+            display: block;
+        }
+        .required { color: #ef4444; }
+        .optional { color: rgba(255, 255, 255, 0.4); font-weight: 400; font-size: 0.85rem; }
+
+        .input, .select, textarea.input {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: #fff;
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.3s;
+            width: 100%;
+            outline: none;
+        }
+        .input::placeholder, textarea.input::placeholder { color: rgba(255, 255, 255, 0.3); }
+        .input:focus, .select:focus, textarea.input:focus {
+            border-color: rgba(59, 130, 246, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        select.select { appearance: auto; }
+        textarea.input { resize: vertical; min-height: 80px; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        .form-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: rgba(59, 130, 246, 0.8);
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        .checkbox-label {
+            display: flex; align-items: center; gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; cursor: pointer;
+        }
+        .checkbox-label input[type="checkbox"] { accent-color: #3b82f6; width: 16px; height: 16px; }
+
+        .card-footer {
+            display: flex; flex-direction: row; gap: 0.75rem; margin-top: 2rem;
+        }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; font-size: 0.95rem;
+            cursor: pointer; transition: all 0.3s; border: none; font-family: inherit;
+        }
+        .btn-primary {
+            background: #3b82f6; color: #fff; flex: 1;
+        }
+        .btn-primary:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06); color: #fff; border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
+
+        .status-message { padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.9rem; display: none; }
+        .error-message { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); color: #fca5a5; }
+        .success-message { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.25); color: #86efac; }
+
+        .back-link {
+            text-align: center; margin-top: 1.5rem; padding-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.6); font-size: 0.875rem;
+        }
+        .back-link a { color: rgba(59, 130, 246, 0.8); font-weight: 500; }
+        .back-link a:hover { color: #60a5fa; text-decoration: underline; }
+
+        @media (max-width: 640px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .reg-card { padding: 1.5rem; }
+            .card-footer { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="reg-card">
+        <div class="card-header">
+            <h1 class="card-title">Talent Registration</h1>
+            <p class="card-description">Join our platform as a content creator</p>
+        </div>
+        
+        <div class="card-content">
+            <div id="error-message" class="status-message error-message"></div>
+            <div id="success-message" class="status-message success-message"></div>
+            
+            <form id="register-form">
+                <!-- Basic Information -->
+                <div class="form-group">
+                    <div class="grid-2">
+                        <div>
+                            <label for="firstName" class="label">First Name <span class="required">*</span></label>
+                            <input id="firstName" type="text" class="input" placeholder="Emma" required>
+                        </div>
+                        <div>
+                            <label for="lastName" class="label">Last Name <span class="required">*</span></label>
+                            <input id="lastName" type="text" class="input" placeholder="Wilson" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email" class="label">Email <span class="required">*</span></label>
+                    <input id="email" type="email" class="input" placeholder="emma@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="stageName" class="label">Talent Name / Stage Name <span class="optional">(Optional)</span></label>
+                    <input id="stageName" type="text" class="input" placeholder="Emma Creator">
+                </div>
+                
+                <div class="form-group">
+                    <label for="age" class="label">Age <span class="optional">(Optional)</span></label>
+                    <input id="age" type="number" class="input" placeholder="25" min="18" max="100">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="label">Password <span class="required">*</span></label>
+                    <input id="password" type="password" class="input" placeholder="Min. 6 characters" required minlength="6">
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword" class="label">Confirm Password <span class="required">*</span></label>
+                    <input id="confirmPassword" type="password" class="input" placeholder="Repeat password" required>
+                </div>
+
+                <!-- Talent Information -->
+                <div class="form-section-title">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    Talent Information <span class="optional">(Optional)</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="country" class="label">Country</label>
+                    <select id="country" class="select">
+                        <option value="">Select your country</option>
+                        <option value="France">France</option>
+                        <option value="Belgium">Belgium</option>
+                        <option value="Switzerland">Switzerland</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Spain">Spain</option>
+                        <option value="Italy">Italy</option>
+                        <option value="Germany">Germany</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="United States">United States</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="label">Platforms you use</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="platforms" value="OnlyFans">
+                            <span>OnlyFans</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="platforms" value="Fanvue">
+                            <span>Fanvue</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="platforms" value="MYM">
+                            <span>MYM</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="platforms" value="Reveal">
+                            <span>Reveal</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="platforms" value="Fansly">
+                            <span>Fansly</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="grid-2">
+                        <div>
+                            <label for="monthlyRevenue" class="label">Monthly revenue ($)</label>
+                            <input id="monthlyRevenue" type="number" class="input" placeholder="e.g., 8500" min="0">
+                        </div>
+                        <div>
+                            <label for="hasManager" class="label">Manager</label>
+                            <select id="hasManager" class="select">
+                                <option value="no">No</option>
+                                <option value="yes">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bio" class="label">Bio / Description</label>
+                    <textarea id="bio" class="input" placeholder="Tell us about yourself, your content and what you offer to your subscribers..." rows="4"></textarea>
+                </div>
+            </form>
+        </div>
+        
+        <div class="card-footer">
+            <button type="submit" form="register-form" class="btn btn-primary" id="submitBtn">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Create Account
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='/signup'">
+                Back
+            </button>
+        </div>
+        
+        <div class="back-link">
+            Already have an account? <a href="/login">Sign in</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('register-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const age = parseInt(document.getElementById('age').value);
+            
+            if (password !== confirmPassword) {
+                showError('Passwords do not match');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters');
+                return;
+            }
+            
+            if (age && age < 18) {
+                showError('You must be at least 18 years old to register');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const originalHTML = submitBtn.innerHTML;
+            submitBtn.innerHTML = 'Creating Account...';
+            submitBtn.disabled = true;
+            
+            try {
+                const data = {
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    email: document.getElementById('email').value,
+                    password: password,
+                    role: 'talent',
+                    talentProfile: {
+                        displayName: document.getElementById('stageName').value || document.getElementById('firstName').value,
+                        age: document.getElementById('age').value,
+                        bio: document.getElementById('bio').value,
+                        platforms: Array.from(document.querySelectorAll('input[name="platforms"]:checked')).map(cb => cb.value).join(', '),
+                        country: document.getElementById('country').value,
+                        revenue: document.getElementById('monthlyRevenue').value,
+                        hasManager: document.getElementById('hasManager').value,
+                        specialty: 'Content Creator'
+                    }
+                };
+                
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const text = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(text);
+                } catch (e) {
+                    console.error('Server response:', text);
+                    throw new Error('Server returned invalid response. Please try again.');
+                }
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Registration failed');
+                }
+                
+                Auth.saveSession(result.token, result.user);
+                showSuccess('Talent registration successful! Redirecting...');
+                
+                setTimeout(() => {
+                    window.location.href = '/discover';
+                }, 1500);
+                
+            } catch (error) {
+                showError(error.message || 'Registration failed');
+            } finally {
+                submitBtn.innerHTML = originalHTML;
+                submitBtn.disabled = false;
+            }
+        });
+        
+        function showError(message) {
+            const el = document.getElementById('error-message');
+            el.textContent = message;
+            el.style.display = 'block';
+            document.getElementById('success-message').style.display = 'none';
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+        
+        function showSuccess(message) {
+            const el = document.getElementById('success-message');
+            el.textContent = message;
+            el.style.display = 'block';
+            document.getElementById('error-message').style.display = 'none';
+        }
+        
+    </script>
+</body>
+</html>

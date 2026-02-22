@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Subscription - Talent & Agency</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="profile-manager.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        /* Header - Same as other pages */
+        .header {
+            background: rgba(0, 0, 0, 0.95);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .nav-brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-right: 1rem;
+            margin-left: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Profile Icon */
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1e3a8a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-icon:hover {
+            background: linear-gradient(135deg, #4a90e2, #2563eb);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Sidebar Menu */
+        .sidebar-icon {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .sidebar-icon span {
+            width: 25px;
+            height: 2px;
+            background: #fff;
+            transition: all 0.3s;
+        }
+
+        .sidebar-icon:hover span {
+            background: rgba(59, 130, 246, 0.8);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            transition: left 0.3s ease;
+            z-index: 1001;
+            padding: 2rem;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .close-sidebar {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: color 0.3s;
+        }
+
+        .close-sidebar:hover {
+            color: rgba(59, 130, 246, 0.8);
+        }
+
+        .sidebar-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sidebar-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .sidebar-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-btn.logout {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .sidebar-btn.logout:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Overlay */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        /* Cards - shadcnui style */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Buttons - shadcnui style */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* Subscription Overview */
+        .subscription-overview {
+            background: linear-gradient(135deg, #3b82f6, #1e3a8a);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .subscription-overview::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .subscription-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subscription-plan {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .subscription-price {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .subscription-period {
+            opacity: 0.9;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .subscription-status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .status-active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .status-trial {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .status-expired {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .status-suspended {
+            background: rgba(156, 163, 175, 0.2);
+            color: #9ca3af;
+        }
+
+        .status-cancelled {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .subscription-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subscription-detail {
+            text-align: center;
+        }
+
+        .subscription-detail-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: #fff;
+        }
+
+        .subscription-detail-label {
+            opacity: 0.9;
+            font-size: 0.9rem;
+            color: #fff;
+        }
+
+        .subscription-features {
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #fff;
+        }
+
+        .feature-icon {
+            color: #22c55e;
+        }
+
+        /* Payment Methods */
+        .payment-method {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .payment-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .payment-card {
+            width: 40px;
+            height: 25px;
+            background: linear-gradient(135deg, #3b82f6, #1e3a8a);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .payment-details h4 {
+            margin-bottom: 0.25rem;
+            color: #fff;
+        }
+
+        .payment-details p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        /* Invoice Table */
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .invoice-table th {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+        }
+
+        .invoice-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .invoice-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .invoice-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .invoice-paid {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .invoice-pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .invoice-failed {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        /* Plan Comparison */
+        .plan-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .plan-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .plan-card.featured {
+            border-color: #3b82f6;
+            transform: scale(1.05);
+        }
+
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .plan-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 0.5rem;
+        }
+
+        .plan-period {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1rem;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .plan-feature {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .plan-feature:last-child {
+            border-bottom: none;
+        }
+
+        /* Trial Timer */
+        .trial-timer {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .trial-time {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .trial-message {
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .subscription-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .subscription-details {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-list {
+                grid-template-columns: 1fr;
+            }
+
+            .plan-comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 6rem 1rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="nav">
+            <div class="nav-brand">Talent & Agency</div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="discover.html">Discover</a></li>
+                    <li><a href="/favorites">Favorites</a></li>
+                    <li><a href="/messages">Messages</a></li>
+                </ul>
+            </nav>
+            <div class="nav-actions">
+                <button class="sidebar-icon" onclick="toggleSidebar()" title="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div class="profile-icon" onclick="goToProfile()" title="Go to Profile">
+                    <span id="profileInitial">U</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Menu</div>
+            <button class="close-sidebar" onclick="toggleSidebar()">×</button>
+        </div>
+        <div class="sidebar-actions">
+            <a href="#" onclick="goToProfile(); toggleSidebar();" class="sidebar-btn">
+                My Profile
+            </a>
+            <a href="#" onclick="goToManage(); toggleSidebar();" class="sidebar-btn" id="manageBtn">
+                Manage
+            </a>
+            <a href="pages/settings.html" class="sidebar-btn" onclick="toggleSidebar()">
+                Settings
+            </a>
+            <button class="sidebar-btn logout" onclick="doLogout(); toggleSidebar();">
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Subscription Management</h1>
+            <p class="page-subtitle">Manage your agency subscription and billing</p>
+        </div>
+
+        <!-- Trial Timer (if on trial) -->
+        <div class="trial-timer" id="trialTimer" style="display: none;">
+            <div class="trial-time" id="trialTime">7 days left</div>
+            <div class="trial-message">Your trial ends on <span id="trialEndDate">December 15, 2024</span></div>
+            <button class="btn btn-primary" onclick="addPaymentMethod()">
+                Add Payment Method to Continue
+            </button>
+        </div>
+
+        <!-- 📊 1. Subscription Overview -->
+        <section class="subscription-overview">
+            <div class="subscription-header">
+                <div>
+                    <div class="subscription-plan" id="currentPlan">Pro Plan</div>
+                    <div class="subscription-price" id="currentPrice">$99/month</div>
+                    <div class="subscription-period">Billed monthly</div>
+                    <div class="subscription-status status-active" id="subscriptionStatus">Active</div>
+                </div>
+                <div>
+                    <button class="btn btn-outline" onclick="changePlan()">
+                        Change Plan
+                    </button>
+                </div>
+            </div>
+
+            <div class="subscription-details">
+                <div class="subscription-detail">
+                    <div class="subscription-detail-value" id="nextBilling">Dec 15, 2024</div>
+                    <div class="subscription-detail-label">Next Billing</div>
+                </div>
+                <div class="subscription-detail">
+                    <div class="subscription-detail-value" id="talentsUsed">8/15</div>
+                    <div class="subscription-detail-label">Talents Used</div>
+                </div>
+                <div class="subscription-detail">
+                    <div class="subscription-detail-value" id="messagesUsed">2,450/5,000</div>
+                    <div class="subscription-detail-label">AI Messages</div>
+                </div>
+                <div class="subscription-detail">
+                    <div class="subscription-detail-value" id="storageUsed">4.2 GB/10 GB</div>
+                    <div class="subscription-detail-label">Storage</div>
+                </div>
+            </div>
+
+            <div class="subscription-features">
+                <h3 style="margin-bottom: 1rem;">Included Features</h3>
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Up to 15 talents</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>5,000 AI messages/month</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>10 GB storage</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Advanced analytics</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Priority support</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Custom branding</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 💳 2. Payment Methods -->
+        <section class="card" style="margin-bottom: 2rem;">
+            <h2 class="section-title">Payment Methods</h2>
+            <div id="paymentMethods">
+                <div class="payment-method">
+                    <div class="payment-info">
+                        <div class="payment-card">VISA</div>
+                        <div class="payment-details">
+                            <h4>Visa ending in 4242</h4>
+                            <p>Expires 12/25 • Default payment method</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-secondary" onclick="editPaymentMethod()">
+                            Edit
+                        </button>
+                        <button class="btn btn-danger" onclick="removePaymentMethod()">
+                            Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-outline" onclick="addPaymentMethod()">
+                + Add Payment Method
+            </button>
+        </section>
+
+        <!-- 🧾 3. Billing History -->
+        <section class="card" style="margin-bottom: 2rem;">
+            <h2 class="section-title">Billing History</h2>
+            <div class="invoice-table-container">
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoiceTableBody">
+                        <tr>
+                            <td>Dec 1, 2024</td>
+                            <td>Pro Plan - Monthly</td>
+                            <td>$99.00</td>
+                            <td><span class="invoice-status invoice-paid">Paid</span></td>
+                            <td>
+                                <button class="btn btn-secondary" onclick="downloadInvoice('INV-2024-12-001')">
+                                    Download
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Nov 1, 2024</td>
+                            <td>Pro Plan - Monthly</td>
+                            <td>$99.00</td>
+                            <td><span class="invoice-status invoice-paid">Paid</span></td>
+                            <td>
+                                <button class="btn btn-secondary" onclick="downloadInvoice('INV-2024-11-001')">
+                                    Download
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Oct 1, 2024</td>
+                            <td>Pro Plan - Monthly</td>
+                            <td>$99.00</td>
+                            <td><span class="invoice-status invoice-paid">Paid</span></td>
+                            <td>
+                                <button class="btn btn-secondary" onclick="downloadInvoice('INV-2024-10-001')">
+                                    Download
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 🔄 4. Change Plan Modal (hidden by default) -->
+        <div id="changePlanModal" style="display: none;">
+            <div class="card">
+                <h2 class="section-title">Change Your Plan</h2>
+                <div class="plan-comparison">
+                    <div class="plan-card">
+                        <div class="plan-name">Starter</div>
+                        <div class="plan-price">$29</div>
+                        <div class="plan-period">per month</div>
+                        <ul class="plan-features">
+                            <li class="plan-feature">Up to 5 talents</li>
+                            <li class="plan-feature">1,000 AI messages</li>
+                            <li class="plan-feature">2 GB storage</li>
+                            <li class="plan-feature">Basic analytics</li>
+                            <li class="plan-feature">Email support</li>
+                        </ul>
+                        <button class="btn btn-secondary" onclick="selectPlan('starter')">
+                            Select Starter
+                        </button>
+                    </div>
+                    <div class="plan-card featured">
+                        <div class="plan-name">Pro</div>
+                        <div class="plan-price">$99</div>
+                        <div class="plan-period">per month</div>
+                        <ul class="plan-features">
+                            <li class="plan-feature">Up to 15 talents</li>
+                            <li class="plan-feature">5,000 AI messages</li>
+                            <li class="plan-feature">10 GB storage</li>
+                            <li class="plan-feature">Advanced analytics</li>
+                            <li class="plan-feature">Priority support</li>
+                        </ul>
+                        <button class="btn btn-primary" onclick="selectPlan('pro')">
+                            Current Plan
+                        </button>
+                    </div>
+                    <div class="plan-card">
+                        <div class="plan-name">Agency</div>
+                        <div class="plan-price">$299</div>
+                        <div class="plan-period">per month</div>
+                        <ul class="plan-features">
+                            <li class="plan-feature">Unlimited talents</li>
+                            <li class="plan-feature">Unlimited AI messages</li>
+                            <li class="plan-feature">100 GB storage</li>
+                            <li class="plan-feature">Custom analytics</li>
+                            <li class="plan-feature">Dedicated support</li>
+                        </ul>
+                        <button class="btn btn-secondary" onclick="selectPlan('agency')">
+                            Select Agency
+                        </button>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button class="btn btn-secondary" onclick="closeChangePlanModal()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ❌ 5. Cancel Subscription -->
+        <section class="card">
+            <h2 class="section-title">Cancel Subscription</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                If you cancel your subscription, you will lose access to all premium features at the end of your billing period.
+            </p>
+            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                <h4 style="margin-bottom: 0.5rem;">What you'll lose:</h4>
+                <ul style="color: var(--text-secondary); margin-left: 1rem;">
+                    <li>Access to more than 5 talents</li>
+                    <li>AI messaging capabilities</li>
+                    <li>Advanced analytics and reporting</li>
+                    <li>Priority customer support</li>
+                    <li>Custom branding options</li>
+                </ul>
+            </div>
+            <button class="btn btn-danger" onclick="cancelSubscription()">
+                Cancel Subscription
+            </button>
+        </section>
+    </main>
+
+    <script>
+        // Navigation functions
+        function doLogout() {
+            if (confirm('🚪 Voulez-vous vous déconnecter ?')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = '/login.html';
+            }
+        }
+
+        function goToProfile() {
+            const userType = localStorage.getItem('userType');
+            if (userType === 'TALENT' || userType === 'talent') {
+                window.location.href = '/profile-talent-simple.html';
+            } else if (userType === 'AGENCY' || userType === 'agency') {
+                window.location.href = '/profile-agency-simple.html';
+            } else {
+                window.location.href = '/discover.html';
+            }
+        }
+
+        function goToManage() {
+            window.location.href = '/manage-agency.html';
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+
+        // Set profile initial
+        function setProfileInitial() {
+            const userData = localStorage.getItem('userData');
+            const profileInitial = document.getElementById('profileInitial');
+            
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    const initial = user.firstName ? user.firstName.charAt(0).toUpperCase() : 
+                                   user.email ? user.email.charAt(0).toUpperCase() : 'U';
+                    
+                    if (profileInitial) profileInitial.textContent = initial;
+                } catch (error) {
+                    console.log('Error parsing user data:', error);
+                }
+            }
+        }
+
+        // Load subscription data
+        async function loadSubscriptionData() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                console.log('🔍 Chargement données abonnement depuis le backend...');
+                
+                // Get subscription from backend
+                const response = await fetch('/api/subscription', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load subscription data');
+                }
+
+                const subscriptionData = await response.json();
+                console.log('✅ Données abonnement reçues:', subscriptionData);
+                
+                // Update UI with real subscription data
+                updateSubscriptionUI(subscriptionData);
+                
+            } catch (error) {
+                console.error('❌ Erreur chargement abonnement:', error);
+                showError('Error loading subscription data');
+            }
+        }
+
+        // Update subscription UI with real data
+        function updateSubscriptionUI(data) {
+            // Format dates
+            const nextBilling = data.nextBilling ? new Date(data.nextBilling).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            }) : 'N/A';
+
+            document.getElementById('currentPlan').textContent = data.plan + ' Plan';
+            document.getElementById('currentPrice').textContent = '$' + data.price + '/' + data.period;
+            document.getElementById('nextBilling').textContent = nextBilling;
+            
+            // Update usage
+            if (data.usage && data.features) {
+                document.getElementById('talentsUsed').textContent = 
+                    `${data.usage.talentsUsed}/${data.features.maxTalents}`;
+                document.getElementById('messagesUsed').textContent = 
+                    `${data.usage.messagesUsed}/${data.features.maxMessages}`;
+                document.getElementById('storageUsed').textContent = 
+                    `${data.usage.storageUsed}/${data.features.maxStorage}`;
+            }
+
+            // Update status
+            const statusElement = document.getElementById('subscriptionStatus');
+            statusElement.className = 'subscription-status status-' + data.status;
+            statusElement.textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+
+            // Show/hide trial timer
+            if (data.status === 'trial') {
+                document.getElementById('trialTimer').style.display = 'block';
+                const trialDaysLeft = Math.ceil((new Date(data.endDate) - new Date()) / (1000 * 60 * 60 * 24));
+                document.getElementById('trialTime').textContent = trialDaysLeft + ' days left';
+                
+                document.getElementById('trialEndDate').textContent = new Date(data.endDate).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+            } else {
+                document.getElementById('trialTimer').style.display = 'none';
+            }
+
+            // Update features based on plan
+            updateFeaturesList(data.plan);
+        }
+
+        // Update features list based on plan
+        function updateFeaturesList(plan) {
+            const features = {
+                'Starter': [
+                    'Up to 5 talents',
+                    '1,000 AI messages/month',
+                    '2 GB storage',
+                    'Basic analytics',
+                    'Email support'
+                ],
+                'Pro': [
+                    'Up to 15 talents',
+                    '5,000 AI messages/month',
+                    '10 GB storage',
+                    'Advanced analytics',
+                    'Priority support',
+                    'Custom branding'
+                ],
+                'Agency': [
+                    'Unlimited talents',
+                    'Unlimited AI messages',
+                    '100 GB storage',
+                    'Custom analytics',
+                    'Dedicated support',
+                    'White-label options'
+                ]
+            };
+
+            const featureList = document.querySelector('.feature-list');
+            if (featureList && features[plan]) {
+                featureList.innerHTML = features[plan].map(feature => `
+                    <li class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>${feature}</span>
+                    </li>
+                `).join('');
+            }
+        }
+
+        // Load invoices from backend
+        async function loadInvoices() {
+            try {
+                const token = localStorage.getItem('authToken');
+                
+                const response = await fetch('/api/subscription/invoices', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load invoices');
+                }
+
+                const data = await response.json();
+                console.log('✅ Factures chargées:', data.invoices);
+                
+                // Update invoice table
+                updateInvoiceTable(data.invoices);
+                
+            } catch (error) {
+                console.error('❌ Erreur chargement factures:', error);
+            }
+        }
+
+        // Update invoice table
+        function updateInvoiceTable(invoices) {
+            const tbody = document.getElementById('invoiceTableBody');
+            if (!tbody) return;
+
+            if (invoices.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">No invoices found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = invoices.map(invoice => `
+                <tr>
+                    <td>${invoice.date}</td>
+                    <td>${invoice.description}</td>
+                    <td>$${invoice.amount.toFixed(2)}</td>
+                    <td><span class="invoice-status invoice-${invoice.status}">${invoice.status}</span></td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="downloadInvoice('${invoice.id}')">
+                            Download
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Payment methods functions
+        function addPaymentMethod() {
+            alert('Add Payment Method - This would open Stripe Elements to add a new card');
+        }
+
+        function editPaymentMethod() {
+            alert('Edit Payment Method - This would allow editing the existing card');
+        }
+
+        function removePaymentMethod() {
+            if (confirm('Are you sure you want to remove this payment method?')) {
+                alert('Payment method removed - This would update via Stripe API');
+                loadSubscriptionData(); // Reload data
+            }
+        }
+
+        // Billing functions
+        function downloadInvoice(invoiceId) {
+            alert(`Download Invoice ${invoiceId} - This would generate and download a PDF`);
+        }
+
+        // Plan management functions
+        function changePlan() {
+            document.getElementById('changePlanModal').style.display = 'block';
+        }
+
+        function closeChangePlanModal() {
+            document.getElementById('changePlanModal').style.display = 'none';
+        }
+
+        async function selectPlan(planName) {
+            if (planName === 'pro') {
+                const currentPlan = document.getElementById('currentPlan').textContent;
+                if (currentPlan.includes('Pro')) {
+                    alert('This is your current plan');
+                    return;
+                }
+            }
+
+            const confirmMessage = planName === 'starter' 
+                ? 'Downgrade to Starter plan? You will lose access to some features.'
+                : 'Upgrade to Agency plan? The change will take effect immediately.';
+            
+            if (confirm(confirmMessage)) {
+                try {
+                    const token = localStorage.getItem('authToken');
+                    
+                    const response = await fetch('/api/subscription/plan', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ plan: planName })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to update plan');
+                    }
+
+                    const updatedSubscription = await response.json();
+                    console.log('✅ Plan mis à jour:', updatedSubscription);
+                    
+                    closeChangePlanModal();
+                    loadSubscriptionData(); // Reload data
+                    
+                    alert(`Plan changed to ${planName} successfully!`);
+                    
+                } catch (error) {
+                    console.error('❌ Erreur changement plan:', error);
+                    alert('Failed to change plan. Please try again.');
+                }
+            }
+        }
+
+        // Cancel subscription
+        async function cancelSubscription() {
+            const confirmMessage = `Are you sure you want to cancel your subscription?
+            
+You will continue to have access until the end of your current billing period.
+After that date, you will lose access to all premium features.`;
+
+            if (confirm(confirmMessage)) {
+                try {
+                    const token = localStorage.getItem('authToken');
+                    
+                    const response = await fetch('/api/subscription/cancel', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to cancel subscription');
+                    }
+
+                    console.log('✅ Abonnement annulé');
+                    loadSubscriptionData(); // Reload data
+                    
+                    alert('Subscription cancelled successfully. You will keep access until the end of your billing period.');
+                    
+                } catch (error) {
+                    console.error('❌ Erreur annulation abonnement:', error);
+                    alert('Failed to cancel subscription. Please try again.');
+                }
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Manage Subscription page loaded');
+            
+            // Check authentication
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                console.log('❌ No token, redirecting to login');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            console.log('✅ User authenticated, loading subscription data');
+            
+            // Set profile initial
+            setProfileInitial();
+            
+            // Load subscription data
+            loadSubscriptionData();
+            
+            // Load invoices
+            loadInvoices();
+        });
+    </script>
+</body>
+</html>

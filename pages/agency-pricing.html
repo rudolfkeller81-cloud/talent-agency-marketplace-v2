@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agency Pricing - Talent & Agency</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1e293b;
+            --primary-dark: #0f172a;
+            --secondary: #475569;
+            --accent: #64748b;
+            --accent-blue: #1e3a8a;
+            --accent-blue-light: #3b82f6;
+            --accent-blue-subtle: rgba(59, 130, 246, 0.08);
+            --accent-blue-border: rgba(59, 130, 246, 0.15);
+            --accent-blue-glow: rgba(59, 130, 246, 0.25);
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            --bg-tertiary: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-tertiary: #71717a;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.16);
+            --border-blue: rgba(59, 130, 246, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-hover);
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(40px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 3rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 0.5rem;
+        }
+
+        .logo::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent-blue-light);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--accent-blue-glow);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-blue-light);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link.active {
+            color: var(--accent-blue-light);
+        }
+
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: 1px solid var(--accent-blue);
+        }
+
+        .nav-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--accent-blue-glow);
+        }
+
+        .nav-btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .nav-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--border-hover);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem; /* Ajout de padding-top pour éviter la navigation fixe */
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .pricing-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .pricing-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 2rem;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .pricing-card.featured {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px var(--accent-blue-subtle);
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-blue);
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-price .currency {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .pricing-price .period {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .pricing-description {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features {
+            margin-bottom: 2rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .feature-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .feature-icon.available {
+            background: var(--success);
+            color: white;
+        }
+
+        .feature-icon.unavailable {
+            background: var(--error);
+            color: white;
+        }
+
+        .feature-text {
+            font-size: 0.95rem;
+        }
+
+        .pricing-cta {
+            text-align: center;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--accent-blue-glow);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--border-hover);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        /* Comparison Section */
+        .comparison-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .comparison-title {
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-table th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .comparison-table th:first-child {
+            border-radius: 0.5rem 0 0 0;
+        }
+
+        .comparison-table th:last-child {
+            border-radius: 0 0.5rem 0 0;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .check-icon {
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .cross-icon {
+            color: var(--error);
+            font-weight: bold;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            margin-bottom: 4rem;
+        }
+
+        .faq-title {
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .faq-container {
+            max-width: 672px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .faq-item {
+            /* Les styles sont maintenant gérés par les classes Tailwind */
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            margin-bottom: 0;
+            overflow: visible;
+        }
+
+        .faq-item.active .faq-chevron {
+            transform: rotate(180deg);
+        }
+
+        .faq-item.active .faq-content {
+            max-height: 12rem;
+            opacity: 1;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: rgba(59, 130, 246, 0.8);
+        }
+
+        .footer-bottom {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .footer-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav {
+                padding: 1rem 1.5rem;
+            }
+
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .main-content {
+                padding: 6rem 1rem 2rem; /* Padding-top réduit pour mobile */
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .pricing-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .comparison-table {
+                font-size: 0.875rem;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .faq-title {
+                font-size: 1.5rem;
+            }
+
+            .faq-question {
+                font-size: 0.95rem;
+            }
+
+            .faq-answer {
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="logo">Talent & Agency</div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h1 class="hero-title">Agency Subscription Required</h1>
+            <p class="hero-subtitle">Complete your agency registration to access the platform and connect with talent</p>
+        </section>
+
+        <!-- Pricing Cards -->
+        <div class="pricing-container">
+            <!-- Premium Plan Only -->
+            <div class="pricing-card featured">
+                <div class="pricing-badge">1 Day Free Trial</div>
+                <div class="pricing-header">
+                    <h2 class="pricing-title">Premium Plan</h2>
+                    <div class="pricing-price">
+                        <span class="currency">$</span>9.99
+                        <span class="period">/month</span>
+                    </div>
+                    <p class="pricing-description">Start with 1 day free trial, then connect with top talent</p>
+                </div>
+
+                <div class="pricing-features">
+                    <div class="feature-item">
+                        <div class="feature-icon available">✓</div>
+                        <span class="feature-text">Create agency profile</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon available">✓</div>
+                        <span class="feature-text">Browse all talent profiles</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon available">✓</div>
+                        <span class="feature-text">View detailed talent information</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon available">✓</div>
+                        <span class="feature-text">Save favorites</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon available">✓</div>
+                        <span class="feature-text">Send unlimited messages</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon available">✓</div>
+                        <span class="feature-text">Contact talents directly</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon available">✓</div>
+                        <span class="feature-text">Advanced search filters</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon available">✓</div>
+                        <span class="feature-text">Priority support</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon available">✓</div>
+                        <span class="feature-text">Analytics dashboard</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon available">✓</div>
+                        <span class="feature-text">Brand partnership opportunities</span>
+                    </div>
+                </div>
+
+                <div class="pricing-cta">
+                    <button class="btn btn-primary" onclick="upgradeToPremium()">
+                        <span>🚀</span>
+                        Complete Registration - $10/month
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        
+        <!-- FAQ Section -->
+        <section class="faq-section">
+            <h2 class="faq-title">Frequently Asked Questions</h2>
+            
+            <div class="faq-container">
+                <div class="faq-item border-b border-gray-800">
+                    <button class="faq-trigger w-full flex items-center justify-between px-0 py-6 text-left text-white hover:text-gray-300 transition-colors text-lg font-normal" onclick="toggleFAQ(this)">
+                        <span class="text-lg font-normal">How does the 1 day free trial work?</span>
+                        <svg class="faq-chevron w-5 h-5 text-gray-400 transition-transform duration-300 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="faq-content overflow-hidden transition-all duration-300 ease-in-out max-h-0 opacity-0">
+                        <div class="pb-6 text-gray-400 leading-relaxed">
+                            Start your 1 day free trial now! You'll get full access to all Premium features. After 24 hours, you'll be automatically charged $10/month unless you cancel.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item border-b border-gray-800">
+                    <button class="faq-trigger w-full flex items-center justify-between px-0 py-6 text-left text-white hover:text-gray-300 transition-colors text-lg font-normal" onclick="toggleFAQ(this)">
+                        <span class="text-lg font-normal">What happens if I cancel my subscription?</span>
+                        <svg class="faq-chevron w-5 h-5 text-gray-400 transition-transform duration-300 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="faq-content overflow-hidden transition-all duration-300 ease-in-out max-h-0 opacity-0">
+                        <div class="pb-6 text-gray-400 leading-relaxed">
+                            You can cancel anytime. You'll keep Premium features until the end of your billing period, then your access will end. Your profile and data will remain intact.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item border-b border-gray-800">
+                    <button class="faq-trigger w-full flex items-center justify-between px-0 py-6 text-left text-white hover:text-gray-300 transition-colors text-lg font-normal" onclick="toggleFAQ(this)">
+                        <span class="text-lg font-normal">Is there a contract or commitment?</span>
+                        <svg class="faq-chevron w-5 h-5 text-gray-400 transition-transform duration-300 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="faq-content overflow-hidden transition-all duration-300 ease-in-out max-h-0 opacity-0">
+                        <div class="pb-6 text-gray-400 leading-relaxed">
+                            No contracts! You pay monthly and can cancel anytime. No long-term commitments or hidden fees.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item border-b border-gray-800">
+                    <button class="faq-trigger w-full flex items-center justify-between px-0 py-6 text-left text-white hover:text-gray-300 transition-colors text-lg font-normal" onclick="toggleFAQ(this)">
+                        <span class="text-lg font-normal">What payment methods do you accept?</span>
+                        <svg class="faq-chevron w-5 h-5 text-gray-400 transition-transform duration-300 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="faq-content overflow-hidden transition-all duration-300 ease-in-out max-h-0 opacity-0">
+                        <div class="pb-6 text-gray-400 leading-relaxed">
+                            We accept all major credit cards through Stripe. Your payment information is secure and never stored on our servers.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="../terms.html">Terms of Service</a>
+                <a href="../privacy.html">Privacy Policy</a>
+                <a href="../contact.html">Contact</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Talent & Agency. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+
+        // FAQ Toggle
+        function toggleFAQ(element) {
+            const faqItem = element.parentElement;
+            const allItems = document.querySelectorAll('.faq-item');
+            
+            // Close all other items
+            allItems.forEach(item => {
+                if (item !== faqItem) {
+                    item.classList.remove('active');
+                }
+            });
+            
+            // Toggle current item
+            faqItem.classList.toggle('active');
+        }
+
+        // Navigation functions - goToDiscover supprimé car pas d'accès avant paiement
+
+        function upgradeToPremium() {
+            handleAgencyPro();
+        }
+        
+        // Handle Agency Pro subscription
+        async function handleAgencyPro() {
+            if (!stripe) {
+                alert('Le service de paiement n\'est pas disponible. Veuillez réessayer plus tard.');
+                return;
+            }
+            
+            // Check if user is authenticated
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                alert('Vous devez être connecté pour vous abonner. Redirection vers la page de connexion...');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+                return;
+            }
+            
+            try {
+                // Show loading state
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '⏳ Traitement en cours...';
+                button.disabled = true;
+                
+                // Create checkout session via API
+                const response = await fetch('/api/stripe/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        priceId: 'price_1Sou9kBMaYssuiS8fJ4tRpGT', // Remplacez avec votre price ID de TEST
+                        successUrl: `http://localhost:3001/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+                        cancelUrl: `http://localhost:3001/pages/agency-pricing?canceled=true`
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok || !result.success) {
+                    throw new Error(result.error || 'Erreur lors de la création de la session de paiement');
+                }
+                
+                // Redirect to Stripe Checkout
+                window.location.href = result.url;
+                
+            } catch (error) {
+                console.error('Erreur paiement:', error);
+                alert('Erreur lors du paiement: ' + error.message);
+                
+                // Reset button
+                const button = event.target;
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        // Check if this is a return from successful payment
+        function checkPaymentReturn() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const paymentSuccess = urlParams.get('payment') === 'success';
+            const isNewRegistration = sessionStorage.getItem('isNewAgencyRegistration') === 'true';
+            
+            if (paymentSuccess && isNewRegistration) {
+                console.log('✅ Paiement réussi pour nouvelle agence!');
+                
+                // Get the agency data
+                const pendingAgencyData = sessionStorage.getItem('pendingAgencyData');
+                if (pendingAgencyData) {
+                    const agencyData = JSON.parse(pendingAgencyData);
+                    console.log('🏢 Création du compte agence:', agencyData);
+                    
+                    // In a real app, you would:
+                    // 1. Create the agency account in your database
+                    // 2. Set subscription status to active
+                    // 3. Log the user in automatically
+                    // 4. Clear the temporary data
+                    
+                    // For demo purposes, we'll simulate success
+                    showSuccessMessage('Paiement réussi! Votre compte agence est maintenant actif. Redirection vers Discover...');
+                    
+                    // Clear temporary data
+                    sessionStorage.removeItem('pendingAgencyData');
+                    sessionStorage.removeItem('isNewAgencyRegistration');
+                    
+                    // Ensure user type is set to agency
+                    sessionStorage.setItem('userType', 'agency');
+                    
+                    // Redirect to discover after 3 seconds
+                    setTimeout(() => {
+                        window.location.href = '../discover.html';
+                    }, 3000);
+                }
+            }
+        }
+        
+        function showSuccessMessage(message) {
+            // Create success message element
+            const successDiv = document.createElement('div');
+            successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            successDiv.textContent = message;
+            document.body.appendChild(successDiv);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                if (successDiv.parentNode) {
+                    successDiv.parentNode.removeChild(successDiv);
+                }
+            }, 5000);
+        }
+
+        // Initialize Stripe
+        let stripe;
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check if returning from successful payment
+            checkPaymentReturn();
+            
+            // Initialize Stripe with publishable key
+            const stripeKey = await getStripePublishableKey();
+            if (stripeKey) {
+                stripe = Stripe(stripeKey);
+                console.log('✅ Stripe initialisé');
+            }
+        });
+        
+        // Get Stripe publishable key from server
+        async function getStripePublishableKey() {
+            try {
+                console.log('🔍 Récupération de la clé Stripe...');
+                const response = await fetch('/api/stripe/config');
+                console.log('📡 Réponse reçue:', response.status);
+                
+                if (response.ok) {
+                    const config = await response.json();
+                    console.log('⚙️ Config reçue:', config);
+                    return config.publishableKey;
+                } else {
+                    console.error('❌ Erreur HTTP:', response.status);
+                }
+            } catch (error) {
+                console.error('❌ Erreur récupération clé Stripe:', error);
+            }
+            return null;
+        }
+    </script>
+</body>
+</html>

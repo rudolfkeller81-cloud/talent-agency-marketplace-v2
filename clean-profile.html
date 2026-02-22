@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clean Profile Data</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .warning {
+            color: #ef4444;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .info {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .status-message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .status-message.show {
+            display: block;
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .data-preview {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: left;
+            font-size: 0.8rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Clean Profile Data</h1>
+        
+        <div class="warning">⚠️ This will remove all profile data and start fresh</div>
+        
+        <div class="info">
+            This will delete all stored profile information including posts, 
+            and create a clean profile with only basic fields empty.
+        </div>
+
+        <div id="current-data" class="data-preview" style="display: none;">
+            <strong>Current data:</strong>
+            <pre id="data-content"></pre>
+        </div>
+
+        <div id="status-message" class="status-message"></div>
+
+        <button class="btn btn-danger" onclick="cleanProfileData()">
+            🗑️ Clean All Profile Data
+        </button>
+        
+        <a href="/profile" class="btn btn-secondary">
+            ← Back to Profile
+        </a>
+    </div>
+
+    <script>
+        // Show current data on load
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedProfile = localStorage.getItem('userProfile');
+            if (savedProfile) {
+                try {
+                    const profileData = JSON.parse(savedProfile);
+                    const dataPreview = document.getElementById('current-data');
+                    const dataContent = document.getElementById('data-content');
+                    
+                    dataContent.textContent = JSON.stringify(profileData, null, 2);
+                    dataPreview.style.display = 'block';
+                } catch (e) {
+                    console.error('Error parsing profile data:', e);
+                }
+            } else {
+                document.getElementById('current-data').innerHTML = '<strong>No profile data found</strong>';
+                document.getElementById('current-data').style.display = 'block';
+            }
+        });
+
+        function cleanProfileData() {
+            if (confirm('Are you sure you want to delete all profile data? This cannot be undone.')) {
+                // Remove all profile data
+                localStorage.removeItem('userProfile');
+                
+                // Show success message
+                const statusEl = document.getElementById('status-message');
+                statusEl.textContent = '✅ All profile data has been cleaned! Your profile is now empty.';
+                statusEl.className = 'status-message status-success show';
+                
+                // Hide current data preview
+                document.getElementById('current-data').style.display = 'none';
+                
+                // Redirect to profile after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/profile';
+                }, 2000);
+            }
+        }
+    </script>
+</body>
+</html>

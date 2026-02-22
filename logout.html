@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logout - Talent & Agency</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="config.js"></script>
+    <script src="supabase-client.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1e293b;
+            --primary-dark: #0f172a;
+            --secondary: #475569;
+            --accent: #64748b;
+            --accent-blue: #1e3a8a;
+            --accent-blue-light: #3b82f6;
+            --accent-blue-subtle: rgba(59, 130, 246, 0.08);
+            --accent-blue-border: rgba(59, 130, 246, 0.15);
+            --accent-blue-glow: rgba(59, 130, 246, 0.25);
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            --bg-tertiary: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-tertiary: #71717a;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.16);
+            --border-blue: rgba(59, 130, 246, 0.2);
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-blue-border);
+        }
+
+        /* Navigation - Same style as other pages */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(40px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+            padding: 2rem 3rem 2rem 3rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--primary-dark) 100%);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            height: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+        }
+
+        .nav-links {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-right: 1rem;
+            margin-left: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: transparent;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 3rem 3rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+
+        /* Logout Card - Shadcn/UI Style */
+        .logout-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 3rem;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .logout-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Logout Profile - Shadcn/UI Style */
+        .logout-profile {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+            border: 3px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            border-color: var(--accent-blue-border);
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
+        }
+
+        .avatar-fallback {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .logout-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            letter-spacing: -0.025em;
+        }
+
+        .logout-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        /* Buttons - Shadcn/UI Style */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-direction: column;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--accent-blue-light);
+            border: 1px solid var(--accent-blue-border);
+        }
+
+        .btn-outline:hover {
+            background: var(--accent-blue-subtle);
+            border-color: var(--accent-blue-light);
+            transform: translateY(-1px);
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top: 2px solid var(--accent-blue-light);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success State */
+        .success-state {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            animation: successBounce 0.5s ease-out;
+        }
+
+        @keyframes successBounce {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav {
+                padding: 1rem 1.5rem;
+            }
+            
+            .container {
+                padding: 6rem 1.5rem 3rem;
+            }
+            
+            .logout-card {
+                padding: 2rem;
+                margin: 1rem;
+            }
+            
+            .logout-title {
+                font-size: 1.5rem;
+            }
+            
+            .button-group {
+                gap: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="logo"></div>
+            <div class="nav-links">
+                <div class="nav-brand">Talent & Agency</div>
+                <a href="index.html" class="nav-btn">Accueil</a>
+                <a href="discover.html" class="nav-btn">Discover</a>
+                <a href="/favorites" class="nav-btn">Favorites</a>
+                <a href="/messages" class="nav-btn">Messages</a>
+                <!-- Avatar Simple - tout à droite -->
+                <div class="nav-avatar" onclick="window.location.href='discover.html'" style="width: 32px; height: 32px; border-radius: 50%; background: #3b82f6; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid rgba(255,255,255,0.1); margin-left: 1rem;">
+                    <img id="navAvatarImg" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: none;" alt="Profile">
+                    <span id="navAvatarFallback" style="color: white; font-size: 12px; font-weight: bold;">?</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Logout Form -->
+        <div id="logoutForm" class="logout-card">
+            <div class="logout-profile">
+                <div class="profile-avatar">
+                    <img id="profileAvatarImg" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: none;" alt="Profile">
+                    <div id="profileAvatarFallback" class="avatar-fallback">?</div>
+                </div>
+            </div>
+            <h1 class="logout-title">Déconnexion</h1>
+            <p class="logout-subtitle">Êtes-vous sûr de vouloir vous déconnecter ?</p>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="performLogout()">
+                    <span>🚪</span>
+                    Se déconnecter
+                </button>
+                <button class="btn btn-secondary" onclick="goBack()">
+                    <span>←</span>
+                    Retour
+                </button>
+                <a href="pages/settings.html" class="btn btn-outline">
+                    <span>⚙️</span>
+                    Paramètres
+                </a>
+            </div>
+            
+            <div class="loading" id="loadingState">
+                <div class="spinner"></div>
+                <p>Déconnexion en cours...</p>
+                <p>Redirection vers l'accueil...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="index.html" class="footer-link">Home</a>
+            <a href="/terms" class="footer-link">Terms of Service</a>
+            <a href="/privacy" class="footer-link">Privacy Policy</a>
+            <a href="/contact" class="footer-link">Contact</a>
+            <a href="register-fixed.html" class="footer-link">S'inscrire</a>
+            <a href="login.html" class="footer-link">Se connecter</a>
+            <a href="discover.html" class="footer-link">Discover</a>
+            <a href="/favorites" class="footer-link">Favorites</a>
+        </div>
+        <p>&copy; 2026 Talent & Agency. All rights reserved.</p>
+    </footer>
+
+    <style>
+        .footer {
+            background: #000;
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.05);
+            margin-top: 2rem;
+        }
+
+        .footer-links {
+            margin-bottom: 0.8rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            padding: 0.3rem 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            display: inline-block;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .footer-link:hover {
+            color: rgba(255, 255, 255, 0.8);
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .footer p {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.8rem;
+        }
+    </style>
+
+    <script>
+        // Perform logout
+        async function performLogout() {
+            const logoutForm = document.getElementById('logoutForm');
+            const loadingState = document.getElementById('loadingState');
+            
+            // Show loading
+            logoutForm.querySelector('.button-group').style.display = 'none';
+            loadingState.style.display = 'block';
+            
+            try {
+                // Supabase logout
+                if (window.supabaseClient) {
+                    const { error } = await window.supabaseClient.auth.signOut();
+                    if (error) {
+                        console.error('Supabase logout error:', error);
+                    }
+                }
+                
+                // Clear local storage
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userType');
+                localStorage.removeItem('userProfilePhoto');
+                localStorage.removeItem('sessionStartTime');
+                localStorage.removeItem('userFavorites');
+                
+                // Simulate loading time
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Redirect to index.html
+                window.location.href = 'index.html';
+                
+            } catch (error) {
+                console.error('Logout error:', error);
+                loadingState.style.display = 'none';
+                logoutForm.querySelector('.button-group').style.display = 'flex';
+                alert('Erreur lors de la déconnexion. Veuillez réessayer.');
+            }
+        }
+
+        // Go back
+        function goBack() {
+            window.history.back();
+        }
+
+        // Navigation functions
+        function goToFavorites() {
+            window.location.href = '/favorites';
+        }
+        
+        function goToMessages() {
+            window.location.href = '/messages';
+        }
+        
+        function goToSettings() {
+            window.location.href = 'pages/settings.html';
+        }
+        
+        function goToManage() {
+            window.location.href = 'pages/manage-subscription.html';
+        }
+
+        // Avatar update
+        function updateNavAvatar() {
+            const photo = localStorage.getItem('userProfilePhoto');
+            const img = document.getElementById('navAvatarImg');
+            const fallback = document.getElementById('navAvatarFallback');
+            
+            if (photo && img) {
+                img.src = photo;
+                img.style.display = 'block';
+                fallback.style.display = 'none';
+            } else if (fallback) {
+                fallback.style.display = 'block';
+            }
+        }
+
+        // Profile avatar update for logout page
+        function updateProfileAvatar() {
+            const photo = localStorage.getItem('userProfilePhoto');
+            const userName = localStorage.getItem('userName') || '';
+            const img = document.getElementById('profileAvatarImg');
+            const fallback = document.getElementById('profileAvatarFallback');
+            
+            if (photo && img) {
+                img.src = photo;
+                img.style.display = 'block';
+                fallback.style.display = 'none';
+            } else if (fallback) {
+                // Use initials if no photo
+                const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                fallback.textContent = initials || '?';
+                fallback.style.display = 'block';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNavAvatar();
+            updateProfileAvatar();
+        });
+    </script>
+</body>
+</html>

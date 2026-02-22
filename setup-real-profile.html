@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Your Real Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .status-message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .status-message.show {
+            display: block;
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Setup Your Real Profile</h1>
+        <p class="subtitle">Enter your actual information to replace the demo data</p>
+        
+        <div id="status-message" class="status-message"></div>
+
+        <form id="profileForm">
+            <!-- Basic Info -->
+            <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input type="text" class="form-input" id="first-name" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input type="text" class="form-input" id="last-name" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" id="email" required>
+            </div>
+
+            <!-- Role Selection -->
+            <div class="form-group">
+                <label class="form-label">I am a:</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="role" value="talent" checked>
+                        Talent
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="role" value="agency">
+                        Agency
+                    </label>
+                </div>
+            </div>
+
+            <!-- Talent Fields -->
+            <div id="talent-fields">
+                <div class="form-group">
+                    <label class="form-label">Stage Name / Display Name</label>
+                    <input type="text" class="form-input" id="display-name">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">What type of talent are you?</label>
+                    <select class="form-select" id="talent-type">
+                        <option value="">Select your talent type</option>
+                        <option value="actor">Actor</option>
+                        <option value="model">Model</option>
+                        <option value="musician">Musician</option>
+                        <option value="dancer">Dancer</option>
+                        <option value="photographer">Photographer</option>
+                        <option value="videographer">Videographer</option>
+                        <option value="content-creator">Content Creator</option>
+                        <option value="influencer">Influencer</option>
+                        <option value="artist">Artist</option>
+                        <option value="writer">Writer</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Years of Experience</label>
+                    <select class="form-select" id="experience">
+                        <option value="">Select experience level</option>
+                        <option value="beginner">Beginner (0-2 years)</option>
+                        <option value="intermediate">Intermediate (2-5 years)</option>
+                        <option value="experienced">Experienced (5-10 years)</option>
+                        <option value="expert">Expert (10+ years)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Portfolio/Website URL (optional)</label>
+                    <input type="url" class="form-input" id="portfolio" placeholder="https://yourportfolio.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Age</label>
+                    <input type="number" class="form-input" id="age" placeholder="25" min="18" max="100">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Country</label>
+                    <select class="form-select" id="country">
+                        <option value="">Select your country</option>
+                        <option value="US">United States</option>
+                        <option value="UK">United Kingdom</option>
+                        <option value="CA">Canada</option>
+                        <option value="AU">Australia</option>
+                        <option value="FR">France</option>
+                        <option value="DE">Germany</option>
+                        <option value="IT">Italy</option>
+                        <option value="ES">Spain</option>
+                        <option value="NL">Netherlands</option>
+                        <option value="BR">Brazil</option>
+                        <option value="MX">Mexico</option>
+                        <option value="JP">Japan</option>
+                        <option value="KR">South Korea</option>
+                        <option value="IN">India</option>
+                        <option value="OTHER">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Languages you speak</label>
+                    <textarea class="form-textarea" id="languages" placeholder="List the languages you speak (e.g., English, French, Spanish, Italian...)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Platforms</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="platforms" value="onlyfans">
+                            OnlyFans
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="platforms" value="fansly">
+                            Fansly
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="platforms" value="admireme">
+                            AdmireMe
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="platforms" value="other">
+                            Other
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Social Media Networks</label>
+                    <input type="text" class="form-input" id="instagram" placeholder="Instagram username">
+                    <input type="text" class="form-input" id="twitter" placeholder="Twitter username" style="margin-top: 0.5rem;">
+                    <input type="text" class="form-input" id="tiktok" placeholder="TikTok username" style="margin-top: 0.5rem;">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Monthly Revenue ($)</label>
+                    <select class="form-select" id="monthly-revenue">
+                        <option value="">Select revenue range</option>
+                        <option value="less-10k">Less than $10,000</option>
+                        <option value="10k-25k">$10,000 - $25,000</option>
+                        <option value="25k-50k">$25,000 - $50,000</option>
+                        <option value="50k-100k">$50,000 - $100,000</option>
+                        <option value="100k-250k">$100,000 - $250,000</option>
+                        <option value="250k-500k">$250,000 - $500,000</option>
+                        <option value="500k+">More than $500,000</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Do you currently have a manager?</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="has-manager" value="yes">
+                            Yes
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="has-manager" value="no" checked>
+                            No
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Bio / Description</label>
+                    <textarea class="form-textarea" id="bio" placeholder="Tell us about yourself..."></textarea>
+                </div>
+            </div>
+
+            <!-- Agency Fields -->
+            <div id="agency-fields" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Agency Name</label>
+                    <input type="text" class="form-input" id="agency-name">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Agency Type</label>
+                    <select class="form-select" id="agency-type">
+                        <option value="">Select agency type</option>
+                        <option value="talent-agency">Talent Agency</option>
+                        <option value="modeling-agency">Modeling Agency</option>
+                        <option value="digital-agency">Digital Agency</option>
+                        <option value="management-agency">Management Agency</option>
+                        <option value="production-company">Production Company</option>
+                        <option value="pr-agency">PR Agency</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Number of Talents</label>
+                    <input type="number" class="form-input" id="talent-count" placeholder="e.g., 25" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Monthly Revenue ($)</label>
+                    <input type="number" class="form-input" id="agency-monthly-revenue" placeholder="e.g., 50000" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Total Revenue ($)</label>
+                    <input type="number" class="form-input" id="total-revenue" placeholder="e.g., 500000" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Country</label>
+                    <input type="text" class="form-input" id="agency-country" placeholder="e.g., France">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" id="agency-description" placeholder="Describe your agency..."></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save My Real Profile</button>
+        </form>
+
+        <a href="/profile" class="btn btn-secondary">Go to Profile Page</a>
+    </div>
+
+    <script>
+        // Toggle between talent and agency fields
+        document.querySelectorAll('input[name="role"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const talentFields = document.getElementById('talent-fields');
+                const agencyFields = document.getElementById('agency-fields');
+                
+                if (this.value === 'talent') {
+                    talentFields.style.display = 'block';
+                    agencyFields.style.display = 'none';
+                } else {
+                    talentFields.style.display = 'none';
+                    agencyFields.style.display = 'block';
+                }
+            });
+        });
+
+        // Form submission
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const role = document.querySelector('input[name="role"]:checked').value;
+            
+            // Create profile data object
+            const profileData = {
+                first_name: document.getElementById('first-name').value,
+                last_name: document.getElementById('last-name').value,
+                email: document.getElementById('email').value,
+                role: role,
+                posts: [] // Start with empty posts
+            };
+
+            if (role === 'talent') {
+                // Talent fields
+                profileData.talent_type = document.getElementById('talent-type').value;
+                profileData.experience = document.getElementById('experience').value;
+                profileData.portfolio = document.getElementById('portfolio').value;
+                profileData.age = document.getElementById('age').value;
+                profileData.country = document.getElementById('country').value;
+                profileData.languages = document.getElementById('languages').value;
+                profileData.instagram = document.getElementById('instagram').value;
+                profileData.twitter = document.getElementById('twitter').value;
+                profileData.tiktok = document.getElementById('tiktok').value;
+                profileData.monthly_revenue = document.getElementById('monthly-revenue').value;
+                profileData.has_manager = document.querySelector('input[name="has-manager"]:checked').value;
+                profileData.bio = document.getElementById('bio').value;
+                
+                // Platforms
+                const platforms = Array.from(document.querySelectorAll('input[name="platforms"]:checked'))
+                    .map(cb => cb.value);
+                profileData.talent_platforms = platforms.join(', ');
+                
+            } else if (role === 'agency') {
+                // Agency fields
+                profileData.agency_name = document.getElementById('agency-name').value;
+                profileData.agency_type = document.getElementById('agency-type').value;
+                profileData.talent_count = document.getElementById('talent-count').value;
+                profileData.agency_revenue = document.getElementById('agency-monthly-revenue').value;
+                profileData.total_revenue = document.getElementById('total-revenue').value;
+                profileData.agency_country = document.getElementById('agency-country').value;
+                profileData.agency_description = document.getElementById('agency-description').value;
+            }
+
+            // Save to localStorage
+            localStorage.setItem('userProfile', JSON.stringify(profileData));
+            
+            // Show success message
+            const statusEl = document.getElementById('status-message');
+            statusEl.textContent = 'Profile saved successfully! You can now go to your profile page.';
+            statusEl.className = 'status-message status-success show';
+            
+            // Redirect to profile after 2 seconds
+            setTimeout(() => {
+                window.location.href = '/profile';
+            }, 2000);
+        });
+
+        // Load existing data if available
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedProfile = localStorage.getItem('userProfile');
+            if (savedProfile) {
+                try {
+                    const profileData = JSON.parse(savedProfile);
+                    
+                    // Fill basic fields
+                    document.getElementById('first-name').value = profileData.first_name || '';
+                    document.getElementById('last-name').value = profileData.last_name || '';
+                    document.getElementById('email').value = profileData.email || '';
+                    
+                    // Set role
+                    if (profileData.role === 'agency') {
+                        document.querySelector('input[name="role"][value="agency"]').checked = true;
+                        document.getElementById('talent-fields').style.display = 'none';
+                        document.getElementById('agency-fields').style.display = 'block';
+                        
+                        // Fill agency fields
+                        document.getElementById('agency-name').value = profileData.agency_name || '';
+                        document.getElementById('agency-type').value = profileData.agency_type || '';
+                        document.getElementById('talent-count').value = profileData.talent_count || '';
+                        document.getElementById('agency-monthly-revenue').value = profileData.agency_revenue || '';
+                        document.getElementById('total-revenue').value = profileData.total_revenue || '';
+                        document.getElementById('agency-country').value = profileData.agency_country || '';
+                        document.getElementById('agency-description').value = profileData.agency_description || '';
+                    } else {
+                        // Fill talent fields
+                        document.getElementById('display-name').value = profileData.first_name + ' ' + profileData.last_name;
+                        document.getElementById('talent-type').value = profileData.talent_type || '';
+                        document.getElementById('experience').value = profileData.experience || '';
+                        document.getElementById('portfolio').value = profileData.portfolio || '';
+                        document.getElementById('age').value = profileData.age || '';
+                        document.getElementById('country').value = profileData.country || '';
+                        document.getElementById('languages').value = profileData.languages || '';
+                        document.getElementById('instagram').value = profileData.instagram || '';
+                        document.getElementById('twitter').value = profileData.twitter || '';
+                        document.getElementById('tiktok').value = profileData.tiktok || '';
+                        document.getElementById('monthly-revenue').value = profileData.monthly_revenue || '';
+                        
+                        // Set has manager radio
+                        const hasManagerRadio = document.querySelector(`input[name="has-manager"][value="${profileData.has_manager || 'no'}"]`);
+                        if (hasManagerRadio) hasManagerRadio.checked = true;
+                        
+                        document.getElementById('bio').value = profileData.bio || '';
+                        
+                        // Set platforms checkboxes
+                        if (profileData.talent_platforms) {
+                            const platforms = profileData.talent_platforms.split(',').map(p => p.trim());
+                            platforms.forEach(platform => {
+                                const checkbox = document.querySelector(`input[name="platforms"][value="${platform}"]`);
+                                if (checkbox) checkbox.checked = true;
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error loading existing profile:', e);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

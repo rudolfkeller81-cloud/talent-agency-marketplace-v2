@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Talent & Agency</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .role-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+        .role-btn:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-center mb-12">Create Your Account</h1>
+        
+        <div class="max-w-md mx-auto">
+            <h2 class="text-xl font-semibold mb-6">What type of account are you creating?</h2>
+            
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <button type="button" class="role-btn" onclick="selectRole('talent')">
+                    <div class="text-4xl mb-2">🎭</div>
+                    <div class="font-semibold">Talent</div>
+                    <div class="text-sm text-gray-400">Artist, Performer, Creator</div>
+                </button>
+                
+                <a href="/pricing" class="role-btn">
+                    <div class="text-4xl mb-2">🏢</div>
+                    <div class="font-semibold">Agency</div>
+                    <div class="text-sm text-gray-400">Representative, Manager</div>
+                </a>
+            </div>
+            
+            <div id="talent-form" style="display: none;">
+                <!-- Talent form here -->
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-4">Talent Registration</h3>
+                    <p class="text-gray-400">Talent form will be implemented here...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function selectRole(role) {
+            if (role === 'talent') {
+                document.getElementById('talent-form').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

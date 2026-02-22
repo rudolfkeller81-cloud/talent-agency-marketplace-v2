@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up - Talent & Agency</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1e293b;
+            --primary-dark: #0f172a;
+            --secondary: #475569;
+            --accent: #64748b;
+            --accent-blue: #1e3a8a;
+            --accent-blue-light: #3b82f6;
+            --accent-blue-subtle: rgba(59, 130, 246, 0.08);
+            --accent-blue-border: rgba(59, 130, 246, 0.15);
+            --accent-blue-glow: rgba(59, 130, 246, 0.25);
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            --bg-tertiary: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-tertiary: #71717a;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.16);
+            --border-blue: rgba(59, 130, 246, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-hover);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.95);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            color: var(--accent-blue-light);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding-top: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 2rem;
+        }
+
+        .signup-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 3rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin: 2rem;
+        }
+
+        .signup-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .signup-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .signup-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Role Selection */
+        .role-selection {
+            margin-bottom: 2rem;
+        }
+
+        .role-label {
+            display: block;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .role-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .role-btn {
+            padding: 1.5rem;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .role-btn:hover {
+            border-color: var(--accent-blue-light);
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .role-btn.selected {
+            border-color: var(--accent-blue-light);
+            background: rgba(59, 130, 246, 0.15);
+            box-shadow: 0 0 0 3px var(--accent-blue-subtle);
+        }
+
+        .role-icon {
+            font-size: 2rem;
+        }
+
+        .role-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .role-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue-light);
+            background: var(--bg-tertiary);
+            box-shadow: 0 0 0 3px var(--accent-blue-subtle);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue-light);
+            background: var(--bg-tertiary);
+            box-shadow: 0 0 0 3px var(--accent-blue-subtle);
+        }
+
+        .form-textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--accent-blue-light);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px var(--accent-blue-glow);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .form-links {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .form-links a {
+            color: var(--accent-blue-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .form-links a:hover {
+            color: #60a5fa;
+        }
+
+        /* Message Styles */
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: rgba(239, 68, 68, 0.9);
+        }
+
+        .message.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: rgba(34, 197, 94, 0.9);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-field {
+            border-color: rgba(239, 68, 68, 0.5) !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+        }
+
+        .error-text {
+            color: rgba(239, 68, 68, 0.9);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .strength-weak { color: rgba(239, 68, 68, 0.9); }
+        .strength-medium { color: rgba(245, 158, 11, 0.9); }
+        .strength-strong { color: rgba(34, 197, 94, 0.9); }
+
+        /* Conditional Questions */
+        .conditional-questions {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .conditional-questions.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Footer */
+        .footer {
+            padding: 4rem 0 2rem;
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-left {
+            max-width: 300px;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .footer-desc {
+            font-size: 0.9rem;
+            color: var(--text-tertiary);
+            line-height: 1.5;
+        }
+
+        .footer-right {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-link {
+            color: var(--text-tertiary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .footer-link:hover {
+            color: var(--accent-blue-light);
+        }
+
+        .footer-link.terms {
+            color: var(--accent-blue-light);
+            font-weight: 500;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 2rem 3rem 0;
+            border-top: 1px solid var(--border);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-bottom p {
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .signup-container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+
+            .role-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="index.html" class="logo">
+                <span>Talent & Agency</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="discover.html" class="nav-link">Discover</a>
+                <a href="favorites.html" class="nav-link">Favorites</a>
+                <a href="login.html" class="nav-link">Login</a>
+                <a href="signup.html" class="nav-link active">Sign Up</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="signup-container">
+            <div class="signup-header">
+                <h1>Create Account</h1>
+                <p>Join our community of talented creators and agencies</p>
+            </div>
+
+            <div id="message-container"></div>
+
+            <form id="signupForm">
+                <!-- Role Selection -->
+                <div class="role-selection">
+                    <label class="role-label">What type of account are you creating?</label>
+                    <div class="role-buttons">
+                        <button type="button" class="role-btn" data-role="talent" onclick="selectRole('talent')">
+                            <div class="role-icon">🎭</div>
+                            <div class="role-title">Talent</div>
+                            <div class="role-desc">Artist, Performer, Creator</div>
+                        </button>
+                        <button type="button" class="role-btn" data-role="agency" onclick="selectRole('agency')">
+                            <div class="role-icon">🏢</div>
+                            <div class="role-title">Agency</div>
+                            <div class="role-desc">Representative, Manager</div>
+                        </button>
+                    </div>
+                    <input type="hidden" id="role" name="role" required>
+                    <div class="error-text" id="role-error"></div>
+                </div>
+
+                <!-- Basic Information -->
+                <div class="form-group">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" id="name" name="name" class="form-input" placeholder="Enter your full name" required>
+                    <div class="error-text" id="name-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-input" placeholder="Enter your email" required>
+                    <div class="error-text" id="email-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" name="password" class="form-input" placeholder="Create a strong password" required>
+                    <div class="password-strength" id="password-strength"></div>
+                    <div class="error-text" id="password-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" placeholder="Confirm your password" required>
+                    <div class="error-text" id="confirmPassword-error"></div>
+                </div>
+
+                <!-- Talent Specific Questions -->
+                <div id="talent-questions" class="conditional-questions">
+                    <div class="form-group">
+                        <label for="talent-type" class="form-label">What type of talent are you?</label>
+                        <select id="talent-type" name="talent-type" class="form-input">
+                            <option value="">Select your talent type</option>
+                            <option value="actor">Actor</option>
+                            <option value="musician">Musician</option>
+                            <option value="dancer">Dancer</option>
+                            <option value="model">Model</option>
+                            <option value="photographer">Photographer</option>
+                            <option value="videographer">Videographer</option>
+                            <option value="writer">Writer</option>
+                            <option value="artist">Visual Artist</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <div class="error-text" id="talent-type-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="experience" class="form-label">Years of Experience</label>
+                        <select id="experience" name="experience" class="form-input">
+                            <option value="">Select experience level</option>
+                            <option value="beginner">Beginner (0-2 years)</option>
+                            <option value="intermediate">Intermediate (2-5 years)</option>
+                            <option value="experienced">Experienced (5-10 years)</option>
+                            <option value="expert">Expert (10+ years)</option>
+                        </select>
+                        <div class="error-text" id="experience-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="portfolio" class="form-label">Portfolio/Website URL (optional)</label>
+                        <input type="url" id="portfolio" name="portfolio" class="form-input" placeholder="https://yourportfolio.com">
+                        <div class="error-text" id="portfolio-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bio" class="form-label">Tell us about yourself</label>
+                        <textarea id="bio" name="bio" class="form-textarea" placeholder="Describe your background, skills, and what makes you unique..." required></textarea>
+                        <div class="error-text" id="bio-error"></div>
+                    </div>
+                </div>
+
+                <!-- Agency Specific Questions -->
+                <div id="agency-questions" class="conditional-questions">
+                    <div class="form-group">
+                        <label for="agency-name" class="form-label">Agency Name</label>
+                        <input type="text" id="agency-name" name="agency-name" class="form-input" placeholder="Enter your agency name" required>
+                        <div class="error-text" id="agency-name-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="agency-type" class="form-label">Agency Type</label>
+                        <select id="agency-type" name="agency-type" class="form-input">
+                            <option value="">Select agency type</option>
+                            <option value="talent-agency">Talent Agency</option>
+                            <option value="modeling-agency">Modeling Agency</option>
+                            <option value="music-agency">Music Agency</option>
+                            <option value="film-agency">Film Agency</option>
+                            <option value="literary-agency">Literary Agency</option>
+                            <option value="sports-agency">Sports Agency</option>
+                            <option value="management">Management Company</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <div class="error-text" id="agency-type-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="company-size" class="form-label">Company Size</label>
+                        <select id="company-size" name="company-size" class="form-input">
+                            <option value="">Select company size</option>
+                            <option value="solo">Solo Practitioner</option>
+                            <option value="small">Small (2-10 employees)</option>
+                            <option value="medium">Medium (11-50 employees)</option>
+                            <option value="large">Large (50+ employees)</option>
+                        </select>
+                        <div class="error-text" id="company-size-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="website" class="form-label">Company Website</label>
+                        <input type="url" id="website" name="website" class="form-input" placeholder="https://youragency.com" required>
+                        <div class="error-text" id="website-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="services" class="form-label">What services do you offer?</label>
+                        <textarea id="services" name="services" class="form-textarea" placeholder="Describe the services you provide to your clients..." required></textarea>
+                        <div class="error-text" id="services-error"></div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                    <span id="btn-text">Create Account</span>
+                </button>
+            </form>
+
+            <div class="form-links">
+                <p>Already have an account? <a href="login.html">Sign in</a></p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-left">
+                <div class="footer-logo">Talent & Agency</div>
+                <p class="footer-desc">Connecting talented creators with leading agencies worldwide.</p>
+            </div>
+            <div class="footer-right">
+                <div class="footer-links">
+                    <a href="index.html" class="footer-link">Home</a>
+                    <a href="discover.html" class="footer-link">Discover</a>
+                    <a href="favorites.html" class="footer-link">Favorites</a>
+                    <a href="terms.html" class="footer-link terms">Terms of Service</a>
+                    <a href="privacy.html" class="footer-link">Privacy Policy</a>
+                    <a href="contact.html" class="footer-link">Contact</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Talent & Agency. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        let isLoading = false;
+        let selectedRole = null;
+
+        // Role selection
+        function selectRole(role) {
+            // Update UI
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`[data-role="${role}"]`).classList.add('selected');
+            
+            // Update hidden input
+            document.getElementById('role').value = role;
+            selectedRole = role;
+            
+            // Hide all conditional questions
+            document.querySelectorAll('.conditional-questions').forEach(q => {
+                q.classList.remove('show');
+            });
+            
+            // Show relevant questions
+            if (role === 'talent') {
+                document.getElementById('talent-questions').classList.add('show');
+            } else if (role === 'agency') {
+                document.getElementById('agency-questions').classList.add('show');
+            }
+            
+            // Enable submit button
+            document.getElementById('submitBtn').disabled = false;
+            
+            // Clear role error
+            document.getElementById('role-error').textContent = '';
+        }
+
+        // Utility functions
+        function showMessage(message, type = 'error') {
+            const container = document.getElementById('message-container');
+            container.innerHTML = `<div class="message ${type}">${message}</div>`;
+            
+            // Auto-remove success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    container.innerHTML = '';
+                }, 5000);
+            }
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('.form-input, .form-textarea').forEach(input => {
+                input.classList.remove('error-field');
+            });
+            document.querySelectorAll('.error-text').forEach(error => {
+                error.textContent = '';
+            });
+            document.getElementById('message-container').innerHTML = '';
+        }
+
+        function showError(field, message) {
+            const input = document.getElementById(field);
+            const errorText = document.getElementById(`${field}-error`);
+            
+            input.classList.add('error-field');
+            errorText.textContent = message;
+        }
+
+        function setLoading(loading) {
+            isLoading = loading;
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btn-text');
+            
+            if (loading) {
+                submitBtn.disabled = true;
+                btnText.innerHTML = '<span class="loading"></span> Creating account...';
+            } else {
+                submitBtn.disabled = !selectedRole;
+                btnText.textContent = 'Create Account';
+            }
+        }
+
+        function checkPasswordStrength(password) {
+            const strengthEl = document.getElementById('password-strength');
+            
+            if (password.length < 6) {
+                strengthEl.textContent = 'Weak password';
+                strengthEl.className = 'password-strength strength-weak';
+                return 'weak';
+            } else if (password.length < 10 || !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+                strengthEl.textContent = 'Medium strength';
+                strengthEl.className = 'password-strength strength-medium';
+                return 'medium';
+            } else {
+                strengthEl.textContent = 'Strong password';
+                strengthEl.className = 'password-strength strength-strong';
+                return 'strong';
+            }
+        }
+
+        // Form submission
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (isLoading || !selectedRole) return;
+            
+            clearErrors();
+            setLoading(true);
+            
+            try {
+                const formData = new FormData(e.target);
+                const data = {
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    password: formData.get('password'),
+                    role: selectedRole
+                };
+                
+                // Add role-specific data
+                if (selectedRole === 'talent') {
+                    data.talentType = formData.get('talent-type');
+                    data.experience = formData.get('experience');
+                    data.portfolio = formData.get('portfolio');
+                    data.bio = formData.get('bio');
+                } else if (selectedRole === 'agency') {
+                    data.agencyName = formData.get('agency-name');
+                    data.agencyType = formData.get('agency-type');
+                    data.companySize = formData.get('company-size');
+                    data.website = formData.get('website');
+                    data.services = formData.get('services');
+                }
+                
+                // Validate passwords match
+                if (data.password !== formData.get('confirmPassword')) {
+                    showError('confirmPassword', 'Passwords do not match');
+                    throw new Error('Passwords do not match');
+                }
+                
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    // Handle specific field errors
+                    if (result.field) {
+                        showError(result.field, result.error);
+                        throw new Error(result.error || 'Registration failed');
+                    }
+                    throw new Error(result.error || 'Registration failed');
+                }
+                
+                showMessage('Account created successfully! Redirecting...', 'success');
+                
+                // Store session
+                if (result.remember) {
+                    localStorage.setItem('sessionId', result.sessionId);
+                } else {
+                    sessionStorage.setItem('sessionId', result.sessionId);
+                }
+                document.cookie = `sessionId=${result.sessionId}; path=/; max-age=86400`;
+                
+                // Store user info
+                localStorage.setItem('user', JSON.stringify(result.user));
+                
+                // Redirect to discover after delay
+                setTimeout(() => {
+                    window.location.href = 'discover.html';
+                }, 2000);
+                
+            } catch (error) {
+                showMessage(error.message, 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // Real-time validation
+        document.getElementById('name').addEventListener('blur', function() {
+            const name = this.value.trim();
+            if (!name) {
+                showError('name', 'Name is required');
+            } else if (name.length < 2) {
+                showError('name', 'Name must be at least 2 characters');
+            } else {
+                this.classList.remove('error-field');
+                document.getElementById('name-error').textContent = '';
+            }
+        });
+
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value.trim();
+            if (!email) {
+                showError('email', 'Email is required');
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showError('email', 'Please enter a valid email address');
+            } else {
+                this.classList.remove('error-field');
+                document.getElementById('email-error').textContent = '';
+            }
+        });
+
+        document.getElementById('password').addEventListener('input', function() {
+            checkPasswordStrength(this.value);
+        });
+
+        document.getElementById('password').addEventListener('blur', function() {
+            const password = this.value;
+            if (!password) {
+                showError('password', 'Password is required');
+            } else if (password.length < 6) {
+                showError('password', 'Password must be at least 6 characters');
+            } else {
+                this.classList.remove('error-field');
+                document.getElementById('password-error').textContent = '';
+            }
+        });
+
+        document.getElementById('confirmPassword').addEventListener('blur', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            
+            if (!confirmPassword) {
+                showError('confirmPassword', 'Please confirm your password');
+            } else if (password !== confirmPassword) {
+                showError('confirmPassword', 'Passwords do not match');
+            } else {
+                this.classList.remove('error-field');
+                document.getElementById('confirmPassword-error').textContent = '';
+            }
+        });
+
+        // Focus first input on load
+        window.addEventListener('load', () => {
+            document.getElementById('name').focus();
+        });
+    </script>
+</body>
+</html>

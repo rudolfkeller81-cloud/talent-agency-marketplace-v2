@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement - Talent & Agency</title>
+    <link rel="stylesheet" href="payment.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .logo img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="nav">
+                <div class="logo"></div>
+                <nav class="nav-links">
+                    <a href="index.html">Accueil</a>
+                    <a href="#pricing">Tarifs</a>
+                    <a href="#contact">Contact</a>
+                </nav>
+                <button class="sign-in-btn">Se connecter</button>
+            </div>
+        </header>
+
+        <!-- Payment Section -->
+        <main class="payment-main">
+            <section class="payment-section">
+                <div class="payment-container">
+                    <div class="payment-content">
+                        <div class="payment-left">
+                            <h1 class="payment-title">
+                                Choisissez votre <span class="highlight">formule</span>
+                            </h1>
+                            <p class="payment-description">
+                                Rejoignez Talent & Agency et accédez à des opportunités professionnelles exceptionnelles.
+                            </p>
+                            
+                            <!-- Pricing Cards -->
+                            <div class="pricing-cards">
+                                <div class="pricing-card basic" data-plan="basic">
+                                    <div class="card-header">
+                                        <h3>Basic</h3>
+                                        <div class="price">
+                                            <span class="amount">€0</span>
+                                            <span class="period">/mois</span>
+                                        </div>
+                                    </div>
+                                    <ul class="features">
+                                        <li>✓ Profil professionnel</li>
+                                        <li>✓ 5 propositions par mois</li>
+                                        <li>✓ Accès aux projets basiques</li>
+                                    </ul>
+                                    <button class="btn-select-plan" data-price="0">Sélectionner</button>
+                                </div>
+
+                                <div class="pricing-card pro" data-plan="pro">
+                                    <div class="card-header">
+                                        <h3>Pro</h3>
+                                        <div class="price">
+                                            <span class="amount">€29</span>
+                                            <span class="period">/mois</span>
+                                        </div>
+                                    </div>
+                                    <ul class="features">
+                                        <li>✓ Tout le plan Basic</li>
+                                        <li>✓ Propositions illimitées</li>
+                                        <li>✓ Accès prioritaire</li>
+                                        <li>✓ Analytics avancés</li>
+                                        <li>✓ Support prioritaire</li>
+                                    </ul>
+                                    <button class="btn-select-plan" data-price="2900">Sélectionner</button>
+                                </div>
+
+                                <div class="pricing-card enterprise" data-plan="enterprise">
+                                    <div class="card-header">
+                                        <h3>Enterprise</h3>
+                                        <div class="price">
+                                            <span class="amount">€99</span>
+                                            <span class="period">/mois</span>
+                                        </div>
+                                    </div>
+                                    <ul class="features">
+                                        <li>✓ Tout le plan Pro</li>
+                                        <li>✓ Équipe jusqu'à 10 membres</li>
+                                        <li>✓ API complète</li>
+                                        <li>✓ Intégrations personnalisées</li>
+                                        <li>✓ Manager dédié</li>
+                                    </ul>
+                                    <button class="btn-select-plan" data-price="9900">Sélectionner</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="payment-right">
+                            <div class="payment-form-container">
+                                <h2>Paiement sécurisé</h2>
+                                
+                                <!-- Selected Plan Display -->
+                                <div class="selected-plan">
+                                    <div class="plan-info">
+                                        <span class="plan-name">Sélectionnez un plan</span>
+                                        <span class="plan-price">-</span>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Form -->
+                                <form id="payment-form" class="payment-form">
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" id="email" name="email" required placeholder="votre@email.com">
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="first-name">Prénom</label>
+                                            <input type="text" id="first-name" name="first-name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="last-name">Nom</label>
+                                            <input type="text" id="last-name" name="last-name" required>
+                                        </div>
+                                    </div>
+
+                                    <!-- Stripe Elements -->
+                                    <div class="form-group">
+                                        <label for="card-element">Carte bancaire</label>
+                                        <div id="card-element" class="stripe-card">
+                                            <!-- Stripe Elements insérera ici -->
+                                        </div>
+                                        <div id="card-errors" role="alert" class="card-errors"></div>
+                                    </div>
+
+                                    <button type="submit" id="submit-button" class="btn-payment" disabled>
+                                        <span id="button-text">Payer maintenant</span>
+                                        <div id="spinner" class="spinner hidden"></div>
+                                    </button>
+
+                                    <div class="payment-security">
+                                        <div class="security-badges">
+                                            <span>🔒 Paiement sécurisé</span>
+                                            <span>💳 Stripe</span>
+                                            <span>🛡️ SSL</span>
+                                        </div>
+                                    </div>
+                                </form>
+
+                                <!-- Success Message -->
+                                <div id="payment-success" class="payment-success hidden">
+                                    <div class="success-icon">✓</div>
+                                    <h3>Paiement réussi !</h3>
+                                    <p>Votre abonnement est maintenant actif.</p>
+                                    <button class="btn-dashboard">Accéder au dashboard</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Talent & Agency</h4>
+                    <p>Le marketplace pour les professionnels</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Liens rapides</h4>
+                    <ul>
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="#pricing">Tarifs</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="contact.html">Contact Page</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>contact@talent-agency.com</p>
+                    <p>+33 1 23 45 67 89</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Talent & Agency. Tous droits réservés.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="payment.js"></script>
+</body>
+</html>

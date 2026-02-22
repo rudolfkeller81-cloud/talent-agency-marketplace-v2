@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up - Talent & Agency</title>
+    
+    <!-- Google Sign-In Script -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.95);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 0.5rem;
+        }
+
+        .auth-link {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        .auth-link:hover {
+            color: rgba(59, 130, 246, 0.9);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .signup-container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 3rem;
+            color: #fff;
+        }
+
+        /* Role Selection */
+        .role-selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .role-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .role-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .role-card.selected {
+            background: rgba(59, 130, 246, 0.05);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .role-card.agency.selected {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+        }
+
+        .role-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .role-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .role-price {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .role-price.free {
+            background: rgba(34, 197, 94, 0.1);
+            color: rgba(34, 197, 94, 0.9);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .role-price.paid {
+            background: rgba(59, 130, 246, 0.1);
+            color: rgba(59, 130, 246, 0.9);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .role-features {
+            list-style: none;
+        }
+
+        .role-features li {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .role-features li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: rgba(59, 130, 246, 0.9);
+        }
+
+        .radio-input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        /* Form Section */
+        .form-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 2.5rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            color: #fff;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            background: rgba(59, 130, 246, 0.05);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Radio and Checkbox Styles */
+        .radio-group, .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .radio-label, .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .radio-input, .checkbox-input {
+            width: auto;
+            margin: 0;
+            accent-color: rgba(59, 130, 246, 0.9);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .checkbox-label {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .checkbox-label:hover {
+            background: rgba(59, 130, 246, 0.05);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+
+        .checkbox-input:checked + .checkbox-label {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .microcopy {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        /* Upload styles */
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .upload-area:hover {
+            border-color: #007bff;
+            background: #f0f8ff;
+        }
+
+        .upload-preview {
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-placeholder {
+            color: #666;
+        }
+
+        .upload-placeholder span {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-placeholder p {
+            margin: 0.5rem 0 0.25rem 0;
+            font-weight: 600;
+        }
+
+        .upload-placeholder small {
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        .upload-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 0.5rem;
+        }
+
+        .upload-preview video {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 0.5rem;
+        }
+
+        .upload-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .upload-grid-item {
+            position: relative;
+        }
+
+        .upload-grid-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+        }
+
+        .upload-grid-item .remove-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            line-height: 1;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(30, 58, 138, 0.3) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(30, 58, 138, 0.4) 100%);
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 2rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .login-link a {
+            color: rgba(59, 130, 246, 0.9);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-link a:hover {
+            color: rgba(59, 130, 246, 1);
+        }
+
+        /* Message Styles */
+        .message {
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: rgba(239, 68, 68, 0.9);
+        }
+
+        .message.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: rgba(34, 197, 94, 0.9);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .role-selection {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-section {
+                padding: 2rem 1.5rem;
+            }
+            
+            .page-title {
+                font-size: 1.75rem;
+            }
+        }
+
+        /* Google Sign-in Styles */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 2rem 0;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .google-btn {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #3c4043;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .google-btn:hover {
+            background: #f8f9fa;
+            border-color: rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .google-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: rgba(59, 130, 246, 0.8);
+        }
+
+        .footer-bottom {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .footer-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="nav">
+                <div class="logo"></div>
+                <div class="nav-links">
+                    <a href="index.html" class="nav-link">Home</a>
+                </div>
+                <a href="login.html" class="auth-link">Already have an account? Log in</a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="signup-container">
+                <h1 class="page-title">Create your account</h1>
+                
+                <!-- Role Selection -->
+                <div class="role-selection">
+                    <div class="role-card talent" onclick="selectRole('talent')">
+                        <input type="radio" name="role" value="talent" class="radio-input" id="role-talent">
+                        <div class="role-header">
+                            <h3 class="role-title">Talent</h3>
+                            <span class="role-price free">Free</span>
+                        </div>
+                        <ul class="role-features">
+                            <li>Create a profile</li>
+                            <li>Get discovered by agencies</li>
+                            <li>No subscription required</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="role-card agency" onclick="selectRole('agency')">
+                        <input type="radio" name="role" value="agency" class="radio-input" id="role-agency">
+                        <div class="role-header">
+                            <h3 class="role-title">Agency</h3>
+                            <span class="role-price paid">Paid access</span>
+                        </div>
+                        <ul class="role-features">
+                            <li>Browse and contact talents</li>
+                            <li>Subscription required to message</li>
+                            <li>Verified talent profiles</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Signup Form -->
+                <div class="form-section">
+                    <h2 class="form-title">Sign up as <span id="selected-role-text">Talent</span></h2>
+                    
+                    <div id="message-container"></div>
+                    
+                    <form id="signupForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="firstName">First Name</label>
+                                <input type="text" id="firstName" name="firstName" class="form-input" placeholder="John" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="lastName">Last Name</label>
+                                <input type="text" id="lastName" name="lastName" class="form-input" placeholder="Doe" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email</label>
+                            <input type="email" id="email" name="email" class="form-input" placeholder="john@example.com" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="password">Password</label>
+                            <input type="password" id="password" name="password" class="form-input" placeholder="••••••••" required>
+                            <div class="microcopy">You can complete your profile after signup.</div>
+                        </div>
+                        
+                        <!-- Talent-specific fields -->
+                        <div id="talent-fields" style="display: none;">
+                            <div class="form-group">
+                                <label class="form-label" for="revenue">Monthly Revenue (USD)</label>
+                                <input type="number" id="revenue" name="revenue" class="form-input" placeholder="5000" min="0" step="100">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Current Manager</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="hasManager" value="yes" class="radio-input">
+                                        Yes, I have a manager
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="hasManager" value="no" class="radio-input">
+                                        No, I don't have a manager
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="platforms">Platforms</label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="platforms" value="onlyfans" class="checkbox-input">
+                                        OnlyFans
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="platforms" value="fanvue" class="checkbox-input">
+                                        Fanvue
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="platforms" value="fansly" class="checkbox-input">
+                                        Fansly
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="platforms" value="mym" class="checkbox-input">
+                                        MYM
+                                    </label>
+                                </div>
+                                <input type="text" id="otherPlatform" name="otherPlatform" class="form-input" placeholder="Other platform...">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="country">Country</label>
+                                <select id="country" name="country" class="form-input">
+                                    <option value="">Select a country</option>
+                                    <option value="france">France</option>
+                                    <option value="usa">USA</option>
+                                    <option value="uk">UK</option>
+                                    <option value="canada">Canada</option>
+                                    <option value="belgium">Belgium</option>
+                                    <option value="switzerland">Switzerland</option>
+                                    <option value="spain">Spain</option>
+                                    <option value="italy">Italy</option>
+                                    <option value="germany">Germany</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="languages">Languages spoken</label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="languages" value="fr" class="checkbox-input">
+                                        French
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="languages" value="en" class="checkbox-input">
+                                        English
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="languages" value="es" class="checkbox-input">
+                                        Spanish
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="languages" value="it" class="checkbox-input">
+                                        Italian
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="languages" value="de" class="checkbox-input">
+                                        German
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="age">Age (18+ required)</label>
+                                <input type="number" id="age" name="age" class="form-input" placeholder="25" min="18" max="100" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="workingHours">Working hours per day</label>
+                                <select id="workingHours" name="workingHours" class="form-input">
+                                    <option value="">Select working hours</option>
+                                    <option value="1-2">1-2 hours</option>
+                                    <option value="3-4">3-4 hours</option>
+                                    <option value="5-6">5-6 hours</option>
+                                    <option value="7-8">7-8 hours</option>
+                                    <option value="9-10">9-10 hours</option>
+                                    <option value="11-12">11-12 hours</option>
+                                    <option value="12+">12+ hours</option>
+                                    <option value="flexible">Flexible schedule</option>
+                                </select>
+                                <div class="microcopy">How many hours per day do you dedicate to content creation?</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Content Types You Create</label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="contentTypes" value="lingerie" class="checkbox-input">
+                                        Lingerie
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="contentTypes" value="ass" class="checkbox-input">
+                                        Ass Content
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="contentTypes" value="boobs" class="checkbox-input">
+                                        Boobs Content
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="contentTypes" value="full_nude" class="checkbox-input">
+                                        Full Nude Pics/Videos
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="contentTypes" value="anal" class="checkbox-input">
+                                        Anal Content
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="contentTypes" value="masturbation" class="checkbox-input">
+                                        Masturbation Content
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="contentTypes" value="boy_girl" class="checkbox-input">
+                                        Boy-Girl Content
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="contentTypes" value="girl_girl" class="checkbox-input">
+                                        Girl-Girl Content
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="contentTypes" value="pussy" class="checkbox-input">
+                                        Pussy Pics
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="contentTypes" value="voice_notes" class="checkbox-input">
+                                        Voice Notes
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="contentTypes" value="twerk" class="checkbox-input">
+                                        Twerk Videos
+                                    </label>
+                                </div>
+                                <div class="microcopy">Select all content types you're comfortable creating</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Social Media</label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="socialMedia" value="instagram" class="checkbox-input">
+                                        Instagram
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="socialMedia" value="tiktok" class="checkbox-input">
+                                        TikTok
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="socialMedia" value="twitter" class="checkbox-input">
+                                        Twitter
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="socialMedia" value="snapchat" class="checkbox-input">
+                                        Snapchat
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="socialMedia" value="threads" class="checkbox-input">
+                                        Threads
+                                    </label>
+                                </div>
+                                <input type="text" id="otherSocial" name="otherSocial" class="form-input" placeholder="Other social media...">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="totalFollowers">Total number of followers</label>
+                                <input type="number" id="totalFollowers" name="totalFollowers" class="form-input" placeholder="50000" min="0">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="displayName">Display Name</label>
+                                <input type="text" id="displayName" name="displayName" class="form-input" placeholder="Name used on all networks" required>
+                                <div class="microcopy">This name will be displayed on your profile</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="bio">Bio / Description</label>
+                                <textarea id="bio" name="bio" class="form-input" placeholder="Tell us about yourself..." rows="4"></textarea>
+                                <div class="microcopy">You can include links in your bio</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Profile Photo</label>
+                                <div class="upload-area" onclick="document.getElementById('avatarInput').click()">
+                                    <div class="upload-preview" id="avatarPreview">
+                                        <div class="upload-placeholder">
+                                            <span>📷</span>
+                                            <p>Click to add a photo</p>
+                                            <small>JPG, PNG, WebP - Max 10MB</small>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="previewAvatar(event)">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Portfolio (up to 5 photos)</label>
+                                <div class="upload-area" onclick="document.getElementById('portfolioInput').click()">
+                                    <div class="upload-preview" id="portfolioPreview">
+                                        <div class="upload-placeholder">
+                                            <span>🖼️</span>
+                                            <p>Add your portfolio</p>
+                                            <small>JPG, PNG, WebP - Max 10MB per photo</small>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="portfolioInput" accept="image/*" multiple style="display: none;" onchange="previewPortfolio(event)">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Demo Video</label>
+                                <div class="upload-area" onclick="document.getElementById('videoInput').click()">
+                                    <div class="upload-preview" id="videoPreview">
+                                        <div class="upload-placeholder">
+                                            <span>🎬</span>
+                                            <p>Add a demo video</p>
+                                            <small>MP4, WebM, MOV - Max 50MB</small>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="videoInput" accept="video/*" style="display: none;" onchange="previewVideo(event)">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="profilePhoto">Profile Photo</label>
+                                <input type="file" id="profilePhoto" name="profilePhoto" class="form-input" accept="image/*">
+                                <div class="microcopy">Upload your profile photo</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Agency-specific fields -->
+                        <div id="agency-fields" style="display: none;">
+                            <div class="form-group">
+                                <label class="form-label" for="platforms">Platforms you manage</label>
+                                <input type="text" id="platforms" name="platforms" class="form-input" placeholder="OnlyFans, Fansly, etc.">
+                                <div class="microcopy">List all platforms you currently manage talent on</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="talentCount">Current number of talents</label>
+                                <input type="number" id="talentCount" name="talentCount" class="form-input" placeholder="10" min="0">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="totalRevenue">Total revenue (USD)</label>
+                                <input type="number" id="totalRevenue" name="totalRevenue" class="form-input" placeholder="50000" min="0" step="1000">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="description">Agency description</label>
+                                <textarea id="description" name="description" class="form-input" placeholder="Tell us about your agency..." rows="4"></textarea>
+                                <div class="microcopy">Describe your agency's approach and expertise</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="links">Portfolio/Social links</label>
+                                <textarea id="links" name="links" class="form-input" placeholder="https://twitter.com/agency&#10;https://instagram.com/agency" rows="3"></textarea>
+                                <div class="microcopy">One link per line (social media, portfolio, website)</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="agencyProfilePhoto">Profile photo (optional)</label>
+                                <input type="file" id="agencyProfilePhoto" name="agencyProfilePhoto" class="form-input" accept="image/*">
+                                <div class="microcopy">Upload your agency logo or profile photo</div>
+                            </div>
+                            
+                            <!-- Agency Upgrade Notice -->
+                            <div class="upgrade-notice">
+                                <h3 class="notice-title"> Start Free, Upgrade When Ready</h3>
+                                <div class="notice-content">
+                                    <div class="free-features">
+                                        <h4> Free Forever:</h4>
+                                        <ul class="features-list">
+                                            <li>Create your agency profile</li>
+                                            <li>Browse all talent profiles</li>
+                                            <li>View detailed talent information</li>
+                                            <li>Save favorites</li>
+                                        </ul>
+                                    </div>
+                                    <div class="paid-features">
+                                        <h4> Premium Features:</h4>
+                                        <ul class="features-list">
+                                            <li>Send unlimited messages</li>
+                                            <li>Contact talents directly</li>
+                                            <li>Advanced search filters</li>
+                                            <li>Priority support</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="upgrade-cta">
+                                    <p>Upgrade anytime to unlock full access and start connecting with talents!</p>
+                                </div>
+                            </div>
+                        
+                        <!-- Google Sign-in Option -->
+                        <div class="divider">
+                            <span>OR</span>
+                        </div>
+                        
+                        <button type="button" class="google-btn" onclick="signInWithGoogle()">
+                            <svg class="google-icon" viewBox="0 0 24 24">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                            Continue with Google
+                        </button>
+                        
+                        <button type="submit" class="submit-btn" id="submitBtn">Create Account</button>
+                    </form>
+                    
+                    <div class="login-link">
+                        Already have an account? <a href="login.html">Log in</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let selectedRole = 'talent';
+
+        function selectRole(role) {
+            selectedRole = role;
+            
+            // Update UI
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector(`.role-card.${role}`).classList.add('selected');
+            
+            // Update radio button
+            document.getElementById(`role-${role}`).checked = true;
+            
+            // Update form title
+            document.getElementById('selected-role-text').textContent = role.charAt(0).toUpperCase() + role.slice(1);
+            
+            // Show/hide role-specific fields
+            const talentFields = document.getElementById('talent-fields');
+            const agencyFields = document.getElementById('agency-fields');
+            
+            if (role === 'talent') {
+                talentFields.style.display = 'block';
+                agencyFields.style.display = 'none';
+                // Make talent fields required
+                document.getElementById('age').required = true;
+                document.getElementById('displayName').required = true;
+                // Remove required from agency fields
+                document.getElementById('platforms').required = false;
+                document.getElementById('talentCount').required = false;
+                document.getElementById('totalRevenue').required = false;
+                document.getElementById('description').required = false;
+            } else if (role === 'agency') {
+                talentFields.style.display = 'none';
+                agencyFields.style.display = 'block';
+                // Make agency fields required
+                document.getElementById('platforms').required = true;
+                document.getElementById('talentCount').required = true;
+                document.getElementById('totalRevenue').required = true;
+                document.getElementById('description').required = true;
+                // Remove required from talent fields
+                document.getElementById('age').required = false;
+                document.getElementById('displayName').required = false;
+            }
+        }
+
+        function showMessage(message, type) {
+            const container = document.getElementById('message-container');
+            container.innerHTML = `<div class="message ${type}">${message}</div>`;
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        function setLoading(loading) {
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = loading;
+            submitBtn.textContent = loading ? 'Creating Account...' : 'Create Account';
+        }
+
+        // Upload functions
+        let uploadedFiles = {
+            avatar: null,
+            portfolio: [],
+            video: null
+        };
+
+        function previewAvatar(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('avatarPreview');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="Avatar preview">
+                        <div class="upload-info">
+                            <p>${file.name}</p>
+                            <small>${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                        </div>
+                    `;
+                    uploadedFiles.avatar = file;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function previewPortfolio(event) {
+            const files = Array.from(event.target.files);
+            const preview = document.getElementById('portfolioPreview');
+            
+            if (files.length > 0) {
+                let html = '<div class="upload-grid">';
+                files.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        html += `
+                            <div class="upload-grid-item">
+                                <img src="${e.target.result}" alt="Portfolio ${index + 1}">
+                                <button type="button" class="remove-btn" onclick="removePortfolioItem(${index})">×</button>
+                            </div>
+                        `;
+                        
+                        if (index === files.length - 1) {
+                            html += '</div>';
+                            preview.innerHTML = html;
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+                uploadedFiles.portfolio = files;
+            }
+        }
+
+        function previewVideo(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('videoPreview');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `
+                        <video controls>
+                            <source src="${e.target.result}" type="${file.type}">
+                            Votre navigateur ne supporte pas les vidéos.
+                        </video>
+                        <div class="upload-info">
+                            <p>${file.name}</p>
+                            <small>${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                        </div>
+                    `;
+                    uploadedFiles.video = file;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removePortfolioItem(index) {
+            uploadedFiles.portfolio.splice(index, 1);
+            const input = document.getElementById('portfolioInput');
+            const dt = new DataTransfer();
+            
+            uploadedFiles.portfolio.forEach(file => {
+                dt.items.add(file);
+            });
+            
+            input.files = dt.files;
+            previewPortfolio({ target: { files: dt.files } });
+        }
+
+        // Modified form submission to handle uploads
+        async function submitFormWithUploads(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const data = {
+                firstName: formData.get('firstName'),
+                lastName: formData.get('lastName'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+                role: selectedRole
+            };
+            
+            console.log('🔍 Form data being submitted:', data);
+            
+            // Validate basic fields
+            if (!data.firstName || !data.lastName || !data.email || !data.password) {
+                showMessage('Please fill in all required fields', 'error');
+                setLoading(false);
+                return;
+            }
+            
+            // Add role-specific fields
+            if (selectedRole === 'talent') {
+                data.talentProfile = {
+                    revenue: parseFloat(formData.get('revenue')) || 0,
+                    hasManager: formData.get('hasManager') || 'no',
+                    platforms: Array.from(document.querySelectorAll('input[name="platforms"]:checked')).map(cb => cb.value),
+                    otherPlatform: formData.get('otherPlatform'),
+                    country: formData.get('country'),
+                    languages: Array.from(document.querySelectorAll('input[name="languages"]:checked')).map(cb => cb.value),
+                    age: parseInt(formData.get('age')) || 0,
+                    socialMedia: Array.from(document.querySelectorAll('input[name="socialMedia"]:checked')).map(cb => cb.value),
+                    otherSocial: formData.get('otherSocial'),
+                    totalFollowers: parseInt(formData.get('totalFollowers')) || 0,
+                    displayName: formData.get('displayName'),
+                    bio: formData.get('bio'),
+                    workingHours: formData.get('workingHours'),
+                    contentTypes: Array.from(document.querySelectorAll('input[name="contentTypes"]:checked')).map(cb => cb.value)
+                };
+            } else if (selectedRole === 'agency') {
+                // Get agency fields
+                const platforms = formData.get('platforms');
+                const talentCount = formData.get('talentCount');
+                const totalRevenue = formData.get('totalRevenue');
+                const description = formData.get('description');
+                const links = formData.get('links');
+                
+                console.log('🏢 Agency fields:', { platforms, talentCount, totalRevenue, description, links });
+                
+                // Validate required agency fields
+                if (!platforms || !talentCount || !totalRevenue || !description) {
+                    showMessage('Please fill in all required agency fields', 'error');
+                    setLoading(false);
+                    return;
+                }
+                
+                data.agencyProfile = {
+                    platforms: platforms,
+                    talentCount: parseInt(talentCount) || 0,
+                    totalRevenue: parseFloat(totalRevenue) || 0,
+                    description: description,
+                    links: links
+                };
+            }
+            
+            console.log('📤 Final data to send:', JSON.stringify(data, null, 2));
+            
+            setLoading(true);
+            
+            try {
+                // Register user
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                console.log('📥 Server response:', result);
+                console.log('📊 Response status:', response.status);
+                
+                if (!result.success) {
+                    console.log('❌ Registration failed:', result.error);
+                    throw new Error(result.error || 'Registration failed');
+                }
+                
+                // Store session
+                localStorage.setItem('sessionId', result.sessionId);
+                localStorage.setItem('user', JSON.stringify(result.user));
+                
+                showMessage('Account created successfully! Redirecting...', 'success');
+                
+                // Redirect based on role
+                setTimeout(() => {
+                    if (selectedRole === 'agency') {
+                        window.location.href = 'agency-pricing.html'; // Go to pricing page
+                    } else {
+                        window.location.href = 'discover.html'; // Go to discover for talents
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                console.error('❌ Registration error:', error);
+                showMessage(error.message, 'error');
+                setLoading(false);
+            }
+        }
+
+        // Handle agency subscription payment
+        async function handleAgencySubscription(sessionId, email) {
+            try {
+                console.log('🚀 Starting agency subscription process...');
+                console.log('Session ID:', sessionId);
+                console.log('Email:', email);
+                
+                showMessage('🔄 Redirecting to payment...', 'success');
+                console.log('✅ Redirecting to Stripe Checkout...');
+                
+                // Small delay to show the message
+                setTimeout(() => {
+                    // Redirection directe vers votre lien Stripe
+                    window.location.href = 'https://buy.stripe.com/4gMdR82VjeMcgC7d6KbZe00';
+                }, 1000);
+                
+            } catch (error) {
+                console.error('❌ Subscription error:', error);
+                showMessage('❌ ' + error.message, 'error');
+                setLoading(false);
+            }
+        }
+
+        async function uploadFiles(sessionId) {
+            const headers = {
+                'Authorization': `Bearer ${sessionId}`
+            };
+            
+            // Upload avatar
+            if (uploadedFiles.avatar) {
+                const formData = new FormData();
+                formData.append('avatar', uploadedFiles.avatar);
+                formData.append('type', 'avatar');
+                
+                await fetch('/api/upload/avatar', {
+                    method: 'POST',
+                    headers: headers,
+                    body: formData
+                });
+            }
+            
+            // Upload portfolio
+            if (uploadedFiles.portfolio.length > 0) {
+                const formData = new FormData();
+                uploadedFiles.portfolio.forEach(file => {
+                    formData.append('portfolio', file);
+                });
+                formData.append('type', 'portfolio');
+                
+                await fetch('/api/upload/portfolio', {
+                    method: 'POST',
+                    headers: headers,
+                    body: formData
+                });
+            }
+            
+            // Upload video
+            if (uploadedFiles.video) {
+                const formData = new FormData();
+                formData.append('video', uploadedFiles.video);
+                formData.append('type', 'video');
+                
+                await fetch('/api/upload/video', {
+                    method: 'POST',
+                    headers: headers,
+                    body: formData
+                });
+            }
+        }
+
+        // Google Sign-in Function
+        async function signInWithGoogle() {
+            try {
+                console.log('🔍 Starting Google sign-in...');
+                setLoading(true);
+                
+                // Initialize Google Sign-In
+                const client = google.accounts.oauth2.initTokenClient({
+                    client_id: '574506459380-26bsp1pn6dc5dgb72okl9ic7bet7b36l.apps.googleusercontent.com',
+                    scope: 'email profile',
+                    callback: async (tokenResponse) => {
+                        if (tokenResponse && tokenResponse.access_token) {
+                            console.log('🔑 Got Google token:', tokenResponse.access_token);
+                            
+                            // Send token to backend for verification
+                            const response = await fetch('http://localhost:3001/api/auth/google', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ 
+                                    token: tokenResponse.access_token,
+                                    role: selectedRole 
+                                })
+                            });
+                            
+                            const result = await response.json();
+                            console.log('📥 Backend response:', result);
+                            
+                            if (result.success) {
+                                // Store session
+                                localStorage.setItem('sessionId', result.sessionId);
+                                localStorage.setItem('user', JSON.stringify(result.user));
+                                
+                                showMessage('Account created with Google! Redirecting...', 'success');
+                                
+                                // Redirect based on role
+                                setTimeout(() => {
+                                    if (result.user.role === 'agency') {
+                                        window.location.href = 'agency-pricing.html';
+                                    } else {
+                                        window.location.href = 'discover.html';
+                                    }
+                                }, 2000);
+                            } else {
+                                throw new Error(result.error || 'Google sign-in failed');
+                            }
+                        } else {
+                            throw new Error('No token received from Google');
+                        }
+                    },
+                    error_callback: (error) => {
+                        console.error('❌ Google OAuth error:', error);
+                        throw new Error('Google authentication failed');
+                    }
+                });
+                
+                // Request the token
+                client.requestAccessToken();
+                
+            } catch (error) {
+                console.error('❌ Google sign-in error:', error);
+                showMessage('Google sign-in failed. Please try again or use email signup.', 'error');
+                setLoading(false);
+            }
+        }
+
+        // Update form submission
+        document.getElementById('signupForm').addEventListener('submit', submitFormWithUploads);
+
+        // Select agency by default for testing
+        selectRole('agency');
+    </script>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="terms.html">Terms of Service</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="contact.html">Contact</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Talent & Agency. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

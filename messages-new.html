@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - Talent & Agency</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="auth-utils.js"></script>
+    <style>
+        :root {
+            --primary: #1e293b;
+            --primary-dark: #0f172a;
+            --secondary: #475569;
+            --accent: #64748b;
+            --accent-blue: #1e3a8a;
+            --accent-blue-light: #3b82f6;
+            --accent-blue-subtle: rgba(59, 130, 246, 0.08);
+            --accent-blue-border: rgba(59, 130, 246, 0.15);
+            --accent-blue-glow: rgba(59, 130, 246, 0.25);
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            --bg-tertiary: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-tertiary: #71717a;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.16);
+            --border-blue: rgba(59, 130, 246, 0.2);
+        }
+
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary); 
+            color: var(--text-primary); 
+            padding: 6rem 3rem 0; 
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        .main-content {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 2rem;
+        }
+
+        /* Header - Same as favorites */
+        .header {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.18);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .nav {
+            max-width: 1200px; margin: 0 auto; padding: 0 2rem;
+            display: flex; align-items: center; justify-content: space-between; height: 64px;
+            position: relative;
+        }
+        .nav nav { position: absolute; left: 50%; transform: translateX(-50%); }
+        .nav-brand { font-size: 1.25rem; font-weight: 800; color: #fff; }
+        .nav-links { list-style: none; display: flex; gap: 2rem; align-items: center; }
+        .nav-links a { color: rgba(255,255,255,0.6); font-weight: 500; font-size: 0.9rem; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: #3b82f6; }
+        .profile-icon {
+            width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            font-size: 0.85rem; font-weight: 600; color: rgba(255,255,255,0.7);
+        }
+
+        /* Back Button */
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+            transition: color 0.2s ease;
+        }
+
+        .back:hover {
+            color: var(--accent-blue-light);
+        }
+
+        /* Header */
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        /* Messages Layout */
+        .messages-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            height: calc(100vh - 200px);
+        }
+
+        /* Conversations List */
+        .conversations-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .conversation {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .conversation:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
+        }
+
+        .conversation.active {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--accent-blue-border);
+        }
+
+        .conversation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .conversation-name {
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .conversation-time {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+        }
+
+        .conversation-message {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .unread-indicator {
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+            margin-left: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Chat Section */
+        .chat-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-tertiary);
+        }
+
+        .chat-participant {
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+        }
+
+        .chat-status {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            line-height: 1.4;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 0.25rem;
+        }
+
+        .chat-input-container {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg-tertiary);
+        }
+
+        .chat-input-form {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--accent-blue-light);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .send-button {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .send-button:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            transform: translateY(-1px);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .messages-layout {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .conversations-section {
+                height: 300px;
+            }
+            
+            .chat-section {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+        <header class="header">
+            <div class="nav">
+                <a href="/" class="nav-brand">Talent & Agency</a>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="/discover">Discover</a></li>
+                        <li><a href="/favorites">Favorites</a></li>
+                        <li><a href="/messages" class="active">Messages</a></li>
+                    </ul>
+                </nav>
+                <div class="nav-actions">
+                    <div class="profile-icon" onclick="window.location.href='/profile'" title="My Profile">
+                        <img id="navAvatarImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:none;">
+                        <span id="navAvatarFallback">?</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+    
+    <div class="main-content">
+        <a href="/discover" class="back">← Retour à Discover</a>
+        
+        <h1>Messages</h1>
+        <p class="subtitle">Vos conversations avec les talents et agences</p>
+        
+        <!-- Messages Layout -->
+        <div class="messages-layout">
+            <!-- Conversations List -->
+            <div class="conversations-section">
+                <h2 class="section-title">Conversations</h2>
+                <div id="conversationsList">
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>Chargement des conversations...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Section -->
+            <div class="chat-section">
+                <div id="chatContent">
+                    <div class="empty-state">
+                        <h3>Sélectionnez une conversation</h3>
+                        <p>Choisissez une conversation dans la liste pour commencer à discuter</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUserId = null;
+        let currentConversationId = null;
+        let conversations = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            await Auth.updateNav();
+            await initializeUser();
+            await loadConversations();
+            
+            // Setup profile icon like favorites
+            const user = Auth.getUser();
+            const navAvatarImg = document.getElementById('navAvatarImg');
+            const navAvatarFallback = document.getElementById('navAvatarFallback');
+            
+            if (user && navAvatarImg && navAvatarFallback) {
+                const initials = (user.firstName?.[0] || '') + (user.lastName?.[0] || '');
+                navAvatarFallback.textContent = initials || '?';
+                
+                if (user.profilePhotoUrl) {
+                    navAvatarImg.src = user.profilePhotoUrl;
+                    navAvatarImg.style.display = 'block';
+                    navAvatarFallback.style.display = 'none';
+                }
+            }
+        });
+
+        // Initialize user
+        async function initializeUser() {
+            try {
+                const userData = Auth.getUser();
+                if (userData && userData.id) {
+                    currentUserId = userData.id;
+                    console.log('✅ Utilisateur connecté:', currentUserId);
+                    return;
+                }
+            } catch (error) {
+                console.log('❌ Erreur auth:', error);
+            }
+            
+            // Redirect to login if not authenticated
+            window.location.href = '/login';
+        }
+
+        // Load conversations
+        async function loadConversations() {
+            try {
+                const token = Auth.getToken();
+                const response = await fetch('/api/messages', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    conversations = data.data || [];
+                    renderConversations();
+                } else {
+                    console.error('Error loading conversations');
+                    renderEmptyState();
+                }
+            } catch (error) {
+                console.error('Error loading conversations:', error);
+                renderEmptyState();
+            }
+        }
+
+        // Render conversations
+        function renderConversations() {
+            const container = document.getElementById('conversationsList');
+            
+            if (conversations.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Aucune conversation</h3>
+                        <p>Commencez à discuter avec des talents ou des agences depuis la page Discover</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Group messages by sender to create conversations
+            const conversationMap = new Map();
+            conversations.forEach(msg => {
+                const otherUserId = msg.sender_id === currentUserId ? msg.receiver_id : msg.sender_id;
+                const otherUserName = msg.sender_first_name && msg.sender_last_name 
+                    ? `${msg.sender_first_name} ${msg.sender_last_name}`
+                    : `User ${otherUserId}`;
+                
+                if (!conversationMap.has(otherUserId)) {
+                    conversationMap.set(otherUserId, {
+                        id: `conv_${otherUserId}`,
+                        participant_id: otherUserId,
+                        participant_name: otherUserName,
+                        participant_email: msg.sender_email || '',
+                        last_message: msg.content,
+                        last_message_at: msg.created_at,
+                        messages: []
+                    });
+                }
+                
+                conversationMap.get(otherUserId).messages.push(msg);
+            });
+            
+            const conversationList = Array.from(conversationMap.values());
+            
+            container.innerHTML = conversationList.map(conv => `
+                <div class="conversation ${conv.id === currentConversationId ? 'active' : ''}" 
+                     onclick="selectConversation('${conv.id}', ${conv.participant_id}, '${conv.participant_name}')"
+                     data-conversation-id="${conv.id}">
+                    <div class="conversation-header">
+                        <div class="conversation-name">${conv.participant_name}</div>
+                        <div class="conversation-time">${formatTimestamp(new Date(conv.last_message_at))}</div>
+                    </div>
+                    <div class="conversation-message">${conv.last_message}</div>
+                </div>
+            `).join('');
+        }
+
+        // Select conversation
+        async function selectConversation(conversationId, participantId, participantName) {
+            currentConversationId = conversationId;
+            
+            // Update active state
+            document.querySelectorAll('.conversation').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelector(`[data-conversation-id="${conversationId}"]`).classList.add('active');
+            
+            // Load messages for this conversation
+            await loadMessages(participantId, participantName);
+        }
+
+        // Load messages
+        async function loadMessages(participantId, participantName) {
+            try {
+                const token = Auth.getToken();
+                const response = await fetch('/api/messages', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const allMessages = data.data || [];
+                    
+                    // Filter messages for this conversation
+                    const conversationMessages = allMessages.filter(msg => 
+                        (msg.sender_id === currentUserId && msg.receiver_id === participantId) ||
+                        (msg.sender_id === participantId && msg.receiver_id === currentUserId)
+                    );
+                    
+                    renderChat(participantId, participantName, conversationMessages);
+                } else {
+                    console.error('Error loading messages');
+                    renderChatError();
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                renderChatError();
+            }
+        }
+
+        // Render chat
+        function renderChat(participantId, participantName, messages) {
+            const chatContent = document.getElementById('chatContent');
+            
+            chatContent.innerHTML = `
+                <div class="chat-header">
+                    <div class="chat-participant">${participantName}</div>
+                    <div class="chat-status">En ligne</div>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    ${messages.map(msg => `
+                        <div class="message ${msg.sender_id === currentUserId ? 'sent' : 'received'}">
+                            <div>${msg.content}</div>
+                            <div class="message-time">${formatTimestamp(new Date(msg.created_at))}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="chat-input-container">
+                    <form class="chat-input-form" onsubmit="sendMessage(event, ${participantId})">
+                        <input type="text" class="chat-input" placeholder="Écrivez votre message..." id="messageInput">
+                        <button type="submit" class="send-button" id="sendButton">Envoyer</button>
+                    </form>
+                </div>
+            `;
+            
+            // Scroll to bottom
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Send message
+        async function sendMessage(event, participantId) {
+            event.preventDefault();
+            
+            const input = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            const content = input.value.trim();
+            
+            if (!content || !participantId) return;
+            
+            // Disable send button
+            sendButton.disabled = true;
+            sendButton.textContent = 'Envoi...';
+            
+            try {
+                const token = Auth.getToken();
+                const response = await fetch('/api/messages/conversations', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        participantId: participantId,
+                        content: content
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Clear input
+                    input.value = '';
+                    
+                    // Reload messages
+                    const participantName = document.querySelector('.chat-participant').textContent;
+                    await loadMessages(participantId, participantName);
+                    
+                    // Reload conversations
+                    await loadConversations();
+                } else {
+                    alert('Erreur: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Erreur lors de l\'envoi du message');
+            } finally {
+                // Re-enable send button
+                sendButton.disabled = false;
+                sendButton.textContent = 'Envoyer';
+            }
+        }
+
+        // Format timestamp
+        function formatTimestamp(date) {
+            const now = new Date();
+            const diff = now - date;
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            if (seconds < 60) {
+                return 'À l\'instant';
+            } else if (minutes < 60) {
+                return `Il y a ${minutes} minute${minutes > 1 ? 's' : ''}`;
+            } else if (hours < 24) {
+                return `Il y a ${hours} heure${hours > 1 ? 's' : ''}`;
+            } else if (days < 7) {
+                return `Il y a ${days} jour${days > 1 ? 's' : ''}`;
+            } else {
+                return date.toLocaleDateString('fr-FR', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+                });
+            }
+        }
+
+        // Render empty state
+        function renderEmptyState() {
+            const container = document.getElementById('conversationsList');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>Aucune conversation</h3>
+                    <p>Commencez à discuter avec des talents ou des agences depuis la page Discover</p>
+                </div>
+            `;
+        }
+
+        // Render chat error
+        function renderChatError() {
+            const chatContent = document.getElementById('chatContent');
+            chatContent.innerHTML = `
+                <div class="empty-state">
+                    <h3>Erreur de chargement</h3>
+                    <p>Impossible de charger les messages de cette conversation</p>
+                </div>
+            `;
+        }
+
+        console.log('🚀 Messages page loaded with real messaging system');
+    </script>
+</body>
+</html>

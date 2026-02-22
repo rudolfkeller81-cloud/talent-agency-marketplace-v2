@@ -1,0 +1,399 @@
+/* Performance Optimization CSS */
+
+/* Critical CSS - Above the fold */
+.critical-css {
+    /* Only essential styles for initial render */
+}
+
+/* CSS Containment */
+.container,
+.profiles-grid,
+.conversations-list,
+.chat-area {
+    contain: layout style paint;
+}
+
+/* Hardware Acceleration */
+.nav,
+.profile-card,
+.message,
+.notification-toast {
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* Optimized Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Use transforms instead of position changes for better performance */
+.animate-transform {
+    transition: transform 0.3s ease;
+}
+
+.animate-transform:hover {
+    transform: translateY(-2px);
+}
+
+/* Optimized images */
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Lazy loading placeholder */
+.lazy-load {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Font optimization */
+@font-face {
+    font-family: 'Inter';
+    font-display: swap; /* Prevents invisible text during font loading */
+    src: url('/fonts/inter-regular.woff2') format('woff2'),
+         url('/fonts/inter-regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+/* Reduce repaints and reflows */
+.profile-card,
+.conversation-item,
+.message {
+    contain: layout style paint;
+}
+
+/* Efficient scrolling */
+.conversations-content,
+.chat-messages,
+.profiles-grid {
+    overflow-anchor: none;
+    scroll-behavior: smooth;
+}
+
+/* Optimized form inputs */
+input,
+textarea,
+select {
+    will-change: border-color, box-shadow;
+}
+
+/* Performance-focused hover states */
+.btn,
+.nav-link,
+.profile-btn {
+    transition: 
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+/* Reduce complexity of selectors */
+.simple-selector {
+    /* Avoid nested selectors when possible */
+}
+
+/* Use CSS Grid instead of floats for better performance */
+.profiles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+/* Minimize DOM manipulation with CSS */
+.auto-height {
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Efficient modal animations */
+.modal {
+    will-change: opacity, transform;
+}
+
+.modal.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Performance monitoring utilities */
+.performance-monitor {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    font-family: monospace;
+    font-size: 12px;
+    z-index: 9999;
+    border-radius: 3px;
+}
+
+/* Resource hints */
+.preload {
+    /* Add to HTML head for critical resources */
+}
+
+/* DNS prefetch for external domains */
+.dns-prefetch {
+    /* Add to HTML head */
+}
+
+/* Preconnect for critical domains */
+.preconnect {
+    /* Add to HTML head */
+}
+
+/* Optimized scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Efficient transitions */
+.efficient-transition {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Avoid layout thrashing */
+.layout-stable {
+    contain: layout;
+}
+
+/* Paint containment */
+.paint-contained {
+    contain: paint;
+}
+
+/* Size containment */
+.size-contained {
+    contain: size;
+}
+
+/* Style containment */
+.style-contained {
+    contain: style;
+}
+
+/* Optimized shadows */
+.performance-shadow {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    will-change: box-shadow;
+}
+
+/* Efficient gradients */
+.optimized-gradient {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    will-change: background-position;
+    background-size: 200% 200%;
+}
+
+/* Minimize reflows with fixed dimensions */
+.fixed-dimensions {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* Efficient text rendering */
+.optimize-text {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Performance-focused media queries */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High performance mode */
+@media (prefers-reduced-data: reduce) {
+    .performance-heavy {
+        display: none;
+    }
+}
+
+/* Battery optimization */
+@media (prefers-reduced-motion: reduce) {
+    .animate-transform {
+        transform: none !important;
+        transition: none !important;
+    }
+}
+
+/* Network-aware loading */
+@media (prefers-reduced-data: reduce) {
+    .lazy-load {
+        background: none;
+    }
+    
+    img {
+        filter: blur(0);
+    }
+}
+
+/* Memory-efficient animations */
+.memory-efficient {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+/* CPU-efficient transitions */
+.cpu-efficient {
+    transition: opacity 0.2s ease;
+}
+
+/* GPU-accelerated elements */
+.gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* Optimized backdrop filters */
+.optimized-backdrop {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Efficient blend modes */
+.blend-mode-optimized {
+    mix-blend-mode: normal;
+    isolation: isolate;
+}
+
+/* Performance monitoring classes */
+.debug-performance * {
+    outline: 1px solid red;
+}
+
+.debug-performance .heavy-element {
+    background: rgba(255, 0, 0, 0.1);
+}
+
+/* Critical CSS inlining helper */
+.critical-above-fold {
+    /* These styles should be inlined in HTML */
+}
+
+/* Non-critical CSS loading */
+.non-critical {
+    /* These can be loaded asynchronously */
+}
+
+/* Resource loading optimization */
+.resource-hints {
+    /* Add appropriate resource hints in HTML */
+}
+
+/* Image optimization */
+.responsive-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* Video optimization */
+.optimized-video {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Audio optimization */
+.optimized-audio {
+    width: 100%;
+}
+
+/* Font loading optimization */
+.font-optimized {
+    font-display: swap;
+}
+
+/* Layout optimization */
+.layout-optimized {
+    contain: layout;
+}
+
+/* Paint optimization */
+.paint-optimized {
+    contain: paint;
+}
+
+/* Composite optimization */
+.composite-optimized {
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+/* Animation optimization */
+.animation-optimized {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+/* Transition optimization */
+.transition-optimized {
+    transition: opacity 0.2s ease;
+}
+
+/* Memory optimization */
+.memory-optimized {
+    contain: strict;
+}
+
+/* Performance utilities */
+.perf-boost {
+    contain: layout style paint;
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+.perf-lightweight {
+    contain: layout;
+}
+
+.perf-heavy {
+    contain: layout style paint;
+    will-change: auto;
+}

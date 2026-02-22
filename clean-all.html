@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clean All Test Data</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: #ef4444;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+        }
+
+        .warning {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            color: #ef4444;
+        }
+
+        .data-preview {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .status-message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .status-message.show {
+            display: block;
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .storage-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .storage-title {
+            font-weight: 600;
+            color: #3b82f6;
+            margin-bottom: 0.5rem;
+        }
+
+        .storage-content {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            word-break: break-all;
+        }
+
+        .empty {
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Clean All Test Data</h1>
+        <p class="subtitle">Remove all test profiles and start fresh</p>
+        
+        <div id="status-message" class="status-message"></div>
+
+        <div class="warning">
+            ⚠️ <strong>WARNING:</strong> This will permanently delete ALL stored data including:
+            <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                <li>All user profiles</li>
+                <li>All posts</li>
+                <li>All authentication tokens</li>
+                <li>All session data</li>
+            </ul>
+            This action cannot be undone!
+        </div>
+
+        <div id="current-data">
+            <h3 style="margin-bottom: 1rem;">Current Data Found:</h3>
+            <div id="storage-list">
+                Loading...
+            </div>
+        </div>
+
+        <button class="btn btn-danger" onclick="cleanAllData()">
+            🗑️ Delete All Test Data
+        </button>
+        
+        <a href="/signup" class="btn btn-secondary">
+            📝 Go to Signup (Fresh Start)
+        </a>
+        
+        <a href="/profile" class="btn btn-secondary">
+            👤 Go to Profile (Check Result)
+        </a>
+    </div>
+
+    <script>
+        function checkCurrentData() {
+            const storageList = document.getElementById('storage-list');
+            let html = '';
+            
+            // Check localStorage
+            const localStorageItems = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                localStorageItems[key] = value;
+            }
+            
+            // Check sessionStorage
+            const sessionStorageItems = {};
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                const value = sessionStorage.getItem(key);
+                sessionStorageItems[key] = value;
+            }
+            
+            // Display localStorage items
+            html += '<div class="storage-item">';
+            html += '<div class="storage-title">📦 Local Storage (' + Object.keys(localStorageItems).length + ' items)</div>';
+            
+            if (Object.keys(localStorageItems).length === 0) {
+                html += '<div class="storage-content empty">No localStorage items found</div>';
+            } else {
+                Object.keys(localStorageItems).forEach(key => {
+                    const value = localStorageItems[key];
+                    let displayValue = value;
+                    
+                    try {
+                        const parsed = JSON.parse(value);
+                        displayValue = JSON.stringify(parsed, null, 2);
+                    } catch (e) {
+                        displayValue = value;
+                    }
+                    
+                    html += '<div style="margin-bottom: 0.5rem;">';
+                    html += '<strong>' + key + ':</strong><br>';
+                    html += '<div class="storage-content">' + displayValue.substring(0, 200) + (displayValue.length > 200 ? '...' : '') + '</div>';
+                    html += '</div>';
+                });
+            }
+            html += '</div>';
+            
+            // Display sessionStorage items
+            html += '<div class="storage-item">';
+            html += '<div class="storage-title">🗂️ Session Storage (' + Object.keys(sessionStorageItems).length + ' items)</div>';
+            
+            if (Object.keys(sessionStorageItems).length === 0) {
+                html += '<div class="storage-content empty">No sessionStorage items found</div>';
+            } else {
+                Object.keys(sessionStorageItems).forEach(key => {
+                    const value = sessionStorageItems[key];
+                    let displayValue = value;
+                    
+                    try {
+                        const parsed = JSON.parse(value);
+                        displayValue = JSON.stringify(parsed, null, 2);
+                    } catch (e) {
+                        displayValue = value;
+                    }
+                    
+                    html += '<div style="margin-bottom: 0.5rem;">';
+                    html += '<strong>' + key + ':</strong><br>';
+                    html += '<div class="storage-content">' + displayValue.substring(0, 200) + (displayValue.length > 200 ? '...' : '') + '</div>';
+                    html += '</div>';
+                });
+            }
+            html += '</div>';
+            
+            storageList.innerHTML = html;
+        }
+
+        function cleanAllData() {
+            if (!confirm('⚠️ Are you absolutely sure you want to delete ALL test data?\n\nThis will remove:\n• All user profiles\n• All posts\n• All authentication data\n• All session data\n\nThis cannot be undone!')) {
+                return;
+            }
+            
+            if (!confirm('🔥 FINAL WARNING: This is irreversible!\n\nClick OK to permanently delete everything.')) {
+                return;
+            }
+            
+            try {
+                // Clear localStorage
+                localStorage.clear();
+                
+                // Clear sessionStorage
+                sessionStorage.clear();
+                
+                // Clear IndexedDB (if any)
+                if (window.indexedDB) {
+                    const databases = indexedDB.databases();
+                    databases.then(dbs => {
+                        dbs.forEach(db => {
+                            indexedDB.deleteDatabase(db.name);
+                        });
+                    });
+                }
+                
+                showStatus('✅ All test data has been permanently deleted!', 'success');
+                
+                // Refresh the display
+                setTimeout(() => {
+                    checkCurrentData();
+                }, 1000);
+                
+            } catch (error) {
+                showStatus('❌ Error cleaning data: ' + error.message, 'error');
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status-message');
+            statusEl.textContent = message;
+            statusEl.className = `status-message show status-${type}`;
+            
+            setTimeout(() => {
+                statusEl.classList.remove('show');
+            }, 5000);
+        }
+
+        // Check current data on page load
+        window.addEventListener('DOMContentLoaded', checkCurrentData);
+    </script>
+</body>
+</html>

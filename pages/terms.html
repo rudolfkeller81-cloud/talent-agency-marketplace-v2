@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - Talent & Agency</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.95);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: rgba(59, 130, 246, 0.8);
+        }
+
+        .sign-in-btn {
+            background: transparent;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .sign-in-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+            padding: 3rem 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #fff;
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 3rem;
+            line-height: 1.8;
+        }
+
+        /* Terms Content */
+        .terms-content {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 3rem;
+        }
+
+        .terms-section {
+            margin-bottom: 3rem;
+        }
+
+        .terms-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .section-content {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.8;
+        }
+
+        .section-content ul {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        .section-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .section-content strong {
+            color: #fff;
+        }
+
+        .highlight {
+            color: rgba(59, 130, 246, 0.9);
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: rgba(59, 130, 246, 0.8);
+        }
+
+        .footer-bottom {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 2rem 1rem;
+            }
+            
+            .terms-content {
+                padding: 2rem 1.5rem;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="nav">
+                <div class="logo">Talent & Agency</div>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="../index.html">Home</a></li>
+                    </ul>
+                </nav>
+                <button class="sign-in-btn" onclick="window.location.href='../login.html'">Sign In</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <h1 class="page-title">Terms of Service</h1>
+                <p class="page-subtitle">Last updated: January 2026</p>
+                
+                <div class="terms-content">
+                    <!-- Section 1 -->
+                    <div class="terms-section">
+                        <h2 class="section-title">1. Introduction</h2>
+                        <div class="section-content">
+                            <p>Welcome to Talent & Agency ("Platform", "we", "us", "our").</p>
+                            <p>Talent & Agency is an online marketplace designed to connect digital content creators ("Talents") with talent management agencies ("Agencies").</p>
+                            <p>By accessing or using the Platform, you agree to be bound by these Terms of Service ("Terms"). If you do not agree, you may not use the Platform.</p>
+                        </div>
+                    </div>
+
+                    <!-- Section 2 -->
+                    <div class="terms-section">
+                        <h2 class="section-title">2. Eligibility</h2>
+                        <div class="section-content">
+                            <p>You must be at least 18 years old to use Talent & Agency.</p>
+                            <p>By creating an account, you confirm that:</p>
+                            <ul>
+                                <li>You are legally able to enter into binding agreements</li>
+                                <li>All information you provide is accurate and truthful</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Section 3 -->
+                    <div class="terms-section">
+                        <h2 class="section-title">3. Accounts & Registration</h2>
+                        <div class="section-content">
+                            <p>Users may register as:</p>
+                            <ul>
+                                <li>Talent (free)</li>
+                                <li>Agency (paid subscription required for interaction)</li>
+                            </ul>
+                            <p>All users may browse profiles after registration.</p>
+                            <p>You are responsible for maintaining the confidentiality of your account credentials.</p>
+                        </div>
+                    </div>
+
+                    <!-- Section 4 -->
+                    <div class="terms-section">
+                        <h2 class="section-title">4. Verification & Moderation</h2>
+                        <div class="section-content">
+                            <p>Verification is a trust indicator, not a requirement for visibility.</p>
+                            <p>Talent & Agency reserves the right to:</p>
+                            <ul>
+                                <li>Review profiles manually</li>
+                                <li>Approve, reject, suspend or remove accounts</li>
+                                <li>Remove any content that violates these Terms</li>
+                            </ul>
+                            <p>We are not obligated to verify the identity or legitimacy of users but may do so at our discretion.</p>
+                        </div>
+                    </div>
+
+                    <!-- Section 5 -->
+                    <div class="terms-section">
+                        <h2 class="section-title">5. Visibility vs Interaction</h2>
+                        <div class="section-content">
+                            <p>All profiles are visible to registered users</p>
+                            <p>Messaging and certain interactions are restricted</p>
+                            <p>Messaging rules:</p>
+                            <ul>
+                                <li>Talents must be verified to send messages</li>
+                                <li>Agencies must be verified and have an active subscription to send messages</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Section 6 -->
+                    <div class="terms-section">
+                        <h2 class="section-title">6. Subscriptions & Payments</h2>
+                        <div class="section-content">
+                            <p>Agencies must subscribe to access full interaction features.</p>
+                            <p>Subscriptions are billed on a weekly basis</p>
+                            <p>Payments are handled by third-party providers (e.g. Stripe)</p>
+                            <p>Subscriptions renew automatically unless canceled</p>
+                            <p>Talent & Agency does not offer refunds unless required by law.</p>
+                        </div>
+                    </div>
+
+                    <!-- Section 7 -->
+                    <div class="terms-section">
+                        <h2 class="section-title">7. Platform Role & Responsibility</h2>
+                        <div class="section-content">
+                            <p>Talent & Agency:</p>
+                            <ul>
+                                <li>Is not an employer</li>
+                                <li>Is not a talent agency</li>
+                                <li>Is not a party to agreements between users</li>
+                            </ul>
+                            <p>All agreements, negotiations, and collaborations occur directly between Talents and Agencies.</p>
+                        </div>
+                    </div>
+
+                    <!-- Section 8 -->
+                    <div class="terms-section">
+                        <h2 class="section-title">8. Prohibited Use</h2>
+                        <div class="section-content">
+                            <p>You agree not to:</p>
+                            <ul>
+                                <li>Post false or misleading information</li>
+                                <li>Impersonate another person or entity</li>
+                                <li>Use the Platform for illegal or abusive activities</li>
+                                <li>Circumvent payment or access restrictions</li>
+                            </ul>
+                            <p>Violation may result in suspension or termination.</p>
+                        </div>
+                    </div>
+
+                    <!-- Section 9 -->
+                    <div class="terms-section">
+                        <h2 class="section-title">9. Intellectual Property</h2>
+                        <div class="section-content">
+                            <p>All Platform content, branding, and design are owned by Talent & Agency.</p>
+                            <p>Users retain ownership of content they upload but grant Talent & Agency a license to display it on the Platform.</p>
+                        </div>
+                    </div>
+
+                    <!-- Section 10 -->
+                    <div class="terms-section">
+                        <h2 class="section-title">10. Termination</h2>
+                        <div class="section-content">
+                            <p>We may suspend or terminate your account at any time if you violate these Terms.</p>
+                            <p>You may delete your account at any time.</p>
+                        </div>
+                    </div>
+
+                    <!-- Section 11 -->
+                    <div class="terms-section">
+                        <h2 class="section-title">11. Limitation of Liability</h2>
+                        <div class="section-content">
+                            <p>Talent & Agency is provided "as is".</p>
+                            <p>We are not liable for:</p>
+                            <ul>
+                                <li>User behavior</li>
+                                <li>Financial losses</li>
+                                <li>Failed collaborations</li>
+                                <li>Disputes between users</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Section 12 -->
+                    <div class="terms-section">
+                        <h2 class="section-title">12. Changes to Terms</h2>
+                        <div class="section-content">
+                            <p>We may update these Terms at any time.</p>
+                            <p>Continued use of the Platform constitutes acceptance of the updated Terms.</p>
+                        </div>
+                    </div>
+
+                    <!-- Section 13 -->
+                    <div class="terms-section">
+                        <h2 class="section-title">13. Contact</h2>
+                        <div class="section-content">
+                            <p>For questions regarding these Terms:</p>
+                            <p><a href="mailto:contact.talentandagency@gmail.com" class="highlight">contact.talentandagency@gmail.com</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <div class="footer-logo">Talent & Agency</div>
+                    <p class="footer-desc">Connecting talented creators with leading agencies worldwide.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Talent & Agency. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
