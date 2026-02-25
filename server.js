@@ -3,6 +3,7 @@
 // Version propre - Toutes fonctionnalités consolidées
 // ============================================================================
 
+// Importer dotenv AVANT tout
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
