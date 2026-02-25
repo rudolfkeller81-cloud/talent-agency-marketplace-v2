@@ -1594,6 +1594,23 @@ app.post('/webhooks/stripe', express.raw({ type: 'application/json' }), async (r
     res.json({ received: true });
 });
 
+// Charger les variables d'environnement
+dotenv.config();
+
+// Créer les dossiers nécessaires au démarrage
+const createRequiredDirectories = () => {
+    const dirs = ['./uploads', './logs'];
+    dirs.forEach(dir => {
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+            console.log(`📁 Dossier créé: ${dir}`);
+        }
+    });
+};
+
+// Créer les dossiers au démarrage
+createRequiredDirectories();
+
 // Obtenir le statut de l'abonnement
 app.get('/api/stripe/subscription-status', requireAuth, async (req, res) => {
     try {
