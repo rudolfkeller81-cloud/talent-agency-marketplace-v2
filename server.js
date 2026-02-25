@@ -440,6 +440,9 @@ app.get('/api/test', (req, res) => {
 
 // Register
 app.post('/api/auth/register', authLimiter, async (req, res) => {
+    console.log('🔍 API /api/auth/register appelée');
+    console.log('📦 Body reçu:', req.body);
+    
     try {
         const { firstName, lastName, email, password, role, talentProfile, agencyProfile } = req.body;
 
