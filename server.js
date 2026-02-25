@@ -138,7 +138,7 @@ app.use(helmet({
 const allowedOrigins = process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(',')
     : (isProd
-        ? [productionUrl]
+        ? ['https://talent-agency-marketplace-v2.onrender.com', 'https://talent-agency-marketplace.onrender.com']  // Ajout de votre URL Render
         : ['http://localhost:3003', 'http://127.0.0.1:3003']);
 
 app.use(cors({
