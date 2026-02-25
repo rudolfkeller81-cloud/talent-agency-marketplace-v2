@@ -14,6 +14,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const validator = require('validator');
 const xss = require('xss');
+const fs = require('fs');
 
 // Logger centralisé
 const logger = require('./logger');
