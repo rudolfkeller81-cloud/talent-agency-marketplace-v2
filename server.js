@@ -185,18 +185,18 @@ const authLimiter = rateLimit({
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
-// --- Sanitization middleware : nettoie tous les inputs string ---
-app.use((req, res, next) => {
-    console.log('🔍 Middleware - Body before sanitization:', req.body);
-    if (req.body && typeof req.body === 'object') {
-        sanitizeObject(req.body);
-    }
-    if (req.query && typeof req.query === 'object') {
-        sanitizeObject(req.query);
-    }
-    console.log('🔍 Middleware - Body after sanitization:', req.body);
-    next();
-});
+// --- Sanitization middleware : désactivé pour le déploiement ---
+// app.use((req, res, next) => {
+//     console.log('🔍 Middleware - Body before sanitization:', req.body);
+//     if (req.body && typeof req.body === 'object') {
+//         sanitizeObject(req.body);
+//     }
+//     if (req.query && typeof req.query === 'object') {
+//         sanitizeObject(req.query);
+//     }
+//     console.log('🔍 Middleware - Body after sanitization:', req.body);
+//     next();
+// });
 
 function sanitizeObject(obj) {
     for (const key of Object.keys(obj)) {
