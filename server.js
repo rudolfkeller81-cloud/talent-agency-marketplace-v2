@@ -1110,11 +1110,19 @@ app.get('/api/messages', async (req, res) => {
 
 // Get favorites
 app.get('/api/favorites', requireAuth, async (req, res) => {
+    console.log('🔍 API /api/favorites GET appelée');
+    
     try {
         const userId = req.user.user_id || req.user.id;
+        console.log('👤 User ID:', userId);
+        
         const favorites = await getUserFavorites(userId);
+        console.log('⭐ Favorites trouvés:', favorites.length);
+        console.log('📋 Détails favorites:', favorites);
+        
         res.json({ success: true, data: favorites });
     } catch (error) {
+        console.error('❌ Erreur getting favorites:', error);
         logger.error('Error getting favorites:', error);
         res.status(500).json({ success: false, error: error.message });
     }
@@ -1122,17 +1130,25 @@ app.get('/api/favorites', requireAuth, async (req, res) => {
 
 // Add to favorites
 app.post('/api/favorites', requireAuth, async (req, res) => {
+    console.log('🔍 API /api/favorites POST appelée');
+    console.log('📦 Body reçu:', req.body);
+    
     try {
         const userId = req.user.user_id || req.user.id;
         const { favoritedUserId } = req.body;
+
+        console.log('👤 User ID:', userId);
+        console.log('⭐ Favorited User ID:', favoritedUserId);
 
         if (!favoritedUserId) {
             return res.status(400).json({ success: false, error: 'ID utilisateur favori requis' });
         }
 
         const result = await addToFavorites(userId, favoritedUserId);
+        console.log('✅ Favorite ajouté:', result);
         res.json({ success: true, data: result });
     } catch (error) {
+        console.error('❌ Erreur ajout favorite:', error);
         logger.error('Error adding favorite:', error);
         res.status(500).json({ success: false, error: error.message });
     }
