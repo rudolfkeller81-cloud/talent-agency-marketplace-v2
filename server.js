@@ -1603,6 +1603,7 @@ const createRequiredDirectories = () => {
             console.log(`📁 Dossier créé: ${dir}`);
         }
     });
+    console.log('✅ Talent & Agency Marketplace - Dossiers prêts');
 };
 
 // Créer les dossiers au démarrage
