@@ -1611,6 +1611,14 @@ const createRequiredDirectories = () => {
 // Créer les dossiers au démarrage
 createRequiredDirectories();
 
+// Initialiser la base de données
+try {
+    initDatabase();
+    console.log('🗄️ Base de données initialisée');
+} catch (error) {
+    console.error('❌ Erreur initialisation base de données:', error.message);
+}
+
 // Obtenir le statut de l'abonnement
 app.get('/api/stripe/subscription-status', requireAuth, async (req, res) => {
     try {
