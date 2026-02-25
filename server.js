@@ -1594,9 +1594,6 @@ app.post('/webhooks/stripe', express.raw({ type: 'application/json' }), async (r
     res.json({ received: true });
 });
 
-// Charger les variables d'environnement
-dotenv.config();
-
 // Créer les dossiers nécessaires au démarrage
 const createRequiredDirectories = () => {
     const dirs = ['./uploads', './logs'];
