@@ -60,6 +60,35 @@
             align-items: center;
             justify-content: center;
             font-size: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-avatar-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .avatar-upload-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 30px;
+            height: 30px;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            border: 2px solid #000;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-upload-btn:hover {
+            background: #2563eb;
+            transform: scale(1.1);
         }
 
         .profile-name {
@@ -326,10 +355,23 @@
         <div class="profile-layout">
             <!-- Profile Card -->
             <aside class="profile-card">
-                <div class="profile-avatar" id="profile-avatar">👤</div>
-                <h2 class="profile-name" id="profile-name">Loading...</h2>
+                <div class="profile-avatar-container">
+                    <div class="profile-avatar" id="profile-avatar">👤</div>
+                    <div class="avatar-upload-btn" onclick="document.getElementById('avatar-upload').click()">
+                        <span>📷</span>
+                    </div>
+                    <input type="file" id="avatar-upload" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+                </div>
+                <h2 class="profile-name" id="profile-name">Loading... <span id="verified-badge" style="display:none;color:#3b82f6;font-size:1rem;" title="Verified">✓</span></h2>
                 <p class="profile-role" id="profile-role">Talent</p>
-                
+
+                <div style="margin: 0.75rem 0; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <button onclick="shareMyProfile()" style="padding:0.4rem 0.85rem;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:0.8rem;cursor:pointer;" title="Share my profile">
+                        🔗 Share Profile
+                    </button>
+                    <span id="age-verified-badge" style="display:none;padding:0.4rem 0.85rem;border-radius:8px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);color:#4ade80;font-size:0.75rem;">✓ Âge vérifié</span>
+                </div>
+
                 <div class="profile-stats">
                     <div class="stat-item">
                         <div class="stat-value" id="posts-count">0</div>
@@ -505,20 +547,7 @@
                             <input type="text" class="form-input" id="agency-name" placeholder="Your agency name">
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Agency Type</label>
-                            <select class="form-select" id="agency-type">
-                                <option value="">Select agency type</option>
-                                <option value="talent-agency">Talent Agency</option>
-                                <option value="modeling-agency">Modeling Agency</option>
-                                <option value="digital-agency">Digital Agency</option>
-                                <option value="management-agency">Management Agency</option>
-                                <option value="production-company">Production Company</option>
-                                <option value="pr-agency">PR Agency</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-
+                        
                         <div class="form-group">
                             <label class="form-label">Platforms you manage</label>
                             <div class="checkbox-group">
@@ -604,6 +633,12 @@
     </div>
 
     <script>
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.appendChild(document.createTextNode(String(str ?? '')));
+            return div.innerHTML;
+        }
+
         let profileData = {};
         let userRole = 'talent';
 
@@ -612,6 +647,65 @@
             loadProfile();
             loadPosts();
         });
+
+        async function shareMyProfile() {
+            try {
+                const userData = Auth.getUser();
+                if (!userData) return;
+                const userId = userData.id || userData.user_id;
+                const url = `${window.location.origin}/profile/${userId}`;
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(url);
+                } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = url; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+                    document.body.appendChild(ta); ta.select();
+                    document.execCommand('copy'); document.body.removeChild(ta);
+                }
+                showStatus('Lien copié !', 'success');
+            } catch (e) {
+                showStatus('Impossible de copier le lien', 'error');
+            }
+        }
+
+        function showAgeVerifyModal() {
+            const modal = document.createElement('div');
+            modal.id = 'ageVerifyModal';
+            modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:#111;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:2.5rem;max-width:400px;width:90%;text-align:center;">
+                    <div style="font-size:3rem;margin-bottom:1rem;">🔞</div>
+                    <h2 style="font-size:1.25rem;font-weight:700;margin-bottom:0.75rem;">Vérification d'âge requise</h2>
+                    <p style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:2rem;line-height:1.5;">
+                        Cette plateforme est réservée aux personnes majeures (18+).<br>
+                        En confirmant, vous attestez avoir au moins 18 ans.
+                    </p>
+                    <div style="display:flex;gap:1rem;justify-content:center;">
+                        <button onclick="confirmAge()" style="padding:0.75rem 1.5rem;border-radius:8px;background:#3b82f6;border:none;color:#fff;font-size:0.9rem;font-weight:600;cursor:pointer;">
+                            J'ai 18 ans ou plus
+                        </button>
+                        <button onclick="denyAge()" style="padding:0.75rem 1.5rem;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:0.9rem;cursor:pointer;">
+                            Non, quitter
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        async function confirmAge() {
+            try {
+                await Auth.apiFetch('/api/user/verify-age', { method: 'POST' });
+                document.getElementById('ageVerifyModal')?.remove();
+                document.getElementById('age-verified-badge').style.display = 'inline';
+            } catch (e) {
+                document.getElementById('ageVerifyModal')?.remove();
+            }
+        }
+
+        function denyAge() {
+            Auth.logout();
+        }
 
         // Tab switching
         function switchTab(tabName) {
@@ -637,21 +731,42 @@
         async function loadProfile() {
             console.log('🔍 Starting profile load...');
             
+            // Clear any cached avatar data to ensure fresh load
+            console.log('🧹 Clearing cached profile data...');
+            localStorage.removeItem('userProfile');
+            localStorage.removeItem('userData');
+            
             // Try API first (for logged in users)
             try {
                 const token = Auth.getToken();
                 if (token) {
-                    console.log('� Found token, loading from API...');
+                    console.log(' Found token, loading from API...');
+                    console.log('🔑 Token:', token.substring(0, 20) + '...');
+                    
                     const response = await Auth.apiFetch('/api/user/profile');
-                    if (response.success && response.data) {
-                        profileData = response.data;
+                    console.log('📡 API Response status:', response.status);
+                    
+                    const data = await response.json();
+                    console.log('📡 API Data:', data);
+                    
+                    if (data.success && data.data) {
+                        profileData = data.data;
                         userRole = profileData.role || 'talent';
                         console.log('✅ Loaded profile from API:', profileData);
                         
                         // Save to localStorage for backup
                         localStorage.setItem('userProfile', JSON.stringify(profileData));
                         renderProfile();
+                        
+                        // Load posts if they exist in profile data
+                        if (profileData.posts && profileData.posts.length > 0) {
+                            document.getElementById('posts-count').textContent = profileData.posts.length;
+                            displayPosts();
+                        }
+                        
                         return;
+                    } else {
+                        console.log('❌ API response invalid:', data);
                     }
                 }
             } catch (error) {
@@ -731,14 +846,42 @@
         
         // Separate function to render the profile
         function renderProfile() {
-            console.log('� Rendering profile:', profileData);
+            console.log(' Rendering profile:', profileData);
 
             // Load fields
             document.getElementById('first-name').value = profileData.first_name || '';
             document.getElementById('last-name').value = profileData.last_name || '';
             document.getElementById('email').value = profileData.email || '';
-            document.getElementById('profile-name').textContent = (profileData.first_name || '') + ' ' + (profileData.last_name || '');
+            const nameEl = document.getElementById('profile-name');
+            nameEl.childNodes[0].textContent = (profileData.first_name || '') + ' ' + (profileData.last_name || '') + ' ';
             document.getElementById('profile-role').textContent = userRole.charAt(0).toUpperCase() + userRole.slice(1);
+
+            // Show verified badge
+            if (profileData.verified) {
+                document.getElementById('verified-badge').style.display = 'inline';
+            }
+            // Show age verified badge
+            if (profileData.age_verified) {
+                document.getElementById('age-verified-badge').style.display = 'inline';
+            } else {
+                // Show age verification modal if not verified (once per session)
+                if (!sessionStorage.getItem('ageModalShown')) {
+                    sessionStorage.setItem('ageModalShown', '1');
+                    setTimeout(showAgeVerifyModal, 1000);
+                }
+            }
+
+            // Render avatar if exists
+            const avatarContainer = document.querySelector('.profile-avatar');
+            if (profileData.avatar_url) {
+                const img = document.createElement('img');
+                img.setAttribute('src', profileData.avatar_url);
+                img.setAttribute('style', 'width: 100%; height: 100%; object-fit: cover; border-radius: 50%;');
+                avatarContainer.innerHTML = '';
+                avatarContainer.appendChild(img);
+            } else {
+                avatarContainer.innerHTML = `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #333; border-radius: 50%; font-size: 2rem;">👤</div>`;
+            }
 
             // Show role-specific fields
             if (userRole === 'talent') {
@@ -757,9 +900,14 @@
                 if (profileData.age !== undefined) document.getElementById('age').value = profileData.age;
                 if (profileData.country !== undefined) document.getElementById('country').value = profileData.country;
                 if (profileData.languages !== undefined) document.getElementById('languages').value = profileData.languages;
-                if (profileData.instagram !== undefined) document.getElementById('instagram').value = profileData.instagram;
-                if (profileData.twitter !== undefined) document.getElementById('twitter').value = profileData.twitter;
-                if (profileData.tiktok !== undefined) document.getElementById('tiktok').value = profileData.tiktok;
+                // social_media comes as JSON string from API, or flat fields from localStorage
+                let socials = {};
+                if (profileData.social_media) {
+                    try { socials = typeof profileData.social_media === 'string' ? JSON.parse(profileData.social_media) : profileData.social_media; } catch(e) {}
+                }
+                document.getElementById('instagram').value = profileData.instagram || socials.instagram || socials.Instagram || '';
+                document.getElementById('twitter').value = profileData.twitter || socials.twitter || socials.Twitter || socials.x || '';
+                document.getElementById('tiktok').value = profileData.tiktok || socials.tiktok || socials.TikTok || '';
                 if (profileData.monthly_revenue !== undefined) document.getElementById('monthly-revenue').value = profileData.monthly_revenue;
                 
                 // Set radio button for has-manager only if it exists
@@ -769,6 +917,14 @@
                 }
                 
                 if (profileData.bio !== undefined) document.getElementById('bio').value = profileData.bio;
+
+                // Restore platform checkboxes
+                if (profileData.platforms) {
+                    const pStr = profileData.platforms.toLowerCase();
+                    document.querySelectorAll('input[name="platforms"]').forEach(cb => {
+                        cb.checked = pStr.includes(cb.value.toLowerCase());
+                    });
+                }
             } else if (userRole === 'agency') {
                 document.getElementById('talent-fields').style.display = 'none';
                 document.getElementById('agency-fields').style.display = 'block';
@@ -788,11 +944,16 @@
         }
 
         // Save profile
-        function saveProfile() {
-            // Update profileData
+        async function saveProfile() {
             profileData.first_name = document.getElementById('first-name').value;
             profileData.last_name = document.getElementById('last-name').value;
             profileData.email = document.getElementById('email').value;
+
+            let apiPayload = {
+                firstName: profileData.first_name,
+                lastName: profileData.last_name,
+                email: profileData.email,
+            };
 
             if (userRole === 'talent') {
                 profileData.portfolio = document.getElementById('portfolio').value;
@@ -805,25 +966,61 @@
                 profileData.monthly_revenue = document.getElementById('monthly-revenue').value;
                 profileData.has_manager = document.querySelector('input[name="has-manager"]:checked')?.value || 'no';
                 profileData.bio = document.getElementById('bio').value;
+
+                const checkedPlatforms = Array.from(document.querySelectorAll('input[name="platforms"]:checked')).map(cb => cb.value);
+                profileData.platforms = checkedPlatforms.join(', ');
+
+                apiPayload = {
+                    ...apiPayload,
+                    displayName: profileData.display_name || (profileData.first_name + ' ' + profileData.last_name),
+                    bio: profileData.bio,
+                    age: profileData.age,
+                    country: profileData.country,
+                    languages: profileData.languages,
+                    hasManager: profileData.has_manager,
+                    revenue: profileData.monthly_revenue,
+                    platforms: checkedPlatforms,
+                    socialMedia: { instagram: profileData.instagram, twitter: profileData.twitter, tiktok: profileData.tiktok },
+                };
             } else if (userRole === 'agency') {
                 profileData.agency_name = document.getElementById('agency-name').value;
-                profileData.agency_type = document.getElementById('agency-type').value;
                 profileData.talent_count = document.getElementById('talent-count').value;
                 profileData.agency_revenue = document.getElementById('agency-monthly-revenue').value;
                 profileData.total_revenue = document.getElementById('total-revenue').value;
                 profileData.agency_country = document.getElementById('agency-country').value;
                 profileData.agency_description = document.getElementById('agency-description').value;
+
+                apiPayload = {
+                    ...apiPayload,
+                    agencyName: profileData.agency_name,
+                    talentCount: profileData.talent_count,
+                    totalRevenue: profileData.total_revenue || profileData.agency_revenue,
+                    description: profileData.agency_description,
+                };
             }
 
-            // Save to localStorage (both locations for consistency)
+            // Persist to localStorage
             localStorage.setItem('userProfile', JSON.stringify(profileData));
-            localStorage.setItem('userData', JSON.stringify(profileData));
-            console.log('💾 Profile saved to both userProfile and userData');
-            
-            // Update display
-            document.getElementById('profile-name').textContent = profileData.first_name + ' ' + profileData.last_name;
-            
-            showStatus('Profile saved successfully!', 'success');
+
+            // Persist to API
+            try {
+                const endpoint = userRole === 'talent' ? '/api/profile/talent' : '/api/profile/agency';
+                const res = await Auth.apiFetch(endpoint, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(apiPayload),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('profile-name').childNodes[0].textContent =
+                        profileData.first_name + ' ' + profileData.last_name + ' ';
+                    showStatus('Profile saved successfully!', 'success');
+                } else {
+                    showStatus('Error saving profile: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (e) {
+                showStatus('Connection error — changes saved locally only.', 'error');
+            }
         }
 
         // Handle new post media
@@ -850,7 +1047,7 @@
         }
 
         // Publish new post
-        function publishNewPost() {
+        async function publishNewPost() {
             const content = document.getElementById('new-post-content').value.trim();
             const mediaFile = document.getElementById('new-post-media').files[0];
             
@@ -859,39 +1056,86 @@
                 return;
             }
 
-            const newPost = {
-                id: Date.now(),
-                content: content,
-                type: 'text',
-                media: null,
-                createdAt: new Date().toISOString(),
-                likes: 0,
-                comments: 0,
-                shares: 0
-            };
+            try {
+                const token = Auth.getToken();
+                if (!token) {
+                    showStatus('Please login to publish posts', 'error');
+                    return;
+                }
 
-            // Auto-detect post type
-            if (content && mediaFile) {
-                newPost.type = 'mixed';
-            } else if (mediaFile) {
-                newPost.type = mediaFile.type.startsWith('image/') ? 'photo' : 'video';
-            }
+                // Show loading
+                const publishBtn = document.querySelector('button[onclick="publishNewPost()"]');
+                const originalText = publishBtn.innerHTML;
+                publishBtn.innerHTML = '⏳ Publishing...';
+                publishBtn.disabled = true;
 
-            // Handle media
-            if (mediaFile) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    newPost.media = {
-                        type: mediaFile.type.startsWith('image/') ? 'image' : 'video',
-                        url: e.target.result,
-                        name: mediaFile.name
-                    };
-                    
-                    saveAndDisplayPost(newPost);
-                };
-                reader.readAsDataURL(mediaFile);
-            } else {
-                saveAndDisplayPost(newPost);
+                let media_url = null;
+                let postType = 'text';
+
+                // Handle media upload if exists
+                if (mediaFile) {
+                    const formData = new FormData();
+                    formData.append('media', mediaFile);
+
+                    const uploadResponse = await fetch('/api/upload/post-media', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: formData
+                    });
+
+                    const uploadResult = await uploadResponse.json();
+                    if (uploadResponse.ok && uploadResult.success) {
+                        media_url = uploadResult.media_url;
+                        postType = mediaFile.type.startsWith('image/') ? 'photo' : 'video';
+                    }
+                }
+
+                if (content && mediaFile) {
+                    postType = 'mixed';
+                }
+
+                // Create post in database
+                const response = await fetch('/api/posts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        content: content,
+                        type: postType,
+                        media_url: media_url
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    throw new Error(result.error || 'Failed to publish post');
+                }
+
+                // Clear form
+                document.getElementById('new-post-content').value = '';
+                document.getElementById('new-post-media').value = '';
+                document.getElementById('new-post-media-preview').style.display = 'none';
+
+                // Refresh posts - reload from API to get latest data
+                console.log('🔄 Refreshing posts after publication...');
+                await loadProfile(); // Reload entire profile to get updated posts
+                displayPosts(); // Display the updated posts
+                
+                showStatus('Post published successfully!', 'success');
+
+            } catch (error) {
+                console.error('Publish post error:', error);
+                showStatus('Failed to publish post: ' + error.message, 'error');
+            } finally {
+                // Reset button
+                const publishBtn = document.querySelector('button[onclick="publishNewPost()"]');
+                publishBtn.innerHTML = 'Publish Post';
+                publishBtn.disabled = false;
             }
         }
 
@@ -932,11 +1176,80 @@
                 if (postsTabContent) postsTabContent.classList.add('active');
                 
                 // Load posts
-                loadPosts();
+                loadPostsFromDatabase();
             }, 500);
         }
 
-        // Load posts
+        // Load posts from database (or use already loaded posts from API)
+        async function loadPostsFromDatabase() {
+            try {
+                // If posts are already loaded from API, use them
+                if (profileData.posts && profileData.posts.length > 0) {
+                    console.log('Using posts already loaded from API:', profileData.posts);
+                    document.getElementById('posts-count').textContent = profileData.posts.length;
+                    displayPosts();
+                    return;
+                }
+
+                const token = Auth.getToken();
+                if (!token) {
+                    console.log('No token, using local posts');
+                    loadPosts(); // Fallback to local storage
+                    return;
+                }
+
+                // Get current user ID from profile data or auth
+                const user = Auth.getUser();
+                const userId = user?.id;
+
+                if (!userId) {
+                    console.log('No user ID, using local posts');
+                    loadPosts(); // Fallback
+                    return;
+                }
+
+                const response = await fetch(`/api/posts/user/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load posts');
+                }
+
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    // Update profile data with database posts
+                    profileData.posts = result.data.map(post => ({
+                        id: post.id,
+                        content: post.content,
+                        type: post.type,
+                        media: post.media_url ? {
+                            type: post.type.includes('photo') ? 'image' : post.type.includes('video') ? 'video' : 'image',
+                            url: post.media_url
+                        } : null,
+                        createdAt: post.created_at,
+                        likes: post.likes,
+                        comments: post.comments,
+                        shares: post.shares
+                    }));
+
+                    // Update posts count
+                    document.getElementById('posts-count').textContent = profileData.posts.length;
+                    
+                    // Display posts
+                    displayPosts();
+                }
+
+            } catch (error) {
+                console.error('Load posts error:', error);
+                loadPosts(); // Fallback to local storage
+            }
+        }
+
+        // Load posts (fallback function)
         function loadPosts() {
             const posts = profileData.posts || [];
             const postsList = document.getElementById('posts-list');
@@ -974,21 +1287,21 @@
                             <span class="post-type ${typeClass}">${typeName}</span>
                             <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">${date}</span>
                         </div>
-                        
-                        ${post.content ? `<div class="post-content">${post.content}</div>` : ''}
-                        
+
+                        ${post.content ? `<div class="post-content">${escapeHtml(post.content)}</div>` : ''}
+
                         ${post.media ? `
                             <div class="post-media">
-                                ${post.media.type === 'image' 
-                                    ? `<img src="${post.media.url}" alt="${post.media.name}">`
+                                ${post.media.type === 'image'
+                                    ? `<img src="${post.media.url}" alt="${escapeHtml(post.media.name)}">`
                                     : `<video src="${post.media.url}" controls></video>`
                                 }
                             </div>
                         ` : ''}
-                        
+
                         <div class="post-footer">
                             <div class="post-actions">
-                                <button class="post-action">❤️ ${post.likes || 0}</button>
+                                <button class="post-action" id="like-btn-${post.id}" onclick="togglePostLike(${post.id}, this)">❤️ <span class="like-count">${post.likes || 0}</span></button>
                                 <button class="post-action">💬 ${post.comments || 0}</button>
                                 <button class="post-action">🔄 ${post.shares || 0}</button>
                             </div>
@@ -997,8 +1310,99 @@
                     </div>
                 `;
             });
-            
+
             postsList.innerHTML = postsHtml;
+            // Load like state for each post
+            posts.forEach(post => loadLikeState(post.id));
+        }
+
+        async function togglePostLike(postId, btn) {
+            try {
+                const res = await Auth.apiFetch(`/api/posts/${postId}/like`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    const countEl = btn.querySelector('.like-count');
+                    if (countEl) countEl.textContent = data.likes;
+                    btn.style.color = data.liked ? '#ef4444' : '';
+                }
+            } catch (e) { /* ignore */ }
+        }
+
+        async function loadLikeState(postId) {
+            try {
+                const res = await Auth.apiFetch(`/api/posts/${postId}/liked`);
+                const data = await res.json();
+                if (data.success && data.liked) {
+                    const btn = document.getElementById(`like-btn-${postId}`);
+                    if (btn) btn.style.color = '#ef4444';
+                }
+            } catch (e) { /* ignore */ }
+        }
+
+        // Display posts (for database posts)
+        function displayPosts() {
+            const posts = profileData.posts || [];
+            const postsList = document.getElementById('posts-list');
+
+            if (posts.length === 0) {
+                postsList.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">📝</div>
+                        <p>No posts yet. Create your first post in the "Publish New Post" tab!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let postsHtml = '';
+            posts.forEach(post => {
+                const typeClass = post.type || 'text';
+                const typeName = {
+                    'text': '📄 Text',
+                    'photo': '📷 Photo',
+                    'video': '🎥 Video',
+                    'mixed': '🎨 Mixed'
+                }[typeClass] || '📄 Text';
+                
+                const date = new Date(post.createdAt).toLocaleDateString('fr-FR', {
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                postsHtml += `
+                    <div class="post-item">
+                        <div class="post-header">
+                            <span class="post-type ${typeClass}">${typeName}</span>
+                            <span style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">${date}</span>
+                        </div>
+
+                        ${post.content ? `<div class="post-content">${escapeHtml(post.content)}</div>` : ''}
+
+                        ${post.media ? `
+                            <div class="post-media">
+                                ${post.media.type === 'image'
+                                    ? `<img src="${post.media.url}" alt="${escapeHtml(post.media.name)}">`
+                                    : `<video src="${post.media.url}" controls></video>`
+                                }
+                            </div>
+                        ` : ''}
+
+                        <div class="post-footer">
+                            <div class="post-actions">
+                                <button class="post-action" id="like-btn-${post.id}" onclick="togglePostLike(${post.id}, this)">❤️ <span class="like-count">${post.likes || 0}</span></button>
+                                <button class="post-action">💬 ${post.comments || 0}</button>
+                                <button class="post-action">🔄 ${post.shares || 0}</button>
+                            </div>
+                            <button class="post-action" onclick="deletePost(${post.id})">🗑️ Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            postsList.innerHTML = postsHtml;
+            posts.forEach(post => loadLikeState(post.id));
         }
 
         // Delete post
@@ -1009,6 +1413,107 @@
                 document.getElementById('posts-count').textContent = profileData.posts.length;
                 loadPosts();
                 showStatus('Post deleted', 'success');
+            }
+        }
+
+        // Handle avatar upload
+        async function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            console.log('Avatar upload started:', file.name, file.type, file.size);
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showStatus('Please select an image file', 'error');
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showStatus('Image size must be less than 5MB', 'error');
+                return;
+            }
+
+            try {
+                const token = Auth.getToken();
+                if (!token) {
+                    showStatus('Please login to upload avatar', 'error');
+                    return;
+                }
+
+                console.log('Token found, starting upload...');
+
+                // Show loading
+                const avatarContainer = document.querySelector('.profile-avatar');
+                const originalContent = avatarContainer.innerHTML;
+                avatarContainer.innerHTML = '⏳';
+
+                // Use XMLHttpRequest instead of fetch
+                const result = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    const formData = new FormData();
+                    formData.append('avatar', file);
+
+                    console.log('FormData created, sending request...');
+
+                    xhr.open('POST', '/api/upload/avatar', true);
+                    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+                    xhr.onload = function() {
+                        console.log('XHR response received:', xhr.status, xhr.statusText);
+                        console.log('Response text:', xhr.responseText);
+                        
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            try {
+                                const response = JSON.parse(xhr.responseText);
+                                resolve(response);
+                            } catch (e) {
+                                reject(new Error('Invalid JSON response'));
+                            }
+                        } else {
+                            try {
+                                const errorResponse = JSON.parse(xhr.responseText);
+                                reject(new Error(errorResponse.error || `HTTP ${xhr.status}`));
+                            } catch (e) {
+                                reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));
+                            }
+                        }
+                    };
+
+                    xhr.onerror = function() {
+                        console.error('XHR network error');
+                        reject(new Error('Network error'));
+                    };
+
+                    xhr.send(formData);
+                    console.log('XHR request sent');
+                });
+
+                if (!result.success) {
+                    throw new Error(result.error || 'Upload failed');
+                }
+
+                // Update avatar display
+                if (result.avatar_url) {
+                    avatarContainer.innerHTML = `<img src="${result.avatar_url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+                    
+                    // Update profile data
+                    profileData.avatar_url = result.avatar_url;
+                    localStorage.setItem('userProfile', JSON.stringify(profileData));
+                    
+                    showStatus('Avatar updated successfully!', 'success');
+                }
+
+            } catch (error) {
+                console.error('Avatar upload error:', error);
+                showStatus('Failed to upload avatar: ' + error.message, 'error');
+                
+                // Restore original avatar
+                const avatarContainer = document.querySelector('.profile-avatar');
+                if (typeof originalContent !== 'undefined') {
+                    avatarContainer.innerHTML = originalContent;
+                }
             }
         }
     </script>

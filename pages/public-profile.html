@@ -223,11 +223,22 @@
 <script>
     const profileId = window.location.pathname.split('/').pop();
 
-    function shareProfile() {
+    async function shareProfile() {
         const url = window.location.href;
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(url).then(() => showToast('Link copied to clipboard!'));
-        } else {
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(url);
+            } else {
+                const ta = document.createElement('textarea');
+                ta.value = url;
+                ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            }
+            showToast('Link copied to clipboard!', 'success');
+        } catch (e) {
             showToast('Copy this link: ' + url, 'info');
         }
     }

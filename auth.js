@@ -383,7 +383,9 @@ async function getUserFavorites(userId) {
         SELECT ${USER_SAFE_COLS}, f.favorited_at,
                tp.bio as talent_bio, tp.platforms as talent_platforms, tp.country as talent_country,
                tp.revenue as talent_revenue, tp.display_name as talent_display_name, tp.specialty as talent_specialty,
-               ap.talent_count, ap.description as agency_description, ap.platforms as agency_platforms, ap.total_revenue
+               tp.age as talent_age, tp.has_manager as talent_has_manager, tp.total_followers as talent_total_followers,
+               ap.talent_count, ap.description as agency_description, ap.platforms as agency_platforms,
+               ap.total_revenue, ap.agency_name
         FROM favorites f
         JOIN users u ON f.favorited_user_id = u.id
         LEFT JOIN talent_profiles tp ON u.id = tp.user_id

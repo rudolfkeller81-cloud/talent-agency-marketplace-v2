@@ -34,6 +34,25 @@
             display: flex; align-items: center; justify-content: center; cursor: pointer;
             font-size: 0.85rem; font-weight: 600; color: rgba(255,255,255,0.7);
         }
+        .nav-actions { display: flex; align-items: center; gap: 1rem; }
+
+        /* Sidebar */
+        .sidebar-icon { display: flex; flex-direction: column; gap: 4px; background: none; border: none; cursor: pointer; padding: 0.5rem; transition: all 0.3s; }
+        .sidebar-icon span { width: 25px; height: 2px; background: #fff; transition: all 0.3s; }
+        .sidebar-icon:hover span { background: rgba(59,130,246,0.8); }
+        .sidebar { position: fixed; top: 0; left: -300px; width: 300px; height: 100vh; background: rgba(0,0,0,0.95); border-right: 1px solid rgba(255,255,255,0.1); transition: left 0.3s ease; z-index: 1001; padding: 2rem; }
+        .sidebar.open { left: 0; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .sidebar-title { font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; text-transform: uppercase; }
+        .close-sidebar { background: none; border: none; color: rgba(255,255,255,0.3); font-size: 1.2rem; cursor: pointer; padding: 0.25rem; line-height: 1; transition: color 0.2s; }
+        .close-sidebar:hover { color: rgba(255,255,255,0.8); }
+        .sidebar-actions { display: flex; flex-direction: column; gap: 0.25rem; }
+        .sidebar-btn { display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 0.75rem; color: rgba(255,255,255,0.6); font-size: 0.9rem; font-weight: 500; text-decoration: none; background: none; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; letter-spacing: 0.01em; }
+        .sidebar-btn:hover { color: #fff; background: rgba(255,255,255,0.06); }
+        .sidebar-btn.logout { color: rgba(239,68,68,0.6); margin-top: 0.75rem; padding-top: 0.7rem; border-top: 1px solid rgba(255,255,255,0.06); }
+        .sidebar-btn.logout:hover { color: #ef4444; background: rgba(239,68,68,0.06); }
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none; }
+        .sidebar-overlay.show { display: block; }
 
         /* Page container */
         .fav-container {
@@ -324,6 +343,9 @@
                     </ul>
                 </nav>
                 <div class="nav-actions">
+                    <button class="sidebar-icon" onclick="toggleSidebar()" title="Menu">
+                        <span></span><span></span><span></span>
+                    </button>
                     <div class="profile-icon" onclick="window.location.href='/profile'" title="My Profile">
                         <img id="navAvatarImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:none;">
                         <span id="navAvatarFallback">?</span>
@@ -331,6 +353,45 @@
                 </div>
             </div>
         </header>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Navigation</div>
+                <button class="close-sidebar" onclick="toggleSidebar()">✕</button>
+            </div>
+            <div class="sidebar-actions">
+                <a href="/profile" class="sidebar-btn" onclick="toggleSidebar()">
+                    <i class="fa-regular fa-user" style="width:16px;opacity:.5;"></i>
+                    My Profile
+                </a>
+                <a href="/discover" class="sidebar-btn" onclick="toggleSidebar()">
+                    <i class="fa-regular fa-compass" style="width:16px;opacity:.5;"></i>
+                    Discover
+                </a>
+                <a href="/favorites" class="sidebar-btn" onclick="toggleSidebar()">
+                    <i class="fa-regular fa-heart" style="width:16px;opacity:.5;"></i>
+                    Favorites
+                </a>
+                <a href="/messages" class="sidebar-btn" onclick="toggleSidebar()">
+                    <i class="fa-regular fa-message" style="width:16px;opacity:.5;"></i>
+                    Messages
+                </a>
+                <a href="/manage-subscription" class="sidebar-btn" onclick="toggleSidebar()">
+                    <i class="fa-regular fa-credit-card" style="width:16px;opacity:.5;"></i>
+                    Subscription
+                </a>
+                <a href="/settings" class="sidebar-btn" onclick="toggleSidebar()">
+                    <i class="fa-regular fa-gear" style="width:16px;opacity:.5;"></i>
+                    Settings
+                </a>
+                <button class="sidebar-btn logout" onclick="Auth.logout()">
+                    <i class="fa-regular fa-arrow-right-from-bracket" style="width:16px;opacity:.6;"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
         <!-- Main Content -->
         <div class="fav-container">
@@ -355,6 +416,11 @@
         </div>
 
         <script>
+            function toggleSidebar() {
+                document.getElementById('sidebar').classList.toggle('open');
+                document.getElementById('sidebarOverlay').classList.toggle('show');
+            }
+
             let allFavorites = [];
 
             // Initialize
@@ -366,26 +432,51 @@
 
             // Load user avatar/initials in header
             async function loadNavAvatar() {
+                console.log('🔍 loadNavAvatar called');
                 try {
                     const token = Auth.getToken();
-                    if (!token) return;
+                    if (!token) {
+                        console.log('❌ No token found');
+                        return;
+                    }
+                    console.log('🔑 Token found, fetching profile...');
+                    
                     const res = await fetch('/api/user/profile', { headers: { 'Authorization': 'Bearer ' + token } });
-                    if (!res.ok) return;
+                    if (!res.ok) {
+                        console.log('❌ API response not ok:', res.status);
+                        return;
+                    }
+                    
                     const data = await res.json();
-                    if (!data.success || !data.data) return;
+                    console.log('📡 Profile data:', data);
+                    
+                    if (!data.success || !data.data) {
+                        console.log('❌ Invalid data structure');
+                        return;
+                    }
+                    
                     const d = data.data;
                     const name = d.talent_display_name || d.agency_name || ((d.first_name || '') + ' ' + (d.last_name || '')).trim();
                     const initials = name.split(' ').map(n => n[0] || '').join('').toUpperCase() || '?';
                     const img = document.getElementById('navAvatarImg');
                     const fallback = document.getElementById('navAvatarFallback');
+                    
+                    console.log('🖼️ Avatar URL:', d.avatar_url);
+                    console.log('👤 Name:', name);
+                    console.log('🔤 Initials:', initials);
+                    
                     if (d.avatar_url) {
+                        console.log('✅ Setting avatar image');
                         img.src = d.avatar_url;
                         img.style.display = 'block';
                         fallback.style.display = 'none';
                     } else {
+                        console.log('⚠️ No avatar, setting initials');
                         fallback.textContent = initials;
                     }
-                } catch(e) { console.error('Nav avatar error:', e); }
+                } catch(e) { 
+                    console.error('❌ Nav avatar error:', e); 
+                }
             }
 
             // API calls
@@ -475,6 +566,12 @@
                 const card = document.createElement('div');
                 card.className = 'profile-card';
                 card.id = 'fav-card-' + fav.id;
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', (e) => {
+                    if (!e.target.closest('.profile-actions')) {
+                        showFavProfileModal(fav);
+                    }
+                });
                 
                 const name = fav.display_name || fav.stageName || ((fav.first_name || '') + ' ' + (fav.last_name || '')).trim() || 'Unknown';
                 const initials = name.split(' ').map(n => n[0] || '').join('').toUpperCase() || '?';
@@ -925,11 +1022,11 @@
                         }, 1000);
                     } else {
                         const result = await response.json();
-                        alert('Error sending message: ' + (result.error || 'Unknown error'));
+                        showNotification('Impossible d\'envoyer le message : ' + (result.error || 'Erreur inconnue'), 'error');
                     }
                 } catch (error) {
                     console.error('Error sending message:', error);
-                    alert('Error sending message: ' + error.message);
+                    showNotification('Erreur de connexion. Vérifiez votre connexion internet.', 'error');
                 } finally {
                     sendBtn.disabled = false;
                 }
@@ -992,7 +1089,194 @@
             }
 
             function doLogout() { Auth.logout(); }
+
+            // ── Profile Modal (same view as Discover) ──────────────────────────
+            let _favModalProfile = null;
+
+            function showFavProfileModal(fav) {
+                _favModalProfile = fav;
+                const isAgency = fav.role === 'agency';
+                const name = fav.talent_display_name || fav.agency_name ||
+                    ((fav.first_name || '') + ' ' + (fav.last_name || '')).trim() || 'Unknown';
+                const initial = name.charAt(0).toUpperCase();
+
+                // Avatar
+                const avatarEl = document.getElementById('favModalAvatar');
+                if (fav.avatar_url) {
+                    avatarEl.innerHTML = `<img src="${fav.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+                } else {
+                    avatarEl.textContent = initial;
+                }
+
+                document.getElementById('favModalName').textContent = name;
+                document.getElementById('favModalBadge').textContent = isAgency ? 'AGENCY' : 'TALENT';
+                document.getElementById('favModalBio').textContent =
+                    (isAgency ? fav.agency_description : fav.talent_bio) || 'No bio available.';
+
+                // Details
+                document.getElementById('favModalCountry').textContent = fav.talent_country || '—';
+                const ageRow = document.getElementById('favModalAgeRow');
+                const managerRow = document.getElementById('favModalManagerRow');
+                const tcRow = document.getElementById('favModalTcRow');
+                const followersRow = document.getElementById('favModalFollowersRow');
+
+                if (isAgency) {
+                    ageRow.style.display = 'none';
+                    managerRow.style.display = 'none';
+                    followersRow.style.display = 'none';
+                    tcRow.style.display = 'flex';
+                    document.getElementById('favModalTc').textContent =
+                        fav.talent_count ? `${fav.talent_count} talents` : '—';
+                } else {
+                    ageRow.style.display = 'flex';
+                    managerRow.style.display = 'flex';
+                    followersRow.style.display = 'flex';
+                    tcRow.style.display = 'none';
+                    document.getElementById('favModalAge').textContent = fav.talent_age || '—';
+                    document.getElementById('favModalManager').textContent = fav.talent_has_manager || '—';
+                    document.getElementById('favModalFollowers').textContent =
+                        fav.talent_total_followers ? parseInt(fav.talent_total_followers).toLocaleString() : '—';
+                }
+
+                // Revenue
+                const revStr = isAgency ? fav.total_revenue : fav.talent_revenue;
+                document.getElementById('favModalRevenue').textContent = revStr || '—';
+
+                // Platforms
+                const platStr = isAgency ? fav.agency_platforms : fav.talent_platforms;
+                const platContainer = document.getElementById('favModalPlatforms');
+                if (platStr) {
+                    const plats = platStr.split(',').map(p => p.trim()).filter(Boolean);
+                    platContainer.innerHTML = plats.map(p => `<span class="fav-modal-tag">${p}</span>`).join('');
+                } else {
+                    platContainer.innerHTML = '<span class="fav-modal-tag">—</span>';
+                }
+
+                document.getElementById('favProfileModal').classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeFavProfileModal() {
+                document.getElementById('favProfileModal').classList.remove('show');
+                document.body.style.overflow = '';
+                _favModalProfile = null;
+            }
+
+            function favModalMessage() {
+                if (!_favModalProfile) return;
+                const name = _favModalProfile.talent_display_name || _favModalProfile.agency_name ||
+                    ((_favModalProfile.first_name || '') + ' ' + (_favModalProfile.last_name || '')).trim();
+                closeFavProfileModal();
+                openChatInterface(_favModalProfile.id, name);
+            }
+
+            function favModalRemove() {
+                if (!_favModalProfile) return;
+                closeFavProfileModal();
+                removeFavorite(_favModalProfile.id);
+            }
+
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFavProfileModal(); });
         </script>
 
+    <!-- Profile Modal -->
+    <div id="favProfileModal" style="
+        display:none; position:fixed; inset:0; z-index:9000;
+        background:rgba(0,0,0,0.75); backdrop-filter:blur(8px);
+        align-items:center; justify-content:center; padding:1rem;
+    ">
+        <div style="
+            background:#0f0f0f; border:1px solid rgba(255,255,255,0.1); border-radius:20px;
+            width:100%; max-width:580px; max-height:90vh; overflow-y:auto;
+        ">
+            <!-- Header -->
+            <div style="display:flex; align-items:center; gap:1.25rem; padding:1.75rem 1.75rem 0;">
+                <div id="favModalAvatar" style="
+                    width:72px; height:72px; border-radius:50%; flex-shrink:0;
+                    background:linear-gradient(135deg,#3b82f6,#1e40af);
+                    display:flex; align-items:center; justify-content:center;
+                    font-size:1.75rem; font-weight:700; color:#fff; overflow:hidden;
+                ">U</div>
+                <div style="flex:1; min-width:0;">
+                    <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                        <h2 id="favModalName" style="font-size:1.25rem; font-weight:700; margin:0;">Name</h2>
+                        <span id="favModalBadge" style="
+                            font-size:0.65rem; font-weight:700; letter-spacing:0.08em;
+                            padding:0.2rem 0.6rem; border-radius:20px;
+                            background:rgba(59,130,246,0.15); color:#93c5fd; border:1px solid rgba(59,130,246,0.3);
+                        ">TALENT</span>
+                    </div>
+                    <p id="favModalBio" style="
+                        margin:0.5rem 0 0; font-size:0.875rem; color:rgba(255,255,255,0.55);
+                        line-height:1.5; display:-webkit-box; -webkit-line-clamp:3; line-clamp:3;
+                        -webkit-box-orient:vertical; overflow:hidden;
+                    "></p>
+                </div>
+                <button onclick="closeFavProfileModal()" style="
+                    background:rgba(255,255,255,0.07); border:none; border-radius:50%;
+                    width:36px; height:36px; display:flex; align-items:center; justify-content:center;
+                    color:rgba(255,255,255,0.6); font-size:1.2rem; cursor:pointer; flex-shrink:0;
+                ">×</button>
+            </div>
+
+            <!-- Details -->
+            <div style="padding:1.5rem 1.75rem; display:flex; flex-direction:column; gap:0.5rem;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+                    <div style="background:rgba(255,255,255,0.04); border-radius:10px; padding:0.875rem;">
+                        <div style="font-size:0.7rem; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.35rem;">Country</div>
+                        <div id="favModalCountry" style="font-size:0.9rem; font-weight:600;">—</div>
+                    </div>
+                    <div id="favModalAgeRow" style="background:rgba(255,255,255,0.04); border-radius:10px; padding:0.875rem;">
+                        <div style="font-size:0.7rem; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.35rem;">Age</div>
+                        <div id="favModalAge" style="font-size:0.9rem; font-weight:600;">—</div>
+                    </div>
+                    <div id="favModalManagerRow" style="background:rgba(255,255,255,0.04); border-radius:10px; padding:0.875rem;">
+                        <div style="font-size:0.7rem; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.35rem;">Has Manager</div>
+                        <div id="favModalManager" style="font-size:0.9rem; font-weight:600;">—</div>
+                    </div>
+                    <div id="favModalFollowersRow" style="background:rgba(255,255,255,0.04); border-radius:10px; padding:0.875rem;">
+                        <div style="font-size:0.7rem; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.35rem;">Followers</div>
+                        <div id="favModalFollowers" style="font-size:0.9rem; font-weight:600;">—</div>
+                    </div>
+                    <div id="favModalTcRow" style="background:rgba(255,255,255,0.04); border-radius:10px; padding:0.875rem; display:none;">
+                        <div style="font-size:0.7rem; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.35rem;">Talents</div>
+                        <div id="favModalTc" style="font-size:0.9rem; font-weight:600;">—</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.04); border-radius:10px; padding:0.875rem;">
+                        <div style="font-size:0.7rem; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.35rem;">Revenue</div>
+                        <div id="favModalRevenue" style="font-size:0.9rem; font-weight:600;">—</div>
+                    </div>
+                </div>
+
+                <!-- Platforms -->
+                <div style="margin-top:0.5rem;">
+                    <div style="font-size:0.7rem; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.5rem;">Platforms</div>
+                    <div id="favModalPlatforms" style="display:flex; flex-wrap:wrap; gap:0.4rem;"></div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div style="display:flex; gap:0.75rem; padding:0 1.75rem 1.75rem;">
+                <button onclick="favModalMessage()" style="
+                    flex:1; padding:0.75rem; border-radius:10px;
+                    background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
+                    color:#fff; font-size:0.875rem; font-weight:600; cursor:pointer;
+                ">💬 Message</button>
+                <button onclick="favModalRemove()" style="
+                    flex:1; padding:0.75rem; border-radius:10px;
+                    background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2);
+                    color:#f87171; font-size:0.875rem; font-weight:600; cursor:pointer;
+                ">Remove from Favorites</button>
+            </div>
+        </div>
+    </div>
+    <style>
+        #favProfileModal { display:none; }
+        #favProfileModal.show { display:flex; }
+        .fav-modal-tag {
+            padding:0.3rem 0.75rem; border-radius:20px; font-size:0.78rem; font-weight:500;
+            background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.2); color:#93c5fd;
+        }
+    </style>
     </body>
 </html>
