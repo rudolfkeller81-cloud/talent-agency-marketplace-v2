@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Talent & Agency</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/production.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #000; color: #fff; min-height: 100vh; }
+
+        /* Header */
+        .header {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.18);
+        }
+        .nav {
+            max-width: 1200px; margin: 0 auto; padding: 0 2rem;
+            display: flex; align-items: center; justify-content: space-between; height: 64px;
+        }
+        .nav-brand { font-size: 1.25rem; font-weight: 800; color: #fff; text-decoration: none; }
+        .nav-actions { display: flex; align-items: center; gap: 1rem; }
+        .btn-nav { padding: 0.5rem 1.25rem; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+        .btn-primary { background: #3b82f6; color: #fff; border: none; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-outline { background: transparent; color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.2); }
+        .btn-outline:hover { border-color: rgba(255,255,255,0.4); color: #fff; }
+
+        /* Page */
+        .page { max-width: 900px; margin: 0 auto; padding: 88px 2rem 4rem; }
+
+        /* Loading/Error */
+        .state-center { text-align: center; padding: 6rem 2rem; color: rgba(255,255,255,0.4); }
+        .state-center i { font-size: 3rem; margin-bottom: 1rem; display: block; }
+
+        /* Profile Header */
+        .profile-hero {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .profile-top { display: flex; align-items: flex-start; gap: 2rem; }
+        .profile-avatar {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; font-weight: 700; color: #fff; flex-shrink: 0;
+            overflow: hidden;
+        }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-info { flex: 1; }
+        .profile-name { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; }
+        .verified-badge { color: #3b82f6; font-size: 1.1rem; title: "Verified"; }
+        .profile-role { font-size: 0.875rem; color: rgba(255,255,255,0.4); text-transform: capitalize; margin-bottom: 0.75rem; }
+        .profile-meta { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 0.75rem; }
+        .meta-tag {
+            display: flex; align-items: center; gap: 0.4rem;
+            font-size: 0.8rem; color: rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.05); border-radius: 6px; padding: 0.3rem 0.6rem;
+        }
+        .profile-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap; }
+        .btn-share {
+            display: flex; align-items: center; gap: 0.5rem;
+            padding: 0.6rem 1.25rem; border-radius: 8px;
+            font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s;
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.7);
+        }
+        .btn-share:hover { background: rgba(255,255,255,0.12); color: #fff; }
+        .btn-contact {
+            display: flex; align-items: center; gap: 0.5rem;
+            padding: 0.6rem 1.25rem; border-radius: 8px;
+            font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+            background: #3b82f6; border: none; color: #fff; text-decoration: none;
+        }
+        .btn-contact:hover { background: #2563eb; }
+
+        /* Sections */
+        .section {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 1.75rem;
+            margin-bottom: 1.25rem;
+        }
+        .section-title {
+            font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,0.3);
+            text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem;
+        }
+        .bio-text { color: rgba(255,255,255,0.7); line-height: 1.6; font-size: 0.95rem; }
+
+        /* Platforms */
+        .platform-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .platform-tag {
+            padding: 0.35rem 0.85rem; border-radius: 20px;
+            background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.2);
+            color: #93c5fd; font-size: 0.8rem; font-weight: 500;
+        }
+
+        /* Social Links */
+        .social-links { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        .social-link {
+            display: flex; align-items: center; gap: 0.5rem;
+            padding: 0.4rem 0.85rem; border-radius: 8px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6); font-size: 0.85rem; text-decoration: none;
+            transition: all 0.2s;
+        }
+        .social-link:hover { color: #fff; background: rgba(255,255,255,0.1); }
+
+        /* Stats grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; }
+        .stat-card { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 1rem; text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: #fff; }
+        .stat-label { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 0.25rem; }
+
+        /* CTA */
+        .cta-section {
+            background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(30,64,175,0.1));
+            border: 1px solid rgba(59,130,246,0.2);
+            border-radius: 16px; padding: 2rem; text-align: center; margin-top: 2rem;
+        }
+        .cta-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .cta-text { color: rgba(255,255,255,0.5); font-size: 0.9rem; margin-bottom: 1.25rem; }
+        .cta-buttons { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 24px; right: 24px; z-index: 9999; background: #22c55e; color: #fff; padding: 0.75rem 1.25rem; border-radius: 8px; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+
+        @media (max-width: 640px) {
+            .profile-top { flex-direction: column; }
+            .profile-avatar { width: 80px; height: 80px; font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="nav">
+        <a href="/" class="nav-brand">Talent & Agency</a>
+        <div class="nav-actions" id="navActions">
+            <a href="/login" class="btn-nav btn-outline">Login</a>
+            <a href="/register" class="btn-nav btn-primary">Join Free</a>
+        </div>
+    </div>
+</header>
+
+<main class="page">
+    <div id="loadingState" class="state-center">
+        <i class="fa-solid fa-circle-notch fa-spin" style="color: #3b82f6;"></i>
+        <p>Loading profile...</p>
+    </div>
+
+    <div id="errorState" class="state-center" style="display:none;">
+        <i class="fa-regular fa-face-sad-tear"></i>
+        <p>Profile not found or unavailable.</p>
+        <a href="/discover" style="color: #3b82f6; margin-top: 1rem; display: inline-block;">Browse profiles</a>
+    </div>
+
+    <div id="profileContent" style="display:none;">
+        <!-- Hero -->
+        <div class="profile-hero">
+            <div class="profile-top">
+                <div class="profile-avatar" id="profileAvatar">P</div>
+                <div class="profile-info">
+                    <div class="profile-name" id="profileName">
+                        — <span id="verifiedBadge" class="verified-badge" style="display:none;" title="Verified account"><i class="fa-solid fa-circle-check"></i></span>
+                    </div>
+                    <div class="profile-role" id="profileRole"></div>
+                    <div class="profile-meta" id="profileMeta"></div>
+                    <div class="profile-actions">
+                        <button class="btn-share" onclick="shareProfile()">
+                            <i class="fa-regular fa-share-from-square"></i> Share
+                        </button>
+                        <a href="/login" class="btn-contact" id="contactBtn">
+                            <i class="fa-regular fa-envelope"></i> Contact
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bio -->
+        <div class="section" id="bioSection" style="display:none;">
+            <div class="section-title">About</div>
+            <p class="bio-text" id="bioText"></p>
+        </div>
+
+        <!-- Platforms -->
+        <div class="section" id="platformsSection" style="display:none;">
+            <div class="section-title">Platforms</div>
+            <div class="platform-tags" id="platformTags"></div>
+        </div>
+
+        <!-- Stats (talents) -->
+        <div class="section" id="statsSection" style="display:none;">
+            <div class="section-title">Stats</div>
+            <div class="stats-grid" id="statsGrid"></div>
+        </div>
+
+        <!-- Social -->
+        <div class="section" id="socialSection" style="display:none;">
+            <div class="section-title">Social Media</div>
+            <div class="social-links" id="socialLinks"></div>
+        </div>
+
+        <!-- CTA for non-logged-in users -->
+        <div class="cta-section" id="ctaSection" style="display:none;">
+            <div class="cta-title">Interested in collaborating?</div>
+            <div class="cta-text">Create an account to send messages, save favorites, and discover more profiles.</div>
+            <div class="cta-buttons">
+                <a href="/register" class="btn-nav btn-primary">Join Free</a>
+                <a href="/login" class="btn-nav btn-outline">Login</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="/auth-utils.js"></script>
+<script>
+    const profileId = window.location.pathname.split('/').pop();
+
+    function shareProfile() {
+        const url = window.location.href;
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(() => showToast('Link copied to clipboard!'));
+        } else {
+            showToast('Copy this link: ' + url, 'info');
+        }
+    }
+
+    function formatRevenue(v) {
+        if (!v) return null;
+        const n = parseFloat(v);
+        if (isNaN(n) || n === 0) return null;
+        return '€' + n.toLocaleString() + '/mo';
+    }
+
+    function renderProfile(data) {
+        // Avatar
+        const avatar = document.getElementById('profileAvatar');
+        if (data.avatar_url) {
+            avatar.innerHTML = `<img src="${data.avatar_url}" alt="Avatar">`;
+        } else {
+            const name = data.display_name || data.first_name || data.agency_name || '';
+            avatar.textContent = name ? name.charAt(0).toUpperCase() : 'P';
+        }
+
+        // Name
+        const displayName = data.display_name || data.agency_name || `${data.first_name} ${data.last_name}`;
+        document.getElementById('profileName').childNodes[0].textContent = displayName + ' ';
+        if (data.verified) document.getElementById('verifiedBadge').style.display = 'inline';
+
+        // Role
+        document.getElementById('profileRole').textContent = data.role === 'agency' ? 'Agency' : 'Talent / Content Creator';
+
+        // Meta tags
+        const meta = document.getElementById('profileMeta');
+        const metaItems = [];
+        if (data.country) metaItems.push(`<span class="meta-tag"><i class="fa-solid fa-location-dot" style="font-size:0.7rem;"></i> ${data.country}</span>`);
+        if (data.specialty) metaItems.push(`<span class="meta-tag"><i class="fa-solid fa-tag" style="font-size:0.7rem;"></i> ${data.specialty}</span>`);
+        if (data.languages) {
+            const langs = data.languages.split(',').map(l => l.trim()).filter(Boolean);
+            if (langs.length) metaItems.push(`<span class="meta-tag"><i class="fa-solid fa-language" style="font-size:0.7rem;"></i> ${langs.slice(0,3).join(', ')}</span>`);
+        }
+        if (data.talent_count != null && data.role === 'agency') metaItems.push(`<span class="meta-tag"><i class="fa-solid fa-users" style="font-size:0.7rem;"></i> ${data.talent_count} talents</span>`);
+        meta.innerHTML = metaItems.join('');
+
+        // Bio
+        const bio = data.bio || data.description;
+        if (bio) {
+            document.getElementById('bioText').textContent = bio;
+            document.getElementById('bioSection').style.display = 'block';
+        }
+
+        // Platforms
+        const platformsStr = data.platforms || data.agency_platforms || '';
+        if (platformsStr) {
+            const platforms = platformsStr.split(',').map(p => p.trim()).filter(Boolean);
+            if (platforms.length) {
+                document.getElementById('platformTags').innerHTML = platforms.map(p =>
+                    `<span class="platform-tag">${p}</span>`
+                ).join('');
+                document.getElementById('platformsSection').style.display = 'block';
+            }
+        }
+
+        // Stats (talent only)
+        if (data.role === 'talent') {
+            const stats = [];
+            if (data.total_followers) stats.push({ value: parseInt(data.total_followers).toLocaleString(), label: 'Followers' });
+            if (data.age) stats.push({ value: data.age, label: 'Age' });
+            if (stats.length) {
+                document.getElementById('statsGrid').innerHTML = stats.map(s =>
+                    `<div class="stat-card"><div class="stat-value">${s.value}</div><div class="stat-label">${s.label}</div></div>`
+                ).join('');
+                document.getElementById('statsSection').style.display = 'block';
+            }
+        }
+
+        // Social media
+        if (data.social_media) {
+            try {
+                const socials = typeof data.social_media === 'string' ? JSON.parse(data.social_media) : data.social_media;
+                const icons = { instagram: 'fa-brands fa-instagram', twitter: 'fa-brands fa-x-twitter', tiktok: 'fa-brands fa-tiktok', youtube: 'fa-brands fa-youtube', twitch: 'fa-brands fa-twitch', linkedin: 'fa-brands fa-linkedin' };
+                const links = Object.entries(socials).filter(([, v]) => v).map(([k, v]) => {
+                    const icon = icons[k.toLowerCase()] || 'fa-solid fa-link';
+                    const url = v.startsWith('http') ? v : `https://${k}.com/${v}`;
+                    return `<a href="${url}" target="_blank" rel="noopener" class="social-link"><i class="${icon}"></i> ${k}</a>`;
+                });
+                if (links.length) {
+                    document.getElementById('socialLinks').innerHTML = links.join('');
+                    document.getElementById('socialSection').style.display = 'block';
+                }
+            } catch(e) { /* ignore parse errors */ }
+        }
+
+        // Contact button
+        const isLoggedIn = !!Auth.getToken();
+        if (isLoggedIn) {
+            const contactBtn = document.getElementById('contactBtn');
+            contactBtn.href = `/messages?user=${profileId}`;
+        }
+
+        // CTA for guests
+        if (!isLoggedIn) {
+            document.getElementById('ctaSection').style.display = 'block';
+        }
+
+        // Nav for logged in
+        if (isLoggedIn) {
+            document.getElementById('navActions').innerHTML = `
+                <a href="/discover" style="color:rgba(255,255,255,0.6); font-size:0.9rem; font-weight:500; margin-right:0.5rem;">Discover</a>
+                <a href="/pages/profile" class="btn-nav btn-outline">My Profile</a>
+            `;
+        }
+    }
+
+    async function loadProfile() {
+        try {
+            const res = await fetch(`/api/profile/${profileId}/public`);
+            const data = await res.json();
+            document.getElementById('loadingState').style.display = 'none';
+            if (!data.success || !data.data) {
+                document.getElementById('errorState').style.display = 'block';
+                return;
+            }
+            document.title = `${data.data.display_name || data.data.first_name || 'Profile'} - Talent & Agency`;
+            document.getElementById('profileContent').style.display = 'block';
+            renderProfile(data.data);
+        } catch (e) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+        }
+    }
+
+    loadProfile();
+</script>
+</body>
+</html>

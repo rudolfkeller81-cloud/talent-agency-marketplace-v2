@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discover - Talent & Agency</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Base Reset */
@@ -22,60 +21,24 @@
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,0.2); }
 
-        /* Header - Same as home page */
+        /* Header - Same as favorites */
         .header {
-            background: rgba(0, 0, 0, 0.95);
-            padding: 1rem 2rem;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.18);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.05);
         }
-
         .nav {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            max-width: 1200px; margin: 0 auto; padding: 0 2rem;
+            display: flex; align-items: center; justify-content: space-between; height: 64px;
             position: relative;
         }
 
-        .nav-brand {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #ffffff;
-            margin-right: 1rem;
-            margin-left: 0;
-            display: flex;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .nav-links {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-            align-items: center;
-            top: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 0.95rem;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: rgba(59, 130, 246, 0.8);
-        }
+        .nav nav { position: absolute; left: 50%; transform: translateX(-50%); }
+        .nav-brand { font-size: 1.25rem; font-weight: 800; color: #fff; }
+        .nav-links { list-style: none; display: flex; gap: 2rem; align-items: center; }
+        .nav-links a { color: rgba(255,255,255,0.6); font-weight: 500; font-size: 0.9rem; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: #3b82f6; }
 
         .nav-actions {
             display: flex;
@@ -85,25 +48,9 @@
 
         /* Profile Icon */
         .profile-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6, #1e3a8a);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .profile-icon:hover {
-            background: linear-gradient(135deg, #4a90e2, #2563eb);
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: scale(1.05);
+            width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            font-size: 0.85rem; font-weight: 600; color: rgba(255,255,255,0.7);
         }
 
         /* Sidebar Menu */
@@ -152,28 +99,31 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .sidebar-title {
-            font-size: 1.2rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            color: #fff;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
         }
 
         .close-sidebar {
             background: none;
             border: none;
-            color: #fff;
-            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 1.2rem;
             cursor: pointer;
-            padding: 0.5rem;
-            transition: color 0.3s;
+            padding: 0.25rem;
+            line-height: 1;
+            transition: color 0.2s;
         }
 
         .close-sidebar:hover {
-            color: rgba(59, 130, 246, 0.8);
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .sidebar-nav {
@@ -209,34 +159,43 @@
         .sidebar-actions {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.25rem;
         }
 
         .sidebar-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.7rem 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            font-weight: 500;
             text-decoration: none;
-            text-align: center;
-            transition: all 0.3s;
+            background: none;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            width: 100%;
+            letter-spacing: 0.01em;
         }
 
         .sidebar-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            background: rgba(255, 255, 255, 0.06);
         }
 
         .sidebar-btn.logout {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.2);
+            color: rgba(239, 68, 68, 0.6);
+            margin-top: 0.75rem;
+            padding-top: 0.7rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .sidebar-btn.logout:hover {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.06);
         }
 
         /* Overlay */
@@ -379,7 +338,7 @@
 
         /* Main Content */
         .main-content {
-            margin-top: 80px;
+            margin-top: 64px;
             padding: 2rem;
             max-width: 1200px;
             margin-left: auto;
@@ -709,6 +668,13 @@
             padding: 10px 20px;
         }
 
+        .profile-btn-icon {
+            min-width: 40px;
+            width: 40px;
+            padding: 10px;
+            flex-shrink: 0;
+        }
+
         .profile-btn-secondary:hover {
             background: rgba(255, 255, 255, 0.05);
             border-color: #3a3a3a;
@@ -942,6 +908,71 @@
             font-weight: 500;
         }
 
+        /* Posts in Modal */
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .post-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .post-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .post-type {
+            font-size: 1rem;
+        }
+
+        .post-date {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+        }
+
+        .post-media {
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .post-content {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+            line-height: 1.4;
+            margin: 0.5rem 0;
+        }
+
+        .post-stats {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .post-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
         .modal-actions {
             display: flex;
             gap: 1rem;
@@ -1089,20 +1120,40 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-title">Menu</div>
-            <button class="close-sidebar" onclick="toggleSidebar()">×</button>
+            <div class="sidebar-title">Navigation</div>
+            <button class="close-sidebar" onclick="toggleSidebar()">✕</button>
         </div>
         <div class="sidebar-actions">
             <a href="#" onclick="goToProfile(); toggleSidebar();" class="sidebar-btn">
+                <i class="fa-regular fa-user" style="width:16px;opacity:.5;"></i>
                 My Profile
             </a>
+            <a href="/discover" class="sidebar-btn" onclick="toggleSidebar()">
+                <i class="fa-regular fa-compass" style="width:16px;opacity:.5;"></i>
+                Discover
+            </a>
+            <a href="/favorites" class="sidebar-btn" onclick="toggleSidebar()">
+                <i class="fa-regular fa-heart" style="width:16px;opacity:.5;"></i>
+                Favorites
+            </a>
+            <a href="/messages" class="sidebar-btn" onclick="toggleSidebar()">
+                <i class="fa-regular fa-message" style="width:16px;opacity:.5;"></i>
+                Messages
+            </a>
             <a href="#" onclick="goToManage(); toggleSidebar();" class="sidebar-btn" id="manageBtn" style="display: none;">
-                Manage
+                <i class="fa-regular fa-star" style="width:16px;opacity:.5;"></i>
+                Upgrade to Premium
+            </a>
+            <a href="/manage-subscription" class="sidebar-btn" onclick="toggleSidebar()">
+                <i class="fa-regular fa-credit-card" style="width:16px;opacity:.5;"></i>
+                Subscription
             </a>
             <a href="pages/settings.html" class="sidebar-btn" onclick="toggleSidebar()">
+                <i class="fa-regular fa-gear" style="width:16px;opacity:.5;"></i>
                 Settings
             </a>
             <button class="sidebar-btn logout" onclick="doLogout(); toggleSidebar();">
+                <i class="fa-regular fa-arrow-right-from-bracket" style="width:16px;opacity:.6;"></i>
                 Logout
             </button>
         </div>
@@ -1158,13 +1209,13 @@
                 <div class="filter-group">
                     <label class="filter-label">Revenue per Month</label>
                     <div style="display: flex; gap: 0.5rem;">
-                        <input type="number" class="filter-input" placeholder="Min €" min="0" style="width: 100%;">
-                        <input type="number" class="filter-input" placeholder="Max €" min="0" style="width: 100%;">
+                        <input type="number" id="talentRevenueMin" class="filter-input" placeholder="Min €" min="0" style="width: 100%;">
+                        <input type="number" id="talentRevenueMax" class="filter-input" placeholder="Max €" min="0" style="width: 100%;">
                     </div>
                 </div>
                 <div class="filter-group">
                     <label class="filter-label">Has Manager</label>
-                    <select class="filter-select">
+                    <select id="talentHasManager" class="filter-select">
                         <option value="">All</option>
                         <option value="yes">Yes</option>
                         <option value="no">No</option>
@@ -1198,7 +1249,7 @@
                 </div>
                 <div class="filter-group">
                     <label class="filter-label">Country</label>
-                    <select class="filter-select">
+                    <select id="talentCountry" class="filter-select">
                         <option value="">All Countries</option>
                         <option value="France">France</option>
                         <option value="Belgium">Belgium</option>
@@ -1213,7 +1264,7 @@
                 </div>
                 <div class="filter-group">
                     <label class="filter-label">Language</label>
-                    <select class="filter-select">
+                    <select id="talentLanguage" class="filter-select">
                         <option value="">All Languages</option>
                         <option value="French">French</option>
                         <option value="English">English</option>
@@ -1224,7 +1275,7 @@
                 </div>
                 <div class="filter-group">
                     <label class="filter-label">English Level</label>
-                    <select class="filter-select">
+                    <select id="talentEnglishLevel" class="filter-select">
                         <option value="">All Levels</option>
                         <option value="beginner">Beginner</option>
                         <option value="intermediate">Intermediate</option>
@@ -1235,8 +1286,8 @@
                 <div class="filter-group">
                     <label class="filter-label">Age (18+)</label>
                     <div style="display: flex; gap: 0.5rem;">
-                        <input type="number" class="filter-input" placeholder="Min Age" min="18" max="100" style="width: 100%;">
-                        <input type="number" class="filter-input" placeholder="Max Age" min="18" max="100" style="width: 100%;">
+                        <input type="number" id="talentAgeMin" class="filter-input" placeholder="Min Age" min="18" max="100" style="width: 100%;">
+                        <input type="number" id="talentAgeMax" class="filter-input" placeholder="Max Age" min="18" max="100" style="width: 100%;">
                     </div>
                 </div>
                 <div class="filter-group">
@@ -1305,15 +1356,15 @@
                 <div class="filter-group">
                     <label class="filter-label">Number of Active Talents</label>
                     <div style="display: flex; gap: 0.5rem;">
-                        <input type="number" class="filter-input" placeholder="Min talents" min="0" style="width: 100%;">
-                        <input type="number" class="filter-input" placeholder="Max talents" min="0" style="width: 100%;">
+                        <input type="number" id="agencyTalentMin" class="filter-input" placeholder="Min talents" min="0" style="width: 100%;">
+                        <input type="number" id="agencyTalentMax" class="filter-input" placeholder="Max talents" min="0" style="width: 100%;">
                     </div>
                 </div>
                 <div class="filter-group">
                     <label class="filter-label">Total Agency Revenue</label>
                     <div style="display: flex; gap: 0.5rem;">
-                        <input type="number" class="filter-input" placeholder="Min €/month" min="0" style="width: 100%;">
-                        <input type="number" class="filter-input" placeholder="Max €/month" min="0" style="width: 100%;">
+                        <input type="number" id="agencyRevenueMin" class="filter-input" placeholder="Min €/month" min="0" style="width: 100%;">
+                        <input type="number" id="agencyRevenueMax" class="filter-input" placeholder="Max €/month" min="0" style="width: 100%;">
                     </div>
                 </div>
                 <div class="filter-group">
@@ -1329,7 +1380,7 @@
                 </div>
                 <div class="filter-group">
                     <label class="filter-label">Country</label>
-                    <select class="filter-select">
+                    <select id="agencyCountry" class="filter-select">
                         <option value="">All Countries</option>
                         <option value="France">France</option>
                         <option value="Belgium">Belgium</option>
@@ -1395,6 +1446,16 @@
         let currentType = 'talent';
         let profiles = [];
         let filteredProfiles = [];
+        let currentPage = 1;
+        let totalProfiles = 0;
+        const PAGE_SIZE = 12;
+        let filterDebounce;
+
+        // Debounced filter entry point
+        function scheduleFilter(searchTerm) {
+            clearTimeout(filterDebounce);
+            filterDebounce = setTimeout(() => filterProfiles(searchTerm), 250);
+        }
 
         // NOTE: main initialization is in the second DOMContentLoaded below
 
@@ -1417,22 +1478,28 @@
                         const lastName = p.last_name || p.lastName || '';
                         const stageName = p.display_name || `${firstName} ${lastName}`.trim() || 'Profile';
                         const platforms = p.platforms || p.talent_platforms || '';
-                        const platformsArray = platforms ? platforms.split(',').map(s => s.trim()).filter(Boolean) : ['OnlyFans']; // Valeur par défaut
-                        
+                        const platformsArray = platforms ? platforms.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+                        const revenueRaw = p.revenue || p.talent_revenue || p.total_revenue || '0';
+                        const revenueNum = parseFloat(String(revenueRaw).replace(/[^0-9.]/g, '')) || 0;
+
                         return {
                             id: p.id,
                             firstName: firstName,
                             lastName: lastName,
                             stageName: stageName,
-                            location: p.country || p.talent_country || 'France', // Valeur par défaut
+                            location: p.country || p.talent_country || '',
                             platforms: platformsArray,
-                            age: p.age || '25', // Valeur par défaut
-                            revenue: p.revenue || p.talent_revenue || p.total_revenue || '€5,000/mois', // Valeur par défaut
-                            hasManager: p.has_manager || 'No', // Valeur par défaut
-                            bio: p.bio || p.talent_bio || p.description || p.agency_description || 'Professional content creator with expertise in digital platforms.',
+                            age: p.age ? parseInt(p.age) : null,
+                            revenue: revenueNum,
+                            hasManager: p.has_manager || '',
+                            languages: p.languages || '',
+                            socialMedia: p.social_media || '',
+                            bio: p.bio || p.talent_bio || p.description || p.agency_description || '',
                             avatar: firstName ? firstName.charAt(0).toUpperCase() : 'P',
-                            talentCount: p.talent_count || Math.floor(Math.random() * 50) + 10, // Valeur par défaut pour agences
-                            totalRevenue: p.total_revenue || '€50,000/mois' // Valeur par défaut
+                            verified: !!p.verified,
+                            talentCount: p.talent_count != null ? parseInt(p.talent_count) : null,
+                            totalRevenue: parseFloat(String(p.total_revenue || '0').replace(/[^0-9.]/g, '')) || 0
                         };
                     });
                 } catch (error) {
@@ -1454,8 +1521,12 @@
         function goToManage() {
             const user = Auth.getUser();
             if (user && user.role === 'agency') {
-                window.location.href = '/manage-agency';
+                window.location.href = '/pages/agency-pricing';
             }
+        }
+
+        function goToPricing() {
+            window.location.href = '/pages/agency-pricing';
         }
 
         function toggleSidebar() {
@@ -1476,44 +1547,113 @@
             console.log('🔍 setProfileInitial appelé');
             
             const userData = localStorage.getItem('userData');
+            const userProfile = localStorage.getItem('userProfile');
             const userType = localStorage.getItem('userType');
             console.log('🔍 userData:', userData);
+            console.log('🔍 userProfile:', userProfile);
             console.log('🔍 userType:', userType);
             
-            const profileInitial = document.getElementById('profileInitial');
-            const mobileProfileInitial = document.getElementById('mobileProfileInitial');
-            const sidebarProfileInitial = document.getElementById('sidebarProfileInitial');
+            const profileIcon = document.querySelector('.profile-icon');
+            const mobileProfileIcon = document.querySelector('.mobile-menu-actions .profile-icon');
+            const sidebarProfileIcon = document.querySelector('#sidebarProfileInitial')?.parentElement;
             
-            if (userData) {
+            // Try to get avatar from userProfile first (more recent), then userData
+            let avatarUrl = null;
+            let userName = '';
+            
+            if (userProfile) {
                 try {
-                    const user = JSON.parse(userData);
-                    const initial = user.firstName ? user.firstName.charAt(0).toUpperCase() : 
-                                   user.email ? user.email.charAt(0).toUpperCase() : 'U';
-                    
-                    if (profileInitial) profileInitial.textContent = initial;
-                    if (mobileProfileInitial) mobileProfileInitial.textContent = initial;
-                    if (sidebarProfileInitial) sidebarProfileInitial.textContent = initial;
-                    
-                    console.log('🔍 Initial définie:', initial);
-                } catch (error) {
-                    console.log('Error parsing user data:', error);
+                    const profile = JSON.parse(userProfile);
+                    avatarUrl = profile.avatar_url;
+                    userName = profile.first_name || profile.email || '';
+                    console.log('🔍 Avatar from userProfile:', avatarUrl);
+                } catch (e) {
+                    console.log('❌ Error parsing userProfile:', e);
                 }
             }
-
-            // Show/hide Manage button based on user type
-            const manageBtn = document.getElementById('manageBtn');
             
-            if (manageBtn) {
-                console.log('🔍 Vérification du bouton Manage pour userType:', userType);
-                if (userType === 'AGENCY' || userType === 'agency') {
-                    manageBtn.style.display = 'block';
-                    console.log('🔍 Bouton Manage AFFICHÉ pour AGENCY');
-                } else {
-                    manageBtn.style.display = 'none';
-                    console.log('🔍 Bouton Manage MASQUÉ pour userType:', userType);
+            if (!avatarUrl && userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    avatarUrl = user.avatar_url;
+                    userName = user.firstName || user.email || '';
+                    console.log('🔍 Avatar from userData:', avatarUrl);
+                } catch (e) {
+                    console.log('❌ Error parsing userData:', e);
+                }
+            }
+            
+            // If no cached data, try to load from API
+            if (!avatarUrl && !userName) {
+                console.log('🔄 No cached data, loading from API...');
+                loadProfileFromAPI();
+                return;
+            }
+            
+            // If avatar exists, show it
+            if (avatarUrl) {
+                console.log('🖼️ Setting avatar:', avatarUrl);
+                
+                // Update desktop profile icon
+                if (profileIcon) {
+                    profileIcon.innerHTML = `<img src="${avatarUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" alt="Profile">`;
+                }
+                
+                // Update mobile profile icon
+                if (mobileProfileIcon) {
+                    mobileProfileIcon.innerHTML = `<img src="${avatarUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" alt="Profile">`;
+                }
+                
+                // Update sidebar profile icon if exists
+                if (sidebarProfileIcon) {
+                    sidebarProfileIcon.innerHTML = `<img src="${avatarUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" alt="Profile">`;
                 }
             } else {
-                console.log('🔍 Bouton Manage non trouvé dans le DOM');
+                // Fallback to initial
+                const initial = userName ? userName.charAt(0).toUpperCase() : 'U';
+                console.log('🔍 Using initial:', initial);
+                
+                const profileInitial = document.getElementById('profileInitial');
+                const mobileProfileInitial = document.getElementById('mobileProfileInitial');
+                const sidebarProfileInitial = document.getElementById('sidebarProfileInitial');
+                
+                if (profileInitial) profileInitial.textContent = initial;
+                if (mobileProfileInitial) mobileProfileInitial.textContent = initial;
+                if (sidebarProfileInitial) sidebarProfileInitial.textContent = initial;
+            }
+        }
+
+        // Load profile from API for discover page
+        async function loadProfileFromAPI() {
+            try {
+                const token = Auth.getToken();
+                if (!token) return;
+                
+                const response = await Auth.apiFetch('/api/user/profile');
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    const profile = data.data;
+                    console.log('✅ Profile loaded from API:', profile);
+                    
+                    // Save to localStorage
+                    localStorage.setItem('userProfile', JSON.stringify(profile));
+                    
+                    // Update avatar display
+                    if (profile.avatar_url) {
+                        const profileIcon = document.querySelector('.profile-icon');
+                        const mobileProfileIcon = document.querySelector('.mobile-menu-actions .profile-icon');
+                        
+                        if (profileIcon) {
+                            profileIcon.innerHTML = `<img src="${profile.avatar_url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" alt="Profile">`;
+                        }
+                        if (mobileProfileIcon) {
+                            mobileProfileIcon.innerHTML = `<img src="${profile.avatar_url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" alt="Profile">`;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log('❌ Failed to load profile from API:', error);
             }
         }
 
@@ -1544,118 +1684,84 @@
         // Search functionality
         function handleSearch(event) {
             const searchTerm = event.target.value.toLowerCase();
-            filterProfiles(searchTerm);
+            scheduleFilter(searchTerm);
         }
 
         // Ajouter les écouteurs d'événements pour les filtres
         function setupFilterListeners() {
-            // Filtres pour les talents
-            const talentFilters = document.querySelectorAll('#talentFilters input, #talentFilters select');
-            talentFilters.forEach(filter => {
-                filter.addEventListener('change', () => filterProfiles());
-                filter.addEventListener('input', () => filterProfiles());
+            const handler = () => scheduleFilter(document.getElementById('searchInput')?.value?.toLowerCase() || '');
+            document.querySelectorAll('#talentFilters input, #talentFilters select').forEach(f => {
+                f.addEventListener('change', handler);
+                f.addEventListener('input', handler);
             });
-
-            // Filtres pour les agences
-            const agencyFilters = document.querySelectorAll('#agencyFilters input, #agencyFilters select');
-            agencyFilters.forEach(filter => {
-                filter.addEventListener('change', () => filterProfiles());
-                filter.addEventListener('input', () => filterProfiles());
+            document.querySelectorAll('#agencyFilters input, #agencyFilters select').forEach(f => {
+                f.addEventListener('change', handler);
+                f.addEventListener('input', handler);
             });
-
-            console.log('✅ Écouteurs de filtres configurés');
         }
 
         function filterProfiles(searchTerm = '') {
-            console.log('🔍 Filtrage des profils avec:', { searchTerm, currentType });
-            
+            // Cache all DOM filter values ONCE before the loop
+            const filters = currentType === 'talent' ? {
+                minAge: parseInt(document.getElementById('talentAgeMin')?.value),
+                maxAge: parseInt(document.getElementById('talentAgeMax')?.value),
+                minRev: parseFloat(document.getElementById('talentRevenueMin')?.value),
+                maxRev: parseFloat(document.getElementById('talentRevenueMax')?.value),
+                hasManager: document.getElementById('talentHasManager')?.value || '',
+                country: document.getElementById('talentCountry')?.value || '',
+                language: document.getElementById('talentLanguage')?.value || '',
+                platforms: Array.from(document.querySelectorAll('#talentFilters .filter-checkbox-group:first-of-type input[type="checkbox"]:checked')).map(cb => cb.value),
+                social: Array.from(document.querySelectorAll('#talentFilters .filter-checkbox-group:last-of-type input[type="checkbox"]:checked')).map(cb => cb.value)
+            } : {
+                country: document.getElementById('agencyCountry')?.value || '',
+                minTalents: parseInt(document.getElementById('agencyTalentMin')?.value),
+                maxTalents: parseInt(document.getElementById('agencyTalentMax')?.value),
+                minRev: parseFloat(document.getElementById('agencyRevenueMin')?.value),
+                maxRev: parseFloat(document.getElementById('agencyRevenueMax')?.value),
+                platforms: Array.from(document.querySelectorAll('#agencyFilters input[type="checkbox"]:checked')).map(cb => cb.value)
+            };
+
             filteredProfiles = profiles.filter(profile => {
-                // Search filter - recherche dans tous les champs pertinents
                 if (searchTerm) {
-                    const searchFields = [
-                        profile.firstName || '',
-                        profile.lastName || '',
-                        profile.stageName || '',
-                        profile.companyName || '', // Pour les agences
-                        profile.location || '',
-                        profile.bio || '',
-                        profile.description || '', // Pour les agences
-                        ...(profile.skills || [])
-                    ].join(' ').toLowerCase();
-                    
-                    if (!searchFields.includes(searchTerm)) {
-                        return false;
-                    }
+                    const haystack = [profile.firstName, profile.lastName, profile.stageName, profile.location, profile.bio, ...(profile.platforms || [])].join(' ').toLowerCase();
+                    if (!haystack.includes(searchTerm)) return false;
                 }
-                
-                // Filtres spécifiques aux talents
                 if (currentType === 'talent') {
-                    // Filtre par âge
-                    const minAge = document.querySelector('#talentFilters input[placeholder="Min Age"]')?.value;
-                    const maxAge = document.querySelector('#talentFilters input[placeholder="Max Age"]')?.value;
-                    
-                    if (minAge && profile.age && parseInt(profile.age) < parseInt(minAge)) {
-                        return false;
+                    if (!isNaN(filters.minAge) && profile.age !== null && profile.age < filters.minAge) return false;
+                    if (!isNaN(filters.maxAge) && profile.age !== null && profile.age > filters.maxAge) return false;
+                    if (!isNaN(filters.minRev) && profile.revenue < filters.minRev) return false;
+                    if (!isNaN(filters.maxRev) && profile.revenue > filters.maxRev) return false;
+                    if (filters.hasManager) {
+                        const pm = String(profile.hasManager || '').toLowerCase();
+                        if (filters.hasManager === 'yes' && pm !== 'yes' && pm !== '1' && pm !== 'true') return false;
+                        if (filters.hasManager === 'no' && (pm === 'yes' || pm === '1' || pm === 'true')) return false;
                     }
-                    if (maxAge && profile.age && parseInt(profile.age) > parseInt(maxAge)) {
-                        return false;
+                    if (filters.country && profile.location !== filters.country) return false;
+                    if (filters.language && !String(profile.languages || '').toLowerCase().includes(filters.language.toLowerCase())) return false;
+                    if (filters.platforms.length > 0) {
+                        const pp = profile.platforms || [];
+                        if (!filters.platforms.some(p => pp.some(x => x.toLowerCase().includes(p.toLowerCase())))) return false;
                     }
-                    
-                    // Filtre par réseaux sociaux (skills)
-                    const checkedSkills = Array.from(document.querySelectorAll('#talentFilters input[type="checkbox"]:checked')).map(cb => cb.value);
-                    if (checkedSkills.length > 0) {
-                        const profileSkills = profile.skills || [];
-                        const hasMatchingSkill = checkedSkills.some(skill => 
-                            profileSkills.some(profileSkill => 
-                                profileSkill.toLowerCase().includes(skill.toLowerCase())
-                            )
-                        );
-                        if (!hasMatchingSkill) {
-                            return false;
-                        }
+                    if (filters.social.length > 0) {
+                        const ps = String(profile.socialMedia || '').toLowerCase();
+                        if (!filters.social.some(s => ps.includes(s.toLowerCase()))) return false;
                     }
-                    
-                    // Filtre par pays
-                    const selectedCountry = document.querySelector('#talentFilters select')?.value;
-                    if (selectedCountry && selectedCountry !== 'All Countries' && profile.location !== selectedCountry) {
-                        return false;
-                    }
-                }
-                
-                // Filtres spécifiques aux agences
-                if (currentType === 'agency') {
-                    // Filtre par plateformes gérées
-                    const checkedPlatforms = Array.from(document.querySelectorAll('#agencyFilters input[type="checkbox"]:checked')).map(cb => cb.value);
-                    if (checkedPlatforms.length > 0) {
-                        const profilePlatforms = profile.skills || profile.specialization || [];
-                        const hasMatchingPlatform = checkedPlatforms.some(platform => 
-                            profilePlatforms.some(profilePlatform => 
-                                profilePlatform.toLowerCase().includes(platform.toLowerCase())
-                            )
-                        );
-                        if (!hasMatchingPlatform) {
-                            return false;
-                        }
-                    }
-                    
-                    // Filtre par pays
-                    const selectedCountry = document.querySelector('#agencyFilters select')?.value;
-                    if (selectedCountry && selectedCountry !== 'All Countries' && profile.location !== selectedCountry) {
-                        return false;
-                    }
-                    
-                    // Filtre par taille d'équipe
-                    const teamSize = document.querySelector('#agencyFilters select[placeholder="Team Size"]')?.value;
-                    if (teamSize && profile.teamSize !== teamSize) {
-                        return false;
+                } else {
+                    if (filters.country && profile.location !== filters.country) return false;
+                    if (!isNaN(filters.minTalents) && profile.talentCount !== null && profile.talentCount < filters.minTalents) return false;
+                    if (!isNaN(filters.maxTalents) && profile.talentCount !== null && profile.talentCount > filters.maxTalents) return false;
+                    if (!isNaN(filters.minRev) && profile.totalRevenue < filters.minRev) return false;
+                    if (!isNaN(filters.maxRev) && profile.totalRevenue > filters.maxRev) return false;
+                    if (filters.platforms.length > 0) {
+                        const pp = profile.platforms || [];
+                        if (!filters.platforms.some(p => pp.some(x => x.toLowerCase().includes(p.toLowerCase())))) return false;
                     }
                 }
-                
                 return true;
             });
-            
+
+            currentPage = 1;
             displayProfiles(filteredProfiles);
-            console.log(`✅ ${filteredProfiles.length} profils filtrés sur ${profiles.length} total`);
         }
 
         // Load profiles
@@ -1781,14 +1887,27 @@
             }
         }
 
-        // Display profiles
+        // Display profiles (paginated)
         function displayProfiles(profilesToDisplay) {
+            if (profilesToDisplay.length === 0) {
+                document.getElementById('profilesContainer').innerHTML = `<div class="empty-state"><h3>No ${currentType}s found</h3><p>Try adjusting your filters</p></div>`;
+                const pg = document.getElementById('discoverPagination');
+                if (pg) pg.innerHTML = '';
+                return;
+            }
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const pageSlice = profilesToDisplay.slice(start, start + PAGE_SIZE);
             const container = document.getElementById('profilesContainer');
-            
-            container.innerHTML = '<div class="profiles-grid">' + profilesToDisplay.map(profile => {
+
+            container.innerHTML = '<div class="profiles-grid">' + pageSlice.map(profile => {
                 const initial = profile.avatar || (profile.firstName ? profile.firstName.charAt(0).toUpperCase() : 'U');
                 const displayName = profile.stageName || `${profile.firstName} ${profile.lastName}`.trim();
                 const badgeLabel = currentType === 'talent' ? 'Talent' : 'Agency';
+
+                const verifiedBadge = profile.verified
+                    ? `<svg class="verified-badge" viewBox="0 0 16 16" fill="none" title="Verified"><circle cx="8" cy="8" r="8" fill="#3b82f6"/><path d="M4.8 8.4L6.6 10.2L11.2 5.6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+                    : '';
+                const safeName = displayName.replace(/'/g, "\\'");
 
                 if (currentType === 'talent') {
                     return `
@@ -1798,44 +1917,23 @@
                                 <div class="profile-info">
                                     <div class="profile-name-row">
                                         <h3>${displayName}</h3>
-                                        <svg class="verified-badge" viewBox="0 0 16 16" fill="none">
-                                            <circle cx="8" cy="8" r="8" fill="#fff"/>
-                                            <path d="M4.8 8.4L6.6 10.2L11.2 5.6" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                                        </svg>
+                                        ${verifiedBadge}
                                     </div>
-                                    <div class="talent-badge">${badgeLabel}</div>
+                                    <div class="talent-badge">Talent</div>
                                     <div class="profile-details">
-                                        <div class="detail-item">
-                                            <span class="detail-label">Pays:</span>
-                                            <span class="detail-value">${profile.location || 'N/A'}</span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">Plateforme:</span>
-                                            <span class="detail-value">${profile.platforms.join(', ') || 'N/A'}</span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">Âge:</span>
-                                            <span class="detail-value">${profile.age ? profile.age + ' ans' : 'N/A'}</span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">Revenus:</span>
-                                            <span class="detail-value">${profile.revenue || 'N/A'}</span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">Manager:</span>
-                                            <span class="detail-value">${profile.hasManager || 'N/A'}</span>
-                                        </div>
+                                        <div class="detail-item"><span class="detail-label">Pays:</span><span class="detail-value">${profile.location || 'N/A'}</span></div>
+                                        <div class="detail-item"><span class="detail-label">Plateforme:</span><span class="detail-value">${profile.platforms.join(', ') || 'N/A'}</span></div>
+                                        <div class="detail-item"><span class="detail-label">Âge:</span><span class="detail-value">${profile.age ? profile.age + ' ans' : 'N/A'}</span></div>
+                                        <div class="detail-item"><span class="detail-label">Manager:</span><span class="detail-value">${profile.hasManager || 'N/A'}</span></div>
                                     </div>
                                     <div class="profile-bio">${profile.bio || ''}</div>
                                 </div>
                             </div>
                             <div class="profile-actions" onclick="event.stopPropagation()">
-                                <button class="profile-btn profile-btn-primary" onclick="toggleFavorite('${displayName.replace(/'/g, "\\'")}', ${profile.id}, this)">
-                                    <span class="btn-text">Add to favorites</span>
-                                </button>
-                                <button class="profile-btn profile-btn-secondary" onclick="sendMessage(${profile.id}, '${displayName.replace(/'/g, "\\'")}')">
-                                    <span class="btn-text">Message</span>
-                                </button>
+                                <button class="profile-btn profile-btn-primary" onclick="toggleFavorite('${safeName}', ${profile.id}, this)"><span class="btn-text">Favoris</span></button>
+                                <button class="profile-btn profile-btn-secondary" onclick="sendMessage(${profile.id}, '${safeName}')"><span class="btn-text">Message</span></button>
+                                <button class="profile-btn profile-btn-secondary profile-btn-icon" onclick="shareProfile(${profile.id})" title="Partager"><i class="fa-regular fa-share-from-square"></i></button>
+                                <button class="profile-btn profile-btn-icon" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);color:rgba(239,68,68,0.6);" onclick="reportProfile(${profile.id})" title="Signaler"><i class="fa-regular fa-flag"></i></button>
                             </div>
                         </div>
                     `;
@@ -1847,41 +1945,134 @@
                                 <div class="profile-info">
                                     <div class="profile-name-row">
                                         <h3>${displayName}</h3>
-                                        <svg class="verified-badge" viewBox="0 0 16 16" fill="none">
-                                            <circle cx="8" cy="8" r="8" fill="#fff"/>
-                                            <path d="M4.8 8.4L6.6 10.2L11.2 5.6" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                                        </svg>
+                                        ${verifiedBadge}
                                     </div>
-                                    <div class="talent-badge">${badgeLabel}</div>
+                                    <div class="talent-badge">Agency</div>
                                     <div class="profile-details">
-                                        <div class="detail-item">
-                                            <span class="detail-label">Plateformes:</span>
-                                            <span class="detail-value">${profile.platforms.join(', ') || 'N/A'}</span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">Talents:</span>
-                                            <span class="detail-value">${profile.talentCount} actifs</span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">Revenus totaux:</span>
-                                            <span class="detail-value">${profile.totalRevenue || 'N/A'}</span>
-                                        </div>
+                                        <div class="detail-item"><span class="detail-label">Plateformes:</span><span class="detail-value">${profile.platforms.join(', ') || 'N/A'}</span></div>
+                                        <div class="detail-item"><span class="detail-label">Talents:</span><span class="detail-value">${profile.talentCount != null ? profile.talentCount + ' actifs' : 'N/A'}</span></div>
                                     </div>
                                     <div class="profile-bio">${profile.bio || ''}</div>
                                 </div>
                             </div>
                             <div class="profile-actions" onclick="event.stopPropagation()">
-                                <button class="profile-btn profile-btn-primary" onclick="toggleFavorite('${displayName.replace(/'/g, "\\'")}', ${profile.id}, this)">
-                                    <span class="btn-text">Add to favorites</span>
-                                </button>
-                                <button class="profile-btn profile-btn-secondary" onclick="sendMessage(${profile.id}, '${displayName.replace(/'/g, "\\'")}')">
-                                    <span class="btn-text">Contact</span>
-                                </button>
+                                <button class="profile-btn profile-btn-primary" onclick="toggleFavorite('${safeName}', ${profile.id}, this)"><span class="btn-text">Favoris</span></button>
+                                <button class="profile-btn profile-btn-secondary" onclick="sendMessage(${profile.id}, '${safeName}')"><span class="btn-text">Contact</span></button>
+                                <button class="profile-btn profile-btn-secondary profile-btn-icon" onclick="shareProfile(${profile.id})" title="Partager"><i class="fa-regular fa-share-from-square"></i></button>
+                                <button class="profile-btn profile-btn-icon" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);color:rgba(239,68,68,0.6);" onclick="reportProfile(${profile.id})" title="Signaler"><i class="fa-regular fa-flag"></i></button>
                             </div>
                         </div>
                     `;
                 }
             }).join('') + '</div>';
+
+            // Render pagination
+            renderPagination();
+        }
+
+        function renderPagination() {
+            let container = document.getElementById('discoverPagination');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'discoverPagination';
+                container.style.cssText = 'display:flex;justify-content:center;align-items:center;gap:0.5rem;margin-top:2rem;padding-bottom:2rem;';
+                document.getElementById('profilesContainer').after(container);
+            }
+            const total = filteredProfiles.length;
+            const totalPages = Math.ceil(total / PAGE_SIZE);
+            if (totalPages <= 1) { container.innerHTML = ''; return; }
+
+            const btnStyle = 'padding:0.4rem 0.85rem;border-radius:6px;font-size:0.8rem;cursor:pointer;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);transition:all 0.2s;';
+            const activeBtnStyle = 'padding:0.4rem 0.85rem;border-radius:6px;font-size:0.8rem;cursor:pointer;background:#3b82f6;border:1px solid #3b82f6;color:#fff;';
+
+            let html = `<button style="${btnStyle}" onclick="goPage(${currentPage-1})" ${currentPage<=1?'disabled':''}>‹</button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button style="${i===currentPage ? activeBtnStyle : btnStyle}" onclick="goPage(${i})">${i}</button>`;
+            }
+            html += `<button style="${btnStyle}" onclick="goPage(${currentPage+1})" ${currentPage>=totalPages?'disabled':''}>›</button>`;
+            html += `<span style="font-size:0.8rem;color:rgba(255,255,255,0.3);margin-left:0.5rem;">${total} profils</span>`;
+            container.innerHTML = html;
+        }
+
+        function goPage(page) {
+            const totalPages = Math.ceil(filteredProfiles.length / PAGE_SIZE);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            const start = (page - 1) * PAGE_SIZE;
+            const paginated = filteredProfiles.slice(start, start + PAGE_SIZE);
+            const container = document.getElementById('profilesContainer');
+            const initial_displayProfiles = displayProfiles;
+            // Re-render only current page slice
+            container.innerHTML = '<div class="profiles-grid">' + paginated.map(profile => {
+                const firstName = profile.firstName || '';
+                const displayName = profile.stageName || `${firstName} ${profile.lastName}`.trim();
+                const initial = profile.avatar || (firstName ? firstName.charAt(0).toUpperCase() : 'U');
+                const verifiedBadge = profile.verified ? `<svg class="verified-badge" viewBox="0 0 16 16" fill="none" title="Verified"><circle cx="8" cy="8" r="8" fill="#3b82f6"/><path d="M4.8 8.4L6.6 10.2L11.2 5.6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>` : '';
+                const safeName = displayName.replace(/'/g, "\\'");
+                if (currentType === 'talent') {
+                    return `<div class="profile-card" onclick="showProfileModal(${JSON.stringify(profile).replace(/"/g,'&quot;')})">
+                        <div class="profile-header"><div class="profile-avatar">${initial}</div><div class="profile-info">
+                        <div class="profile-name-row"><h3>${displayName}</h3>${verifiedBadge}</div>
+                        <div class="talent-badge">Talent</div>
+                        <div class="profile-details"><div class="detail-item"><span class="detail-label">Pays:</span><span class="detail-value">${profile.location||'N/A'}</span></div><div class="detail-item"><span class="detail-label">Âge:</span><span class="detail-value">${profile.age?profile.age+' ans':'N/A'}</span></div></div>
+                        <div class="profile-bio">${profile.bio||''}</div></div></div>
+                        <div class="profile-actions" onclick="event.stopPropagation()">
+                        <button class="profile-btn profile-btn-primary" onclick="toggleFavorite('${safeName}',${profile.id},this)"><span class="btn-text">Favoris</span></button>
+                        <button class="profile-btn profile-btn-secondary" onclick="sendMessage(${profile.id},'${safeName}')"><span class="btn-text">Message</span></button>
+                        <button class="profile-btn profile-btn-secondary profile-btn-icon" onclick="shareProfile(${profile.id})" title="Partager"><i class="fa-regular fa-share-from-square"></i></button>
+                        <button class="profile-btn profile-btn-icon" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);color:rgba(239,68,68,0.6);" onclick="reportProfile(${profile.id})" title="Signaler"><i class="fa-regular fa-flag"></i></button>
+                        </div></div>`;
+                } else {
+                    return `<div class="profile-card" onclick="showProfileModal(${JSON.stringify(profile).replace(/"/g,'&quot;')})">
+                        <div class="profile-header"><div class="profile-avatar">${initial}</div><div class="profile-info">
+                        <div class="profile-name-row"><h3>${displayName}</h3>${verifiedBadge}</div>
+                        <div class="talent-badge">Agency</div>
+                        <div class="profile-details"><div class="detail-item"><span class="detail-label">Talents:</span><span class="detail-value">${profile.talentCount!=null?profile.talentCount+' actifs':'N/A'}</span></div></div>
+                        <div class="profile-bio">${profile.bio||''}</div></div></div>
+                        <div class="profile-actions" onclick="event.stopPropagation()">
+                        <button class="profile-btn profile-btn-primary" onclick="toggleFavorite('${safeName}',${profile.id},this)"><span class="btn-text">Favoris</span></button>
+                        <button class="profile-btn profile-btn-secondary" onclick="sendMessage(${profile.id},'${safeName}')"><span class="btn-text">Contact</span></button>
+                        <button class="profile-btn profile-btn-secondary profile-btn-icon" onclick="shareProfile(${profile.id})" title="Partager"><i class="fa-regular fa-share-from-square"></i></button>
+                        <button class="profile-btn profile-btn-icon" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);color:rgba(239,68,68,0.6);" onclick="reportProfile(${profile.id})" title="Signaler"><i class="fa-regular fa-flag"></i></button>
+                        </div></div>`;
+                }
+            }).join('') + '</div>';
+            renderPagination();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function shareProfile(profileId) {
+            const url = `${window.location.origin}/profile/${profileId}`;
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(url);
+                } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = url; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+                    document.body.appendChild(ta); ta.select();
+                    document.execCommand('copy'); document.body.removeChild(ta);
+                }
+                showToast('Lien copié !', 'success');
+            } catch (e) {
+                showToast('Lien : ' + url, 'info');
+            }
+        }
+
+        async function reportProfile(profileId) {
+            const reason = prompt('Raison du signalement:\n(ex: Faux profil, Contenu inapproprié, Arnaque)');
+            if (!reason) return;
+            const details = prompt('Détails supplémentaires (optionnel):') || '';
+            try {
+                const res = await Auth.apiFetch('/api/reports', {
+                    method: 'POST',
+                    body: JSON.stringify({ reported_user_id: profileId, reason, details })
+                });
+                const data = await res.json();
+                if (data.success) showToast('Signalement envoyé', 'success');
+                else showToast(data.error || 'Erreur', 'error');
+            } catch (e) {
+                showToast('Erreur réseau', 'error');
+            }
         }
 
         // Profile actions
@@ -1892,10 +2083,8 @@
             try {
                 if (isAdded) {
                     // Remove from favorites
-                    const token = localStorage.getItem('authToken');
-                    const response = await fetch(`/api/favorites/${profileId}`, {
-                        method: 'DELETE',
-                        headers: { 'Authorization': 'Bearer ' + token }
+                    const response = await Auth.apiFetch(`/api/favorites/${profileId}`, {
+                        method: 'DELETE'
                     });
                     
                     if (response.ok) {
@@ -1906,13 +2095,9 @@
                     }
                 } else {
                     // Add to favorites
-                    const token = localStorage.getItem('authToken');
-                    const response = await fetch('/api/favorites', {
+                    const response = await Auth.apiFetch('/api/favorites', {
                         method: 'POST',
-                        headers: { 
-                            'Authorization': 'Bearer ' + token,
-                            'Content-Type': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ favoritedUserId: profileId })
                     });
                     
@@ -1925,7 +2110,7 @@
                 }
             } catch (error) {
                 console.error('Error toggling favorite:', error);
-                alert('Erreur lors de la gestion des favoris');
+                showToast('Erreur lors de la gestion des favoris');
             }
         }
 
@@ -2291,15 +2476,85 @@
                         }, 1000);
                     } else {
                         const result = await response.json();
-                        alert('Error sending message: ' + (result.error || 'Unknown error'));
+                        showToast('Impossible d\'envoyer le message : ' + (result.error || 'Erreur inconnue'));
                     }
                 } catch (error) {
                     console.error('Error sending message:', error);
-                    alert('Error sending message: ' + error.message);
+                    showToast('Erreur de connexion. Vérifiez votre connexion internet.');
                 } finally {
                     sendBtn.disabled = false;
                 }
             }
+
+        // Load user posts for profile modal
+        async function loadUserPosts(userId) {
+            try {
+                if (!Auth.getToken()) return [];
+
+                const response = await Auth.apiFetch(`/api/posts/user/${userId}`);
+
+                if (!response.ok) return [];
+
+                const result = await response.json();
+                return result.success ? result.data : [];
+            } catch (error) {
+                console.error('Load user posts error:', error);
+                return [];
+            }
+        }
+
+        // Display user posts in modal
+        function displayUserPostsInModal(posts) {
+            const postsContainer = document.getElementById('modalPosts');
+            
+            if (!posts || posts.length === 0) {
+                postsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 1rem; color: rgba(255,255,255,0.5);">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📝</div>
+                        <p>No posts yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let postsHtml = '<div class="posts-grid">';
+            posts.slice(0, 6).forEach(post => { // Show max 6 posts
+                const postDate = new Date(post.created_at).toLocaleDateString();
+                const postType = post.type === 'photo' ? '📷' : post.type === 'video' ? '🎥' : post.type === 'mixed' ? '🎨' : '📄';
+                
+                postsHtml += `
+                    <div class="post-item">
+                        <div class="post-header">
+                            <span class="post-type">${postType}</span>
+                            <span class="post-date">${postDate}</span>
+                        </div>
+                        ${post.media_url ? `
+                            <div class="post-media">
+                                ${post.type.includes('photo') ? 
+                                    `<img src="${post.media_url}" alt="Post image" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px;">` :
+                                    post.type.includes('video') ?
+                                    `<video src="${post.media_url}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px;" controls></video>` :
+                                    `<img src="${post.media_url}" alt="Post media" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px;">`
+                                }
+                            </div>
+                        ` : ''}
+                        ${post.content ? `<div class="post-content">${post.content.substring(0, 100)}${post.content.length > 100 ? '...' : ''}</div>` : ''}
+                        <div class="post-stats">
+                            <span class="post-stat">❤️ ${post.likes || 0}</span>
+                            <span class="post-stat">💬 ${post.comments || 0}</span>
+                            <span class="post-stat">🔄 ${post.shares || 0}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            postsHtml += '</div>';
+            
+            if (posts.length > 6) {
+                postsHtml += `<div style="text-align: center; margin-top: 1rem; color: rgba(255,255,255,0.5); font-size: 0.875rem;">+${posts.length - 6} more posts</div>`;
+            }
+            
+            postsContainer.innerHTML = postsHtml;
+        }
 
         function formatChatTime(date) {
             const now = new Date();
@@ -2330,13 +2585,18 @@
             document.getElementById('modalAvatar').textContent = initial;
             document.getElementById('modalName').textContent = displayName;
             document.getElementById('modalBadge').textContent = badgeLabel;
-            document.getElementById('modalBio').textContent = profile.bio || 'Aucune biographie disponible';
+            document.getElementById('modalBio').textContent = profile.bio || 'No bio available';
             
             // Update details
             document.getElementById('modalCountry').textContent = profile.location || 'N/A';
             document.getElementById('modalAge').textContent = profile.age ? `${profile.age} ans` : 'N/A';
             document.getElementById('modalRevenue').textContent = profile.revenue || 'N/A';
             document.getElementById('modalTotalRevenue').textContent = profile.totalRevenue || 'N/A';
+            
+            // Load and display user posts
+            loadUserPosts(profile.id).then(posts => {
+                displayUserPostsInModal(posts);
+            });
             
             // Show/hide talent-specific vs agency-specific fields
             const managerRow = document.getElementById('modalManagerRow');
@@ -2469,9 +2729,8 @@
         }
 
         function loadProfilesWithFilters(filters) {
-            // For now, just reload profiles (backend doesn't support complex filters yet)
-            console.log('🔄 Loading profiles with filters (basic implementation)');
-            loadProfiles();
+            const searchTerm = document.getElementById('searchInput')?.value?.toLowerCase() || '';
+            filterProfiles(searchTerm);
         }
 
         // Initialize
@@ -2559,6 +2818,13 @@
                         <div class="modal-platforms" id="modalPlatforms">
                             <span class="platform-tag">OnlyFans</span>
                             <span class="platform-tag">Fanvue</span>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-details-section">
+                        <h3 class="modal-section-title">📝 Recent Posts</h3>
+                        <div id="modalPosts" class="modal-posts">
+                            <div class="loading-posts">Loading posts...</div>
                         </div>
                     </div>
                 </div>

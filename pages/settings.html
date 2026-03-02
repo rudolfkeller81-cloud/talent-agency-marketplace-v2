@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - Talent Agency</title>
-    <link rel="stylesheet" href="../styles/production.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../auth-utils.js"></script>
     <style>
         body {
             background: #000;
@@ -49,700 +51,715 @@
             transform: translateY(-1px);
         }
         
-        .settings-btn:active {
-            transform: translateY(0px);
+        .settings-btn.danger {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
         }
         
-        .arrow-icon {
-            transition: transform 0.2s ease;
+        .settings-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.5);
         }
         
-        .settings-btn:hover .arrow-icon {
-            transform: translateX(4px);
+        .settings-btn.success {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
         }
         
-        .section-title {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #fff;
-        }
-        
-        .section-description {
-            color: #666;
-            margin-bottom: 24px;
-            font-size: 14px;
+        .settings-btn.success:hover {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: rgba(34, 197, 94, 0.5);
         }
         
         .back-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 6px;
-            text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            font-size: 14px;
-            transition: all 0.2s ease;
-            margin-bottom: 24px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            transition: color 0.2s;
         }
         
         .back-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-1px);
+            color: #2563eb;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .section-description {
+            color: #a1a1aa;
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            background: #222;
+            color: #fff;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: #2a2a2a;
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid;
+        }
+        
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+        
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+        
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #fff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 64px;
+            height: 34px;
+            cursor: pointer;
+        }
+        
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            inset: 0;
+            background-color: #444;
+            border-radius: 34px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .slider::before {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            left: 4px;
+            top: 4px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+        
+        .toggle input:checked + .slider {
+            background-color: #4cd964;
+        }
+        
+        .toggle input:checked + .slider::before {
+            transform: translateX(30px);
+        }
+        
+        .toggle-label {
+            color: #ccc;
+            font-size: 14px;
+            letter-spacing: 0.05em;
         }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="bg-black text-white">
     <div class="container mx-auto px-4 py-8 max-w-4xl">
         <!-- Back Button -->
         <a href="../discover.html" class="back-btn">
-            ← Retour
+            <i class="fas fa-arrow-left"></i>
+            Back
         </a>
         
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="section-title">Paramètres</h1>
-            <p class="section-description">Gérez vos préférences et votre compte</p>
+            <h1 class="section-title">Settings</h1>
+            <p class="section-description">Manage your preferences and account</p>
         </div>
         
-        <!-- Preferences Section -->
+        <!-- Profile Section -->
         <div class="settings-card">
-            <h2 class="text-xl font-semibold mb-4">Préférences</h2>
-            <p class="text-gray-400 mb-6">Personnalisez votre expérience utilisateur</p>
+            <h2 class="text-xl font-semibold mb-4">
+                <i class="fas fa-user mr-2"></i>Profile
+            </h2>
+            <p class="text-gray-400 mb-6">Manage your personal information</p>
             
             <div class="space-y-3">
-                <button class="settings-btn" onclick="openLanguageSettings()">
-                    <span>Langue et region</span>
+                <button class="settings-btn" onclick="changePassword()">
+                    <span><i class="fas fa-lock mr-2"></i>Change Password</span>
                     <span class="arrow-icon">→</span>
                 </button>
-                
             </div>
         </div>
         
         <!-- Privacy Section -->
         <div class="settings-card">
-            <h2 class="text-xl font-semibold mb-4">Confidentialité</h2>
-            <p class="text-gray-400 mb-6">Contrôlez vos informations personnelles</p>
+            <h2 class="text-xl font-semibold mb-4">
+                <i class="fas fa-shield-alt mr-2"></i>Privacy
+            </h2>
+            <p class="text-gray-400 mb-6">Control your personal information</p>
             
             <div class="space-y-3">
-                <button class="settings-btn" onclick="openDataControl()">
-                    <span>Controle des donnees</span>
+                <button class="settings-btn" onclick="openPrivacySettings()">
+                    <span><i class="fas fa-user-shield mr-2"></i>Privacy Settings</span>
                     <span class="arrow-icon">→</span>
                 </button>
                 
+                <button class="settings-btn" onclick="downloadData()">
+                    <span><i class="fas fa-download mr-2"></i>Download My Data</span>
+                    <span class="arrow-icon">→</span>
+                </button>
+                
+                <button class="settings-btn" onclick="manageCookies()">
+                    <span><i class="fas fa-cookie mr-2"></i>Cookie Management</span>
+                    <span class="arrow-icon">→</span>
+                </button>
             </div>
         </div>
         
         <!-- Management Section -->
-        <div class="settings-card">
-            <h2 class="text-xl font-semibold mb-4">Gestion</h2>
-            <p class="text-gray-400 mb-6">Outils de gestion de votre compte</p>
+        <div class="settings-card" id="managementSection">
+            <h2 class="text-xl font-semibold mb-4">
+                <i class="fas fa-tools mr-2"></i>Management
+            </h2>
+            <p class="text-gray-400 mb-6">Account management tools</p>
             
             <div class="space-y-3">
-                <button class="settings-btn" onclick="openSubscriptionManagement()">
-                    <span>Abonnement et facturation</span>
-                    <span class="arrow-icon">→</span>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Security Section -->
-        <div class="settings-card">
-            <h2 class="text-xl font-semibold mb-4">Securite</h2>
-            <p class="text-gray-400 mb-6">Protegez votre compte et vos donnees</p>
-            
-            <div class="space-y-3">
-                <button class="settings-btn" onclick="openPasswordSettings()">
-                    <span>Mot de passe</span>
-                    <span class="arrow-icon">→</span>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Data Section -->
-        <div class="settings-card">
-            <h2 class="text-xl font-semibold mb-4">Donnees</h2>
-            <p class="text-gray-400 mb-6">Gérez vos données personnelles</p>
-            
-            <div class="space-y-3">
-                <button class="settings-btn" onclick="downloadData()">
-                    <span>Telecharger mes donnees</span>
+                <button class="settings-btn success" onclick="openSubscriptionManagement()">
+                    <span><i class="fas fa-credit-card mr-2"></i>Subscription & Billing</span>
                     <span class="arrow-icon">→</span>
                 </button>
                 
-                <button class="settings-btn" onclick="deleteAccount()">
-                    <span>Supprimer le compte</span>
+                <button class="settings-btn" onclick="exportData()">
+                    <span><i class="fas fa-file-export mr-2"></i>Export My Data</span>
+                    <span class="arrow-icon">→</span>
+                </button>
+                
+                <button class="settings-btn danger" onclick="deleteAccount()">
+                    <span><i class="fas fa-trash mr-2"></i>Delete My Account</span>
+                    <span class="arrow-icon">→</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Support Section -->
+        <div class="settings-card">
+            <h2 class="text-xl font-semibold mb-4">
+                <i class="fas fa-life-ring mr-2"></i>Support
+            </h2>
+            <p class="text-gray-400 mb-6">Help and assistance</p>
+            
+            <div class="space-y-3">
+                <button class="settings-btn" onclick="contactSupport()">
+                    <span><i class="fas fa-envelope mr-2"></i>Contact Support</span>
                     <span class="arrow-icon">→</span>
                 </button>
             </div>
         </div>
     </div>
-
+    
+    <!-- Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle" class="modal-title">Titre</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modalBody">
+                <!-- Content will be inserted here -->
+            </div>
+        </div>
+    </div>
+    
     <script>
-        // Preferences Functions
-        function openPreferences() {
-            console.log('openPreferences appelé');
-            
-            // Créer une vraie interface de préférences
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1000;
-            `;
-            
-            modal.innerHTML = `
-                <div style="background: #111; border: 1px solid #333; border-radius: 16px; padding: 2rem; max-width: 500px; width: 90%;">
-                    <h3 style="color: #fff; margin-bottom: 1.5rem;">⚙️ Préférences</h3>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Mode :</label>
-                        <select id="theme-select" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
-                            <option value="dark">🌙 Sombre</option>
-                            <option value="light">☀️ Clair</option>
-                            <option value="auto">🔄 Auto</option>
-                        </select>
-                    </div>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Taille du texte :</label>
-                        <select id="font-size-select" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
-                            <option value="small">Petit</option>
-                            <option value="medium" selected>Moyen</option>
-                            <option value="large">Grand</option>
-                        </select>
-                    </div>
-                    
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Langue :</label>
-                        <select id="language-select" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
-                            <option value="fr" selected>Français</option>
-                            <option value="en">English</option>
-                            <option value="es">Español</option>
-                        </select>
-                    </div>
-                    
-                    <div style="display: flex; gap: 1rem;">
-                        <button onclick="savePreferences()" style="flex: 1; padding: 0.75rem; background: #3b82f6; color: #fff; border: none; border-radius: 8px; cursor: pointer;">💾 Sauvegarder</button>
-                        <button onclick="this.closest('div[style*=fixed]').remove()" style="flex: 1; padding: 0.75rem; background: #666; color: #fff; border: none; border-radius: 8px; cursor: pointer;">Fermer</button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // Charger les préférences existantes
-            const savedPrefs = localStorage.getItem('userPreferences');
-            if (savedPrefs) {
-                const prefs = JSON.parse(savedPrefs);
-                document.getElementById('theme-select').value = prefs.theme || 'dark';
-                document.getElementById('font-size-select').value = prefs.fontSize || 'medium';
-                document.getElementById('language-select').value = prefs.language || 'fr';
-            }
+        // Modal functions
+        function openModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('settingsModal').classList.add('active');
         }
         
-        function savePreferences() {
-            const preferences = {
-                theme: document.getElementById('theme-select').value,
-                fontSize: document.getElementById('font-size-select').value,
-                language: document.getElementById('language-select').value
-            };
-            
-            localStorage.setItem('userPreferences', JSON.stringify(preferences));
-            console.log('✅ Préférences sauvegardées:', preferences);
-            
-            // Appliquer les préférences
-            applyPreferences(preferences);
-            
-            // Fermer le modal
-            document.querySelector('div[style*="position: fixed"]').remove();
-            
-            alert('✅ Préférences sauvegardées avec succès !');
+        function closeModal() {
+            document.getElementById('settingsModal').classList.remove('active');
         }
         
-        function applyPreferences(preferences) {
-            // Appliquer le thème
-            if (preferences.theme === 'light') {
-                document.body.style.background = '#fff';
-                document.body.style.color = '#000';
-            } else {
-                document.body.style.background = '#000';
-                document.body.style.color = '#fff';
-            }
-            
-            // Appliquer la taille du texte
-            const fontSizeMap = {
-                small: '14px',
-                medium: '16px',
-                large: '18px'
-            };
-            document.body.style.fontSize = fontSizeMap[preferences.fontSize] || '16px';
-        }
-        
-        function openLanguageSettings() {
-            console.log('openLanguageSettings appelé');
-            alert('Langue et region\n\nOptions disponibles:\n- Francais (par defaut)\n- English\n- Espanol\n- Deutsch\n- Format de date/heure\n- Fuseau horaire');
-        }
-        
-        function openNotificationSettings() {
-            console.log('openNotificationSettings appelé');
-            alert('Notifications\n\nOptions disponibles:\n- Notifications par email\n- Notifications push\n- Notifications SMS\n- Frequence des notifications\n- Types de notifications');
-        }
-        
-        
-        // Privacy Functions
-        function openPrivacySettings() {
-            console.log('openPrivacySettings appelé');
-            alert('Confidentialite - Visibilite du profil\n\nOptions disponibles:\n- Profil public/prive\n- Informations visibles\n- Recherche par nom\n- Visibilite des statistiques');
-        }
-        
-        function openDataControl() {
-            console.log('openDataControl appelé');
-            alert('Controle des donnees\n\nOptions disponibles:\n- Collecte de donnees\n- Partage avec tiers\n- Cookies et suivi\n- Historique des activites');
-        }
-        
-        
-        
-        // Management Functions
-        function openAccountManagement() {
-            console.log('openAccountManagement appelé');
-            
-            // Récupérer les données du profil
-            const profileData = JSON.parse(localStorage.getItem('userProfile') || '{}');
-            
-            // Créer une interface de gestion du compte
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1000;
-            `;
-            
-            modal.innerHTML = `
-                <div style="background: #111; border: 1px solid #333; border-radius: 16px; padding: 2rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto;">
-                    <h3 style="color: #fff; margin-bottom: 1.5rem;">👤 Gestion du compte</h3>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Prénom :</label>
-                        <input type="text" id="first-name-input" value="${profileData.first_name || ''}" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
-                    </div>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Nom :</label>
-                        <input type="text" id="last-name-input" value="${profileData.last_name || ''}" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
-                    </div>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Email :</label>
-                        <input type="email" id="email-input" value="${profileData.email || ''}" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
-                    </div>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Bio :</label>
-                        <textarea id="bio-input" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px; min-height: 80px; resize: vertical;">${profileData.bio || ''}</textarea>
-                    </div>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Statut de vérification :</label>
-                        <div style="padding: 0.5rem; background: #222; border: 1px solid #444; border-radius: 4px; color: #888;">
-                            ${profileData.verified ? '✅ Vérifié' : '⏳ Non vérifié'}
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; gap: 1rem;">
-                        <button onclick="saveAccountInfo()" style="flex: 1; padding: 0.75rem; background: #10b981; color: #fff; border: none; border-radius: 8px; cursor: pointer;">💾 Sauvegarder</button>
-                        <button onclick="this.closest('div[style*=fixed]').remove()" style="flex: 1; padding: 0.75rem; background: #666; color: #fff; border: none; border-radius: 8px; cursor: pointer;">Fermer</button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        }
-        
-        function saveAccountInfo() {
-            const updatedProfile = {
-                ...JSON.parse(localStorage.getItem('userProfile') || '{}'),
-                first_name: document.getElementById('first-name-input').value,
-                last_name: document.getElementById('last-name-input').value,
-                email: document.getElementById('email-input').value,
-                bio: document.getElementById('bio-input').value
-            };
-            
-            // Sauvegarder dans les deux emplacements
-            localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
-            localStorage.setItem('userData', JSON.stringify(updatedProfile));
-            
-            console.log('✅ Informations du compte sauvegardées:', updatedProfile);
-            
-            // Fermer le modal
-            document.querySelector('div[style*="position: fixed"]').remove();
-            
-            alert('✅ Informations du compte mises à jour avec succès !');
-        }
-        
-        function openSubscriptionManagement() {
-            console.log('openSubscriptionManagement appelé');
-            
-            // Vérifier si l'utilisateur est une agence
-            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-            const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-            const userRole = userData.role || userProfile.role || 'talent';
-            
-            if (userRole !== 'agency') {
-                alert('🏢 Abonnement et facturation\n\nCette fonctionnalité est réservée aux agences.\n\nEn tant que talent, vous bénéficiez d\'un accès gratuit à toutes les fonctionnalités de base.');
-                return;
-            }
-            
-            // Créer une interface d'abonnement pour les agences
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1000;
-            `;
-            
-            modal.innerHTML = `
-                <div style="background: #111; border: 1px solid #333; border-radius: 16px; padding: 2rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
-                    <h3 style="color: #fff; margin-bottom: 1.5rem;">🏢 Abonnement Agency</h3>
-                    
-                    <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
-                        <h4 style="color: #fff; margin-bottom: 0.5rem;">Plan actuel : Agency Pro</h4>
-                        <p style="color: #888; font-size: 0.9rem;">299€/mois - Illimité talents, analytics avancées</p>
-                    </div>
-                    
-                    <div style="margin-bottom: 1.5rem;">
-                        <h4 style="color: #fff; margin-bottom: 1rem;">Historique des paiements</h4>
-                        <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 1rem;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: #fff;">
-                                <span>21/02/2026</span>
-                                <span>299€</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: #fff;">
-                                <span>21/01/2026</span>
-                                <span>299€</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; color: #fff;">
-                                <span>21/12/2025</span>
-                                <span>299€</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-bottom: 1.5rem;">
-                        <h4 style="color: #fff; margin-bottom: 1rem;">Mode de paiement</h4>
-                        <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 1rem;">
-                            <div style="color: #fff; margin-bottom: 0.5rem;">💳 Carte bancaire **** **** **** 1234</div>
-                            <div style="color: #888; font-size: 0.8rem;">Expire : 12/2025</div>
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; gap: 1rem;">
-                        <button onclick="alert('📧 Factures envoyées par email')" style="flex: 1; padding: 0.75rem; background: #3b82f6; color: #fff; border: none; border-radius: 8px; cursor: pointer;">📧 Factures</button>
-                        <button onclick="alert('💳 Mode de paiement mis à jour')" style="flex: 1; padding: 0.75rem; background: #10b981; color: #fff; border: none; border-radius: 8px; cursor: pointer;">💳 Modifier</button>
-                        <button onclick="this.closest('div[style*=fixed]').remove()" style="flex: 1; padding: 0.75rem; background: #666; color: #fff; border: none; border-radius: 8px; cursor: pointer;">Fermer</button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        }
-        
-        
-        
-        // Security Functions
-        function openPasswordSettings() {
-            console.log('openPasswordSettings appelé');
-            
-            // Créer une interface de gestion du mot de passe
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1000;
-            `;
-            
-            modal.innerHTML = `
-                <div style="background: #111; border: 1px solid #333; border-radius: 16px; padding: 2rem; max-width: 500px; width: 90%;">
-                    <h3 style="color: #fff; margin-bottom: 1.5rem;">🔐 Gestion du mot de passe</h3>
-                    
-                    <div style="margin-bottom: 1.5rem;">
-                        <h4 style="color: #fff; margin-bottom: 1rem;">Options de sécurité</h4>
-                        
-                        <button onclick="changePassword()" style="width: 100%; padding: 0.75rem; background: #3b82f6; color: #fff; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 0.5rem;">
-                            🔑 Changer le mot de passe
-                        </button>
-                        
-                        <button onclick="window.location.href='/forgot-password'" style="width: 100%; padding: 0.75rem; background: #f59e0b; color: #fff; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 0.5rem;">
-                            🔴 Mot de passe oublié
-                        </button>
-                        
-                        <button onclick="showPasswordRequirements()" style="width: 100%; padding: 0.75rem; background: #6b7280; color: #fff; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 0.5rem;">
-                            📋 Exigences de sécurité
-                        </button>
-                        
-                        <button onclick="showPasswordHistory()" style="width: 100%; padding: 0.75rem; background: #6b7280; color: #fff; border: none; border-radius: 8px; cursor: pointer;">
-                            📜 Historique des mots de passe
-                        </button>
-                    </div>
-                    
-                    <div style="display: flex; gap: 1rem;">
-                        <button onclick="this.closest('div[style*=fixed]').remove()" style="flex: 1; padding: 0.75rem; background: #666; color: #fff; border: none; border-radius: 8px; cursor: pointer;">
-                            Fermer
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        }
-        
+        // Profile functions
         function changePassword() {
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1001;
-            `;
-            
-            modal.innerHTML = `
-                <div style="background: #111; border: 1px solid #333; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%;">
-                    <h3 style="color: #fff; margin-bottom: 1.5rem;">🔑 Changer le mot de passe</h3>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Mot de passe actuel :</label>
-                        <input type="password" id="current-password" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
+            // Redirect to forgot password page
+            window.location.href = '../forgot-password.html';
+        }
+        
+        // Privacy functions
+        function openPrivacySettings() {
+            const content = `
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span>Public Profile</span>
+                        <label class="toggle">
+                            <input type="checkbox" id="publicProfile" onchange="updatePrivacySetting('publicProfile', this.checked)">
+                            <span class="slider"></span>
+                        </label>
                     </div>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Nouveau mot de passe :</label>
-                        <input type="password" id="new-password" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
+                    <div class="flex items-center justify-between">
+                        <span>Show Email</span>
+                        <label class="toggle">
+                            <input type="checkbox" id="showEmail" onchange="updatePrivacySetting('showEmail', this.checked)">
+                            <span class="slider"></span>
+                        </label>
                     </div>
-                    
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Confirmer le nouveau mot de passe :</label>
-                        <input type="password" id="confirm-password" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
+                    <div class="flex items-center justify-between">
+                        <span>Allow Search</span>
+                        <label class="toggle">
+                            <input type="checkbox" id="allowSearch" checked onchange="updatePrivacySetting('allowSearch', this.checked)">
+                            <span class="slider"></span>
+                        </label>
                     </div>
-                    
-                    <div style="display: flex; gap: 1rem;">
-                        <button onclick="savePasswordChange()" style="flex: 1; padding: 0.75rem; background: #10b981; color: #fff; border: none; border-radius: 8px; cursor: pointer;">💾 Sauvegarder</button>
-                        <button onclick="this.closest('div[style*=fixed]').remove(); document.querySelector('div[style*=fixed]').remove();" style="flex: 1; padding: 0.75rem; background: #666; color: #fff; border: none; border-radius: 8px; cursor: pointer;">Annuler</button>
+                    <div class="flex gap-3">
+                        <button class="settings-btn success" onclick="closeModal()">
+                            <span><i class="fas fa-save mr-2"></i>Done</span>
+                        </button>
                     </div>
                 </div>
             `;
-            
-            document.body.appendChild(modal);
+            openModal('Privacy Settings', content);
+            loadPrivacySettings();
         }
         
-        function savePasswordChange() {
-            const currentPassword = document.getElementById('current-password').value;
-            const newPassword = document.getElementById('new-password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            
-            if (!currentPassword || !newPassword || !confirmPassword) {
-                alert('❌ Veuillez remplir tous les champs');
+        function loadPrivacySettings() {
+            const token = Auth.getToken();
+            fetch('/api/user/privacy', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('publicProfile').checked = data.data.publicProfile || false;
+                    document.getElementById('showEmail').checked = data.data.showEmail || false;
+                    document.getElementById('allowSearch').checked = data.data.allowSearch !== false;
+                }
+            })
+            .catch(error => console.error('Error loading privacy settings:', error));
+        }
+        
+        async function updatePrivacySetting(setting, value) {
+            try {
+                const token = Auth.getToken();
+                const response = await fetch('/api/user/privacy', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ [setting]: value })
+                });
+                
+                if (response.ok) {
+                    console.log(`${setting} updated to ${value}`);
+                } else {
+                    console.error('Failed to update privacy setting');
+                }
+            } catch (error) {
+                console.error('Error updating privacy setting:', error);
+            }
+        }
+        
+        async function downloadData() {
+            if (!confirm('Are you sure you want to download all your data?')) {
                 return;
             }
             
-            if (newPassword !== confirmPassword) {
-                alert('❌ Les nouveaux mots de passe ne correspondent pas');
+            try {
+                const token = Auth.getToken();
+                const response = await fetch('/api/user/data', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.blob();
+                    const url = window.URL.createObjectURL(data);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'my-data.json';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    showAlert('Données téléchargées avec succès!', 'success');
+                } else {
+                    throw new Error('Erreur lors du téléchargement');
+                }
+            } catch (error) {
+                showAlert('Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        function manageCookies() {
+            const content = `
+                <div class="space-y-4">
+                    <p class="text-gray-300">
+                        Manage your cookie and tracking preferences.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span>Essential Cookies</span>
+                            <label class="toggle">
+                                <input type="checkbox" checked disabled>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>Analytics Cookies</span>
+                            <label class="toggle">
+                                <input type="checkbox" id="analyticsCookies" onchange="updateCookieSetting('analytics', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>Marketing Cookies</span>
+                            <label class="toggle">
+                                <input type="checkbox" id="marketingCookies" onchange="updateCookieSetting('marketing', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <button class="settings-btn success" onclick="closeModal()">
+                            <span><i class="fas fa-save mr-2"></i>Done</span>
+                        </button>
+                        <button class="settings-btn danger" onclick="clearAllCookies()">
+                            <span><i class="fas fa-trash mr-2"></i>Clear All</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+            openModal('Cookie Management', content);
+            loadCookieSettings();
+        }
+        
+        function loadCookieSettings() {
+            const cookieSettings = JSON.parse(localStorage.getItem('cookieSettings') || '{}');
+            document.getElementById('analyticsCookies').checked = cookieSettings.analytics !== false;
+            document.getElementById('marketingCookies').checked = cookieSettings.marketing !== false;
+        }
+        
+        function updateCookieSetting(type, value) {
+            const cookieSettings = JSON.parse(localStorage.getItem('cookieSettings') || '{}');
+            cookieSettings[type] = value;
+            localStorage.setItem('cookieSettings', JSON.stringify(cookieSettings));
+            console.log(`${type} cookies ${value ? 'enabled' : 'disabled'}`);
+        }
+        
+        function clearAllCookies() {
+            if (confirm('Are you sure you want to clear all cookies?')) {
+                document.cookie.split(";").forEach(function(c) { 
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+                });
+                localStorage.clear();
+                showAlert('All cookies have been cleared!', 'success');
+                closeModal();
+            }
+        }
+        
+        // Management functions
+        function openSubscriptionManagement() {
+            // Redirect to subscription management page
+            window.location.href = 'manage-subscription.html';
+        }
+        
+        async function exportData() {
+            if (!confirm('Êtes-vous sûr de vouloir exporter vos données ?')) {
                 return;
             }
             
-            if (newPassword.length < 8) {
-                alert('❌ Le mot de passe doit contenir au moins 8 caractères');
-                return;
+            try {
+                const token = Auth.getToken();
+                const response = await fetch('/api/user/export', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.blob();
+                    const url = window.URL.createObjectURL(data);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'user-export.zip';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    showAlert('Données exportées avec succès!', 'success');
+                } else {
+                    throw new Error('Erreur lors de l\'export');
+                }
+            } catch (error) {
+                showAlert('Erreur: ' + error.message, 'error');
             }
-            
-            // Simuler la sauvegarde
-            console.log('✅ Mot de passe changé avec succès');
-            alert('✅ Mot de passe mis à jour avec succès !');
-            
-            // Fermer les deux modals
-            document.querySelectorAll('div[style*="position: fixed"]').forEach(el => el.remove());
         }
-        
-        function showPasswordRequirements() {
-            alert('📋 Exigences de sécurité\n\nVotre mot de passe doit contenir :\n• Au moins 8 caractères\n• Au moins une lettre majuscule\n• Au moins une lettre minuscule\n• Au moins un chiffre\n• Au moins un caractère spécial (!@#$%^&*)\n\nNe pas utiliser :\n• Votre nom ou prénom\n• Des informations personnelles\n• Des mots de passe communs');
-        }
-        
-        function showPasswordHistory() {
-            alert('📜 Historique des mots de passe\n\nDerniers changements :\n• 21/02/2026 - Mot de passe mis à jour\n• 15/01/2026 - Mot de passe mis à jour\n• 01/12/2025 - Première création\n\nPour des raisons de sécurité, les mots de passe précédents ne sont pas affichés.');
-        }
-        
-        // Data Functions
-        function downloadData() {
-            console.log('downloadData appelé');
-            
-            // Récupérer toutes les données de l'utilisateur
-            const userData = {
-                profile: JSON.parse(localStorage.getItem('userProfile') || '{}'),
-                user: JSON.parse(localStorage.getItem('userData') || '{}'),
-                preferences: JSON.parse(localStorage.getItem('userPreferences') || '{}'),
-                posts: JSON.parse(localStorage.getItem('userProfile') || '{}').posts || [],
-                exportDate: new Date().toISOString(),
-                version: '1.0'
-            };
-            
-            // Créer un fichier JSON
-            const dataStr = JSON.stringify(userData, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            
-            // Créer un lien de téléchargement
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(dataBlob);
-            link.download = `my-data-${new Date().toISOString().split('T')[0]}.json`;
-            
-            // Déclencher le téléchargement
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            console.log('✅ Données téléchargées:', userData);
-            
-            alert('✅ Vos données ont été téléchargées avec succès !\n\nFichier: my-data-' + new Date().toISOString().split('T')[0] + '.json');
-        }
-        
-        
         
         function deleteAccount() {
-            console.log('deleteAccount appelé');
-            const confirmDelete = confirm('⚠️ SUPPRIMER LE COMPTE\n\nCette action est IRREVERSIBLE.\n\nToutes vos données seront définitivement supprimées:\n- Profil et informations personnelles\n- Posts et contenus\n- Préférences et paramètres\n- Historique d\'activité\n\nEtes-vous sûr de vouloir continuer?');
+            const content = `
+                <div class="space-y-4">
+                    <div class="alert-error">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <strong>Warning!</strong> This action is irreversible.
+                    </div>
+                    <p class="text-gray-300">
+                        Deleting your account will permanently lose:
+                    </p>
+                    <ul class="list-disc list-inside text-gray-300 space-y-1">
+                        <li>Your profile and all personal information</li>
+                        <li>Your messages and conversations</li>
+                        <li>Your favorites and preferences</li>
+                        <li>Your active subscription</li>
+                    </ul>
+                    <div class="form-group">
+                        <label class="form-label">Confirm by typing "DELETE"</label>
+                        <input type="text" class="form-input" id="confirmDelete" placeholder="DELETE">
+                    </div>
+                    <div class="flex gap-3">
+                        <button class="settings-btn danger" onclick="confirmDeleteAccount()" id="deleteBtn" disabled>
+                            <span><i class="fas fa-trash mr-2"></i>Delete Permanently</span>
+                        </button>
+                        <button class="settings-btn" onclick="closeModal()">
+                            <span>Cancel</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+            openModal('Delete My Account', content);
             
-            if (confirmDelete) {
-                const userConfirmation = prompt('🔒 CONFIRMATION FINALE\n\nTapez "SUPPRIMER" en majuscules pour confirmer:');
-                
-                if (userConfirmation === 'SUPPRIMER') {
-                    // Supprimer toutes les données
-                    localStorage.removeItem('userProfile');
-                    localStorage.removeItem('userData');
-                    localStorage.removeItem('userPreferences');
-                    localStorage.removeItem('authToken');
-                    localStorage.removeItem('cookieConsent');
-                    localStorage.removeItem('cookieConsentDate');
-                    
-                    // Vider le sessionStorage
-                    sessionStorage.clear();
-                    
-                    console.log('🗑️ Compte et données supprimés');
-                    
-                    alert('✅ Compte supprimé avec succès\n\nToutes vos données ont été définitivement effacées.\n\nRedirection vers la page d\'accueil...');
-                    
-                    // Rediriger vers la page d'accueil
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 2000);
-                } else if (userConfirmation !== null) {
-                    alert('❌ Confirmation incorrecte. La suppression a été annulée.');
-                }
-            }
-        }
-        
-        // Test simple
-        function testClick() {
-            console.log('Test click fonctionne!');
-            alert('Test click OK!');
-        }
-        
-        // Cookie Functions
-        function openCookieSettings() {
-            console.log('openCookieSettings appelé');
-            
-            const consent = localStorage.getItem('cookieConsent');
-            const consentDate = localStorage.getItem('cookieConsentDate');
-            
-            let message = '🍪 Paramètres des Cookies\n\n';
-            message += 'Statut actuel: ' + (consent || 'Non défini') + '\n';
-            
-            if (consentDate) {
-                const date = new Date(consentDate);
-                message += 'Date du consentement: ' + date.toLocaleDateString('fr-FR') + ' ' + date.toLocaleTimeString('fr-FR') + '\n';
-            }
-            
-            message += '\nOptions disponibles:\n';
-            message += '✅ Accepter tous les cookies\n';
-            message += '❌ Refuser les cookies non essentiels\n';
-            message += '🔧 Personnaliser les préférences\n';
-            message += '\n\nNote: Les modifications prendront effet lors de votre prochaine visite.';
-            
-            if (confirm(message + '\n\nVoulez-vous réinitialiser vos préférences cookies ?')) {
-                // Réinitialiser et forcer la bannière
-                localStorage.removeItem('cookieConsent');
-                localStorage.removeItem('cookieConsentDate');
-                
-                // Rediriger vers la page d'accueil pour voir la bannière
-                if (confirm('Rediriger vers la page d\'accueil pour voir la bannière ?')) {
-                    window.location.href = '../index.html';
-                }
-            }
-        }
-        
-        // Add event listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Page Settings chargée - Boutons prêts');
-            
-            // Vérifier le rôle de l'utilisateur et cacher/montrer l'abonnement
-            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-            const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-            const userRole = userData.role || userProfile.role || 'talent';
-            
-            // Cacher la section abonnement si ce n'est pas une agence
-            if (userRole !== 'agency') {
-                const managementSection = document.querySelector('.settings-card h2');
-                if (managementSection && managementSection.textContent.includes('Gestion')) {
-                    const card = managementSection.closest('.settings-card');
-                    if (card) {
-                        card.style.display = 'none';
-                        console.log('🏢 Section abonnement cachée - utilisateur de type:', userRole);
-                    }
-                }
-            }
-            
-            // Tester si les fonctions sont bien définies
-            console.log('Fonctions disponibles:', {
-                openLanguageSettings: typeof openLanguageSettings,
-                openDataControl: typeof openDataControl,
-                openSubscriptionManagement: typeof openSubscriptionManagement,
-                downloadData: typeof downloadData,
-                deleteAccount: typeof deleteAccount
+            // Enable delete button only when correct text is entered
+            document.getElementById('confirmDelete').addEventListener('input', function(e) {
+                document.getElementById('deleteBtn').disabled = e.target.value !== 'DELETE';
             });
+        }
+        
+        async function confirmDeleteAccount() {
+            if (!confirm('FINAL CONFIRMATION: Are you absolutely sure you want to delete your account?')) {
+                return;
+            }
+            
+            const button = document.getElementById('deleteBtn');
+            button.classList.add('loading');
+            button.innerHTML = '<span class="spinner"></span> Deleting...';
+            
+            try {
+                const token = Auth.getToken();
+                const response = await fetch('/api/user/delete', {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+                
+                if (response.ok) {
+                    showAlert('Account deleted successfully', 'success');
+                    // Clear local storage and redirect to home
+                    localStorage.clear();
+                    setTimeout(() => {
+                        window.location.href = '../index.html';
+                    }, 2000);
+                } else {
+                    throw new Error('Error during deletion');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            } finally {
+                button.classList.remove('loading');
+                button.innerHTML = '<span><i class="fas fa-trash mr-2"></i>Delete Permanently</span>';
+            }
+        }
+        
+        // Support functions
+        function contactSupport() {
+            // Redirect to contact page
+            window.location.href = '../contact.html';
+        }
+        
+        // Utility functions
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} mr-2"></i>
+                ${message}
+            `;
+            
+            // Insert at the top of the modal body
+            const modalBody = document.getElementById('modalBody');
+            modalBody.insertBefore(alertDiv, modalBody.firstChild);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Settings page loaded - Full functionality');
+            
+            // Check user role and show/hide management section
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            const userRole = userData.role || 'talent';
+            
+            if (userRole !== 'agency') {
+                document.getElementById('managementSection').style.display = 'none';
+                console.log('🏢 Management section hidden - user type:', userRole);
+            }
+            
+            // Load saved settings
+            loadSavedSettings();
+        });
+        
+        function loadSavedSettings() {
+            // Load notification settings
+            const notificationSettings = JSON.parse(localStorage.getItem('notificationSettings') || '{}');
+            // Apply settings to UI if needed
+            
+            // Load theme settings
+            const themeSettings = JSON.parse(localStorage.getItem('themeSettings') || '{}');
+            if (themeSettings.theme) {
+                document.body.classList.toggle('light-theme', themeSettings.theme === 'light');
+            }
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('settingsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
         });
     </script>
 </body>

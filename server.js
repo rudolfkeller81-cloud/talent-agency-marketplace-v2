@@ -19,6 +19,9 @@ const fs = require('fs');
 // Logger centralisé
 const logger = require('./logger');
 
+// Email service
+const { sendPasswordReset, sendEmailVerification } = require('./email-service');
+
 // Database
 const DB = require('./db');
 
@@ -52,6 +55,7 @@ const {
     deleteUserAccount,
     getUserMessages,
     sendMessage,
+    validatePassword,
     db
 } = require('./auth.js');
 
@@ -95,9 +99,41 @@ const io = new Server(server, {
             ? process.env.ALLOWED_ORIGINS.split(',')
             : (process.env.NODE_ENV === 'production'
                 ? [process.env.PRODUCTION_URL || 'https://yourdomain.onrender.com']
-                : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3003', 'http://127.0.0.1:3003']),
+                : ['http://localhost:3000', 'http://127.0.0.1:3000']),
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true
+    }
+});
+
+// File upload middleware with multer
+const multer = require('multer');
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadPath = path.join(__dirname, 'uploads', file.fieldname === 'avatar' ? 'avatars' : 'posts');
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+        }
+        cb(null, uploadPath);
+    },
+    filename: function (req, file, cb) {
+        const { v4: uuidv4 } = require('uuid');
+        const ext = path.extname(file.originalname).toLowerCase().replace(/[^a-z0-9.]/g, '');
+        cb(null, `${file.fieldname}_${uuidv4()}${ext}`);
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 50 * 1024 * 1024 // 50MB max
+    },
+    fileFilter: function (req, file, cb) {
+        // Allow images and videos
+        if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Invalid file type. Only images and videos allowed.'), false);
+        }
     }
 });
 
@@ -115,7 +151,7 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "https://accounts.google.com", "https://js.stripe.com", "https://cdnjs.cloudflare.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://accounts.google.com", "https://js.stripe.com", "https://cdnjs.cloudflare.com"],
             scriptSrcAttr: ["'unsafe-inline'"],
             styleSrc: [
                 "'self'",
@@ -123,7 +159,7 @@ app.use(helmet({
                 "https://fonts.googleapis.com",
                 "https://cdnjs.cloudflare.com"  // Ajout pour Font Awesome
             ],
-            fontSrc: ["'self'", "https://fonts.gstatic.com"],
+            fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
             imgSrc: ["'self'", "data:", "https:", "blob:"],
             connectSrc: [
                 "'self'",
@@ -188,31 +224,106 @@ const authLimiter = rateLimit({
     legacyHeaders: false,
 });
 
+// --- Rate Limiting très strict pour le login : 5 tentatives / 15 min ---
+const loginFailures = new Map(); // IP -> { count, blockedUntil }
+const loginStrictLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: process.env.NODE_ENV === 'production' ? 5 : 50,
+    message: { success: false, error: 'Trop de tentatives de connexion, réessayez dans 15 minutes' },
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: true,
+});
+
 // --- Body parsing ---
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
-// --- Sanitization middleware : désactivé pour le déploiement ---
-// app.use((req, res, next) => {
-//     console.log('🔍 Middleware - Body before sanitization:', req.body);
-//     if (req.body && typeof req.body === 'object') {
-//         sanitizeObject(req.body);
-//     }
-//     if (req.query && typeof req.query === 'object') {
-//         sanitizeObject(req.query);
-//     }
-//     console.log('🔍 Middleware - Body after sanitization:', req.body);
-//     next();
-// });
-
-function sanitizeObject(obj) {
-    for (const key of Object.keys(obj)) {
-        if (typeof obj[key] === 'string') {
-            obj[key] = xss(obj[key].trim());
-        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-            sanitizeObject(obj[key]);
+// --- CSRF Protection ---
+// Les tokens Bearer en header sont déjà protégés contre le CSRF par design.
+// On ajoute une vérification Origin en production pour bloquer les requêtes cross-site.
+app.use('/api', (req, res, next) => {
+    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+        // En production : vérifier que la requête vient bien du bon domaine
+        if (isProd) {
+            const origin = req.headers.origin || req.headers.referer || '';
+            const isAllowed = !origin || allowedOrigins.some(o => origin.startsWith(o));
+            if (!isAllowed) {
+                logger.warn(`CSRF bloqué - Origin: ${origin}`);
+                return res.status(403).json({ success: false, error: 'Requête non autorisée' });
+            }
+        }
+        // Refuser les soumissions de formulaires HTML classiques sur les routes API
+        // (les requêtes légitimes envoient du JSON ou multipart pour les uploads)
+        const ct = req.headers['content-type'] || '';
+        if (ct.includes('application/x-www-form-urlencoded')) {
+            return res.status(415).json({ success: false, error: 'Format de requête non supporté' });
         }
     }
+    next();
+});
+
+// --- Sanitization middleware ---
+app.use((req, res, next) => {
+    if (req.body && typeof req.body === 'object') {
+        req.body = sanitizeObject(req.body);
+    }
+    if (req.query && typeof req.query === 'object') {
+        req.query = sanitizeObject(req.query);
+    }
+    next();
+});
+
+function sanitizeObject(obj) {
+    if (Array.isArray(obj)) {
+        return obj.map(item => sanitizeObject(item));
+    }
+    if (obj !== null && typeof obj === 'object') {
+        const result = {};
+        for (const key of Object.keys(obj)) {
+            result[key] = sanitizeObject(obj[key]);
+        }
+        return result;
+    }
+    if (typeof obj === 'string') {
+        return xss(obj.trim());
+    }
+    return obj;
+}
+
+// --- Input validation helper ---
+function validateInput(schema, source) {
+    const errors = [];
+    for (const [field, rules] of Object.entries(schema)) {
+        const value = source[field];
+        if (rules.required && (value === undefined || value === null || value === '')) {
+            errors.push(`${field} est requis`);
+            continue;
+        }
+        if (value === undefined || value === null || value === '') continue;
+        if (rules.maxLength && String(value).length > rules.maxLength) {
+            errors.push(`${field} dépasse la longueur maximale (${rules.maxLength})`);
+        }
+        if (rules.isInt) {
+            const num = Number(value);
+            if (!Number.isInteger(num) || num <= 0) errors.push(`${field} doit être un entier positif`);
+        }
+        if (rules.isNumber) {
+            if (isNaN(Number(value))) errors.push(`${field} doit être un nombre`);
+        }
+        if (rules.min !== undefined || rules.max !== undefined) {
+            const num = Number(value);
+            if (rules.min !== undefined && num < rules.min) errors.push(`${field} doit être >= ${rules.min}`);
+            if (rules.max !== undefined && num > rules.max) errors.push(`${field} doit être <= ${rules.max}`);
+        }
+        if (rules.isURL && value) {
+            if (!validator.isURL(String(value), { require_protocol: true })) errors.push(`${field} doit être une URL valide`);
+        }
+        if (rules.isIn && !rules.isIn.includes(value)) {
+            errors.push(`${field} doit être l'une des valeurs: ${rules.isIn.join(', ')}`);
+        }
+    }
+    return errors;
 }
 
 // Bloquer l'accès direct aux fichiers .html (rediriger vers les routes propres)
@@ -242,6 +353,7 @@ function requireAuth(req, res, next) {
                 return res.status(401).json({ success: false, error: 'Session invalide ou expirée' });
             }
             req.user = session;
+            req.userId = session.user_id || session.id;
             next();
         })
         .catch(err => {
@@ -315,10 +427,6 @@ app.get('/forgot-password', (req, res) => {
 
 app.get('/reset-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'reset-password.html'));
-});
-
-app.get('/manage-agency', (req, res) => {
-    res.sendFile(path.join(__dirname, 'manage-agency.html'));
 });
 
 app.get('/settings', (req, res) => {
@@ -455,29 +563,41 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
             return res.status(400).json({ success: false, error: 'Champs requis manquants' });
         }
 
+        const registerErrors = validateInput({
+            email: { required: true },
+            password: { required: true },
+            firstName: { required: true, maxLength: 50 },
+            lastName: { required: true, maxLength: 50 },
+            role: { required: true, isIn: ['talent', 'agency'] }
+        }, req.body);
+        if (registerErrors.length > 0) {
+            return res.status(400).json({ success: false, error: registerErrors[0] });
+        }
+
         if (!validator.isEmail(email)) {
             return res.status(400).json({ success: false, error: 'Adresse email invalide' });
         }
 
-        if (password.length < 6) {
-            return res.status(400).json({ success: false, error: 'Le mot de passe doit contenir au moins 6 caractères' });
-        }
-
-        if (firstName.length > 50 || lastName.length > 50) {
-            return res.status(400).json({ success: false, error: 'Nom trop long (max 50 caractères)' });
-        }
-
-        if (!['talent', 'agency'].includes(role)) {
-            return res.status(400).json({ success: false, error: 'Rôle invalide. Doit être "talent" ou "agency"' });
+        const pwdError = validatePassword(password);
+        if (pwdError) {
+            return res.status(400).json({ success: false, error: pwdError });
         }
 
         const user = await registerUser({ firstName, lastName, email, password, role, talentProfile, agencyProfile });
         const loginData = await loginUser(email, password);
 
+        // Send email verification (async, don't block registration)
+        const crypto = require('crypto');
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+        DB.execute('UPDATE users SET email_verification_token = ? WHERE id = ?', [verificationToken, user.id])
+            .then(() => sendEmailVerification(email, verificationToken, firstName))
+            .catch(err => logger.warn('Email verification send error:', err));
+
         res.json({
             success: true,
             sessionId: loginData.sessionId,
             token: loginData.sessionId,
+            emailVerificationPending: true,
             user: {
                 id: user.id,
                 email: user.email || email,
@@ -488,12 +608,19 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
         });
     } catch (error) {
         logger.error('Registration error:', error);
-        res.status(400).json({ success: false, error: error.message || 'Erreur d\'inscription' });
+        // Traduire les erreurs techniques en messages clairs
+        let userMessage = 'Une erreur est survenue lors de l\'inscription';
+        if (error.message?.includes('déjà utilisé') || error.message?.includes('UNIQUE')) {
+            userMessage = 'Cette adresse email est déjà associée à un compte';
+        } else if (error.message?.includes('majuscule') || error.message?.includes('chiffre') || error.message?.includes('caractères')) {
+            userMessage = error.message; // Les messages de validation sont déjà clairs
+        }
+        res.status(400).json({ success: false, error: userMessage });
     }
 });
 
 // Login
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', loginStrictLimiter, async (req, res) => {
     try {
         console.log('🔑 Raw request body:', req.body);
         const { email, password } = req.body;
@@ -523,84 +650,46 @@ app.post('/api/auth/login', async (req, res) => {
     } catch (error) {
         console.error('❌ Login error:', error.message);
         logger.error('Login error:', error);
-        res.status(401).json({ success: false, error: error.message || 'Email ou mot de passe incorrect' });
+        // Toujours retourner le même message générique pour ne pas révéler si l'email existe
+        res.status(401).json({
+            success: false,
+            error: 'Email ou mot de passe incorrect',
+            code: 'invalid_credentials'
+        });
     }
 });
 
 // Forgot Password
-app.post('/api/forgot-password', async (req, res) => {
+app.post('/api/forgot-password', authLimiter, async (req, res) => {
     try {
         const { email } = req.body;
-        
-        console.log('🔑 Forgot password request:', { email });
-        
-        // Initialize database connection
-        const sqlite3 = require('sqlite3').verbose();
-        const db = new sqlite3.Database('./database.sqlite');
-        
-        if (!email) {
-            return res.status(400).json({ success: false, error: 'Email is required' });
+        if (!email || !validator.isEmail(email)) {
+            return res.status(400).json({ success: false, error: 'Adresse email invalide' });
         }
-        
-        if (!validator.isEmail(email)) {
-            return res.status(400).json({ success: false, error: 'Invalid email address' });
-        }
-        
-        // Check if user exists (using direct SQLite)
-        db.get(`
-            SELECT id, email, first_name, last_name 
-            FROM users 
-            WHERE email = ?
-        `, [email], (err, user) => {
-            if (err) {
-                console.error('❌ Error checking user:', err);
-                return res.status(500).json({ success: false, error: 'Database error.' });
-            }
-            
-            if (!user) {
-                // Don't reveal if email exists or not for security
-                console.log('📧 Email not found:', email);
-                return res.json({ 
-                    success: true, 
-                    message: 'If an account exists with this email, a password reset link has been sent.' 
-                });
-            }
-            
-            console.log('✅ User found:', { id: user.id, email: user.email });
-            
-            // Generate reset token
-            const crypto = require('crypto');
-            const resetToken = crypto.randomBytes(32).toString('hex');
-            const expiresAt = new Date(Date.now() + 3600000); // 1 hour from now
-            
-            // Save reset token to database
-            db.run(`
-                INSERT INTO password_resets (email, token, expires_at, created_at)
-                VALUES (?, ?, ?, ?)
-            `, [email, resetToken, expiresAt.toISOString(), new Date().toISOString()], async (err) => {
-                if (err) {
-                    console.error('❌ Error saving reset token:', err);
-                    return res.status(500).json({ success: false, error: 'Failed to save reset token.' });
-                }
-                
-                console.log('✅ Reset token saved:', { email, token: resetToken.substring(0, 8) + '...' });
-                
-                // Service email désactivé - retourner directement le lien
-                const resetLink = `${req.protocol}://${req.get('host')}/reset-password?token=${resetToken}`;
-                console.log('🔗 Reset link generated:', resetLink);
-                
-                res.json({ 
-                    success: true, 
-                    message: 'Password reset link generated. Please copy this link: ' + resetLink,
-                    resetLink: resetLink
-                });
-            });
-        });
-        
+
+        const user = await DB.queryOne('SELECT id, email, first_name FROM users WHERE email = ?', [email]);
+
+        // Always respond the same way to avoid email enumeration
+        const okResponse = { success: true, message: 'Si un compte existe avec cet email, un lien de réinitialisation a été envoyé.' };
+
+        if (!user) return res.json(okResponse);
+
+        const crypto = require('crypto');
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const expiresAt = new Date(Date.now() + 3600000).toISOString();
+
+        await DB.execute(
+            'INSERT INTO password_resets (email, token, expires_at, created_at) VALUES (?, ?, ?, ?)',
+            [email, resetToken, expiresAt, new Date().toISOString()]
+        );
+
+        await sendPasswordReset(email, resetToken, user.first_name);
+        logger.info(`Password reset requested for ${email}`);
+
+        res.json(okResponse);
     } catch (error) {
-        console.error('❌ Forgot password error:', error);
         logger.error('Forgot password error:', error);
-        res.status(500).json({ success: false, error: 'Failed to send reset link. Please try again.' });
+        res.status(500).json({ success: false, error: 'Erreur serveur, réessayez.' });
     }
 });
 
@@ -608,108 +697,90 @@ app.post('/api/forgot-password', async (req, res) => {
 app.post('/api/reset-password', async (req, res) => {
     try {
         const { token, newPassword } = req.body;
-        
-        console.log('🔑 Reset password request:', { token: token?.substring(0, 8) + '...' });
-        
+
         if (!token || !newPassword) {
-            return res.status(400).json({ success: false, error: 'Token and new password are required' });
+            return res.status(400).json({ success: false, error: 'Token et nouveau mot de passe requis' });
         }
-        
-        if (newPassword.length < 6) {
-            return res.status(400).json({ success: false, error: 'Password must be at least 6 characters' });
+
+        const resetPwdError = validatePassword(newPassword);
+        if (resetPwdError) {
+            return res.status(400).json({ success: false, error: resetPwdError });
         }
-        
-        // Initialize database connection
-        const sqlite3 = require('sqlite3').verbose();
-        const db = new sqlite3.Database('./database.sqlite');
-        
-        // Check if token exists and is valid
-        db.get(`
-            SELECT email, expires_at, used 
-            FROM password_resets 
-            WHERE token = ?
-        `, [token], async (err, resetRecord) => {
-            if (err) {
-                console.error('❌ Error checking reset token:', err);
-                return res.status(500).json({ success: false, error: 'Database error.' });
-            }
-            
-            if (!resetRecord) {
-                console.log('❌ Invalid reset token');
-                return res.status(400).json({ success: false, error: 'invalid_token' });
-            }
-            
-            // Check if token is expired
-            const expiresAt = new Date(resetRecord.expires_at);
-            if (expiresAt < new Date()) {
-                console.log('❌ Expired reset token');
-                return res.status(400).json({ success: false, error: 'token_expired' });
-            }
-            
-            // Check if token is already used
-            if (resetRecord.used) {
-                console.log('❌ Already used reset token');
-                return res.status(400).json({ success: false, error: 'token_used' });
-            }
-            
-            console.log('✅ Valid reset token for:', resetRecord.email);
-            
-            try {
-                // Hash the new password
-                const bcrypt = require('bcryptjs');
-                const hashedPassword = await bcrypt.hash(newPassword, 10);
-                
-                // Update user password
-                db.run(`
-                    UPDATE users 
-                    SET password_hash = ?, updated_at = ?
-                    WHERE email = ?
-                `, [hashedPassword, new Date().toISOString(), resetRecord.email], function(err) {
-                    if (err) {
-                        console.error('❌ Error updating password:', err);
-                        return res.status(500).json({ success: false, error: 'Failed to update password.' });
-                    }
-                    
-                    console.log('✅ Password updated for:', resetRecord.email);
-                    
-                    // Mark token as used
-                    db.run(`
-                        UPDATE password_resets 
-                        SET used = TRUE 
-                        WHERE token = ?
-                    `, [token], function(err) {
-                        if (err) {
-                            console.error('❌ Error marking token as used:', err);
-                        } else {
-                            console.log('✅ Reset token marked as used');
-                        }
-                        
-                        // Clean up expired tokens
-                        db.run(`
-                            DELETE FROM password_resets 
-                            WHERE expires_at < datetime('now') OR used = TRUE
-                        `, (err) => {
-                            if (err) {
-                                console.error('❌ Error cleaning up tokens:', err);
-                            }
-                        });
-                        
-                        res.json({ 
-                            success: true, 
-                            message: 'Password reset successfully!' 
-                        });
-                    });
-                });
-            } catch (hashError) {
-                console.error('❌ Error hashing password:', hashError);
-                return res.status(500).json({ success: false, error: 'Failed to process password.' });
-            }
-        });
-        
+
+        const resetRecord = await DB.queryOne(
+            'SELECT email, expires_at, used FROM password_resets WHERE token = ?',
+            [token]
+        );
+
+        if (!resetRecord) return res.status(400).json({ success: false, error: 'invalid_token' });
+        if (new Date(resetRecord.expires_at) < new Date()) return res.status(400).json({ success: false, error: 'token_expired' });
+        if (resetRecord.used) return res.status(400).json({ success: false, error: 'token_used' });
+
+        const bcrypt = require('bcryptjs');
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await Promise.all([
+            DB.execute('UPDATE users SET password_hash = ?, updated_at = ? WHERE email = ?', [hashedPassword, new Date().toISOString(), resetRecord.email]),
+            DB.execute('UPDATE password_resets SET used = 1 WHERE token = ?', [token])
+        ]);
+
+        // Cleanup old/used tokens async
+        DB.execute("DELETE FROM password_resets WHERE expires_at < datetime('now') OR used = 1").catch(() => {});
+
+        logger.info(`Password reset completed for ${resetRecord.email}`);
+        res.json({ success: true, message: 'Mot de passe réinitialisé avec succès !' });
+
     } catch (error) {
-        console.error('❌ Reset password error:', error);
         logger.error('Reset password error:', error);
-        res.status(500).json({ success: false, error: 'Failed to reset password. Please try again.' });
+        res.status(500).json({ success: false, error: 'Erreur serveur, réessayez.' });
+    }
+});
+
+// Email verification
+app.get('/api/auth/verify-email', async (req, res) => {
+    try {
+        const { token } = req.query;
+        if (!token) return res.redirect('/?emailVerified=error');
+
+        const user = await DB.queryOne(
+            'SELECT id FROM users WHERE email_verification_token = ? AND email_verified = 0',
+            [token]
+        );
+
+        if (!user) return res.redirect('/?emailVerified=invalid');
+
+        await DB.execute(
+            'UPDATE users SET email_verified = 1, email_verification_token = NULL WHERE id = ?',
+            [user.id]
+        );
+
+        logger.info(`Email verified for user ${user.id}`);
+        res.redirect('/?emailVerified=success');
+    } catch (error) {
+        logger.error('Email verification error:', error);
+        res.redirect('/?emailVerified=error');
+    }
+});
+
+// Resend email verification
+app.post('/api/auth/resend-verification', requireAuth, authLimiter, async (req, res) => {
+    try {
+        const user = await DB.queryOne(
+            'SELECT id, email, first_name, email_verified FROM users WHERE id = ?',
+            [req.userId]
+        );
+        if (!user) return res.status(404).json({ success: false, error: 'Utilisateur introuvable' });
+        if (user.email_verified) return res.json({ success: true, message: 'Email déjà vérifié' });
+
+        const crypto = require('crypto');
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+        await DB.execute('UPDATE users SET email_verification_token = ? WHERE id = ?', [verificationToken, user.id]);
+        await sendEmailVerification(user.email, verificationToken, user.first_name);
+
+        res.json({ success: true, message: 'Email de vérification renvoyé' });
+    } catch (error) {
+        logger.error('Resend verification error:', error);
+        res.status(500).json({ success: false, error: 'Erreur serveur' });
     }
 });
 
@@ -719,11 +790,13 @@ app.get('/api/auth/verify', requireAuth, (req, res) => {
         success: true,
         valid: true,
         user: {
-            id: req.user.user_id || req.user.id,
+            id: req.userId,
             email: req.user.email,
             firstName: req.user.first_name,
             lastName: req.user.last_name,
-            role: req.user.role
+            role: req.user.role,
+            email_verified: !!req.user.email_verified,
+            is_admin: !!req.user.is_admin
         }
     });
 });
@@ -809,16 +882,40 @@ app.post('/api/auth/google', authLimiter, async (req, res) => {
 // ============================================================================
 
 app.get('/api/user/profile', requireAuth, async (req, res) => {
+    console.log('🔍 API /api/user/profile appelée');
+    console.log('👤 User auth:', req.user);
+    
     try {
-        const userId = req.user.user_id || req.user.id;
+        const userId = req.userId;
+        console.log('👤 User ID:', userId);
+        
+        console.log('📝 Appel getUserProfile...');
         const profile = await getUserProfile(userId);
+        console.log('📊 Profile result:', profile);
 
         if (!profile) {
+            console.log('❌ Profile non trouvé');
             return res.status(404).json({ success: false, error: 'Profil non trouvé' });
         }
 
+        // Get user posts
+        console.log('📝 Getting user posts...');
+        const posts = await DB.queryAll(`
+            SELECT * FROM posts 
+            WHERE user_id = ? 
+            ORDER BY created_at DESC
+        `, [userId]);
+        
+        console.log('📊 Posts result:', posts);
+
+        // Add posts and avatar_url to profile
+        profile.posts = posts || [];
+        profile.avatar_url = profile.avatar_url || null;
+
+        console.log('✅ Profile envoyé avec posts et avatar');
         res.json({ success: true, data: profile });
     } catch (error) {
+        console.error('❌ Erreur getting user profile:', error);
         logger.error('Error getting user profile:', error);
         res.status(500).json({ success: false, error: error.message });
     }
@@ -826,7 +923,16 @@ app.get('/api/user/profile', requireAuth, async (req, res) => {
 
 app.put('/api/user/profile', requireAuth, async (req, res) => {
     try {
-        const userId = req.user.user_id || req.user.id;
+        const profileErrors = validateInput({
+            firstName: { maxLength: 50 },
+            lastName: { maxLength: 50 },
+            bio: { maxLength: 500 },
+            portfolio: { maxLength: 200, isURL: !!req.body.portfolio }
+        }, req.body);
+        if (profileErrors.length > 0) {
+            return res.status(400).json({ success: false, error: profileErrors[0] });
+        }
+        const userId = req.userId;
         const result = await updateUserProfile(userId, req.body);
         res.json({ success: true, data: result });
     } catch (error) {
@@ -837,7 +943,7 @@ app.put('/api/user/profile', requireAuth, async (req, res) => {
 
 app.delete('/api/user/account', requireAuth, async (req, res) => {
     try {
-        const userId = req.user.user_id || req.user.id;
+        const userId = req.userId;
         await deleteUserAccount(userId);
         res.json({ success: true, message: 'Compte supprimé' });
     } catch (error) {
@@ -865,7 +971,17 @@ app.get('/api/user/:userId', requireAuth, async (req, res) => {
 // Update talent profile
 app.put('/api/profile/talent', requireAuth, async (req, res) => {
     try {
-        const userId = req.user.user_id || req.user.id;
+        const talentErrors = validateInput({
+            displayName: { maxLength: 100 },
+            bio: { maxLength: 1000 },
+            specialty: { maxLength: 100 },
+            country: { maxLength: 100 },
+            age: req.body.age ? { isNumber: true, min: 16, max: 100 } : {}
+        }, req.body);
+        if (talentErrors.length > 0) {
+            return res.status(400).json({ success: false, error: talentErrors[0] });
+        }
+        const userId = req.userId;
         const result = await updateTalentProfile(userId, req.body);
         res.json({ success: true, data: result });
     } catch (error) {
@@ -877,7 +993,15 @@ app.put('/api/profile/talent', requireAuth, async (req, res) => {
 // Update agency profile
 app.put('/api/profile/agency', requireAuth, async (req, res) => {
     try {
-        const userId = req.user.user_id || req.user.id;
+        const agencyErrors = validateInput({
+            agencyName: { maxLength: 100 },
+            description: { maxLength: 1000 },
+            talentCount: req.body.talentCount ? { isNumber: true, min: 0 } : {}
+        }, req.body);
+        if (agencyErrors.length > 0) {
+            return res.status(400).json({ success: false, error: agencyErrors[0] });
+        }
+        const userId = req.userId;
         const result = await updateAgencyProfile(userId, req.body);
         res.json({ success: true, data: result });
     } catch (error) {
@@ -917,22 +1041,28 @@ app.get('/api/profiles', async (req, res) => {
     }
 });
 
-// Get talents
+// Get talents (avec pagination + recommandations)
 app.get('/api/discover/talents', async (req, res) => {
     try {
-        const talents = await getTalents();
-        res.json({ success: true, data: talents });
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.min(50, parseInt(req.query.limit) || 12);
+        const recommended = req.query.recommended === 'true';
+        const result = await getTalents({ page, limit, recommended });
+        res.json({ success: true, ...result });
     } catch (error) {
         logger.error('Error getting talents:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
 
-// Get agencies
+// Get agencies (avec pagination + recommandations)
 app.get('/api/discover/agencies', async (req, res) => {
     try {
-        const agencies = await getAgencies();
-        res.json({ success: true, data: agencies });
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.min(50, parseInt(req.query.limit) || 12);
+        const recommended = req.query.recommended === 'true';
+        const result = await getAgencies({ page, limit, recommended });
+        res.json({ success: true, ...result });
     } catch (error) {
         logger.error('Error getting agencies:', error);
         res.status(500).json({ success: false, error: error.message });
@@ -946,6 +1076,9 @@ app.get('/api/discover/search', async (req, res) => {
 
         if (!q || q.length < 2) {
             return res.status(400).json({ success: false, error: 'Recherche: minimum 2 caractères' });
+        }
+        if (q.length > 100) {
+            return res.status(400).json({ success: false, error: 'Recherche: maximum 100 caractères' });
         }
 
         const results = await searchProfiles(q, type);
@@ -963,7 +1096,7 @@ app.get('/api/discover/search', async (req, res) => {
 // Get user conversations
 app.get('/api/messages/conversations', requireAuth, async (req, res) => {
     try {
-        const userId = req.user.user_id || req.user.id;
+        const userId = req.userId;
         const messages = await getUserMessages(userId);
         
         // Group messages by conversation partner
@@ -997,12 +1130,15 @@ app.get('/api/messages/conversations', requireAuth, async (req, res) => {
 // Send message
 app.post('/api/messages', requireAuth, async (req, res) => {
     try {
-        const { receiverId, content } = req.body;
-        const senderId = req.user.user_id || req.user.id;
-
-        if (!receiverId || !content) {
-            return res.status(400).json({ success: false, error: 'Destinataire et contenu requis' });
+        const msgErrors = validateInput({
+            receiverId: { required: true, isInt: true },
+            content: { required: true, maxLength: 2000 }
+        }, req.body);
+        if (msgErrors.length > 0) {
+            return res.status(400).json({ success: false, error: msgErrors[0] });
         }
+        const { receiverId, content } = req.body;
+        const senderId = req.userId;
 
         const message = await sendMessage(senderId, receiverId, content);
 
@@ -1024,17 +1160,16 @@ app.post('/api/messages', requireAuth, async (req, res) => {
     }
 });
 
-// Simple message API - SANS AUTH pour tests
-app.post('/api/messages/conversations', async (req, res) => {
+// Simple message API
+app.post('/api/messages/conversations', requireAuth, async (req, res) => {
     try {
-        const { participantId, content, senderId } = req.body;
+        const { participantId, content } = req.body;
 
         if (!participantId || !content) {
             return res.status(400).json({ success: false, error: 'Destinataire et contenu requis' });
         }
 
-        // Utiliser senderId du body ou défaut à 1 (Alice)
-        const actualSenderId = senderId || 22; // Alice's ID
+        const actualSenderId = req.userId;
 
         // Create simple messages table if needed
         await DB.execute(`
@@ -1067,11 +1202,10 @@ app.post('/api/messages/conversations', async (req, res) => {
     }
 });
 
-// Get messages - SANS AUTH pour tests
-app.get('/api/messages', async (req, res) => {
+// Get messages
+app.get('/api/messages', requireAuth, async (req, res) => {
     try {
-        // Utiliser Alice's ID (22) pour voir tous ses messages (envoyés et reçus)
-        const aliceId = 22;
+        const userId = req.userId;
 
         // Create table if needed
         await DB.execute(`
@@ -1084,7 +1218,7 @@ app.get('/api/messages', async (req, res) => {
             )
         `);
 
-        // Get ALL messages involving Alice (sent AND received)
+        // Get ALL messages involving this user (sent AND received)
         const messages = await DB.queryAll(`
             SELECT m.*, 
                    u.first_name as sender_first_name, 
@@ -1098,9 +1232,9 @@ app.get('/api/messages', async (req, res) => {
             LEFT JOIN users r ON m.receiver_id = r.id
             WHERE m.sender_id = ? OR m.receiver_id = ?
             ORDER BY m.created_at DESC
-        `, [aliceId, aliceId]);
+        `, [userId, userId]);
 
-        console.log('📨 All messages for Alice:', messages.length, 'messages');
+        console.log('📨 All messages for user', userId, ':', messages.length, 'messages');
 
         res.json({ success: true, data: messages });
     } catch (error) {
@@ -1116,11 +1250,13 @@ app.get('/api/messages', async (req, res) => {
 // Get favorites
 app.get('/api/favorites', requireAuth, async (req, res) => {
     console.log('🔍 API /api/favorites GET appelée');
+    console.log('👤 User auth:', req.user);
     
     try {
-        const userId = req.user.user_id || req.user.id;
+        const userId = req.userId;
         console.log('👤 User ID:', userId);
         
+        console.log('📝 Appel getUserFavorites...');
         const favorites = await getUserFavorites(userId);
         console.log('⭐ Favorites trouvés:', favorites.length);
         console.log('📋 Détails favorites:', favorites);
@@ -1137,18 +1273,23 @@ app.get('/api/favorites', requireAuth, async (req, res) => {
 app.post('/api/favorites', requireAuth, async (req, res) => {
     console.log('🔍 API /api/favorites POST appelée');
     console.log('📦 Body reçu:', req.body);
+    console.log('👤 User auth:', req.user);
     
     try {
-        const userId = req.user.user_id || req.user.id;
+        const favErrors = validateInput({
+            favoritedUserId: { required: true, isInt: true }
+        }, req.body);
+        if (favErrors.length > 0) {
+            console.log('❌ Validation favoritedUserId:', favErrors[0]);
+            return res.status(400).json({ success: false, error: favErrors[0] });
+        }
+        const userId = req.userId;
         const { favoritedUserId } = req.body;
 
         console.log('👤 User ID:', userId);
         console.log('⭐ Favorited User ID:', favoritedUserId);
 
-        if (!favoritedUserId) {
-            return res.status(400).json({ success: false, error: 'ID utilisateur favori requis' });
-        }
-
+        console.log('📝 Appel addToFavorites...');
         const result = await addToFavorites(userId, favoritedUserId);
         console.log('✅ Favorite ajouté:', result);
         res.json({ success: true, data: result });
@@ -1162,7 +1303,7 @@ app.post('/api/favorites', requireAuth, async (req, res) => {
 // Remove from favorites
 app.delete('/api/favorites/:favoritedUserId', requireAuth, async (req, res) => {
     try {
-        const userId = req.user.user_id || req.user.id;
+        const userId = req.userId;
         const result = await removeFromFavorites(userId, req.params.favoritedUserId);
         res.json({ success: true, data: result });
     } catch (error) {
@@ -1174,7 +1315,7 @@ app.delete('/api/favorites/:favoritedUserId', requireAuth, async (req, res) => {
 // Check if favorited
 app.get('/api/favorites/:favoritedUserId/check', requireAuth, async (req, res) => {
     try {
-        const userId = req.user.user_id || req.user.id;
+        const userId = req.userId;
         const isFav = await isFavorite(userId, req.params.favoritedUserId);
         res.json({ success: true, data: { isFavorite: isFav } });
     } catch (error) {
@@ -1190,19 +1331,11 @@ app.get('/api/favorites/:favoritedUserId/check', requireAuth, async (req, res) =
 // Get notifications
 app.get('/api/notifications', requireAuth, async (req, res) => {
     try {
-        const userId = req.user.user_id || req.user.id;
-
-        const notifications = await new Promise((resolve, reject) => {
-            db.all(
-                'SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 50',
-                [userId],
-                (err, rows) => {
-                    if (err) reject(err);
-                    else resolve(rows || []);
-                }
-            );
-        });
-
+        const userId = req.userId;
+        const notifications = await DB.queryAll(
+            'SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 50',
+            [userId]
+        );
         res.json({ success: true, data: notifications });
     } catch (error) {
         logger.error('Error getting notifications:', error);
@@ -1213,16 +1346,11 @@ app.get('/api/notifications', requireAuth, async (req, res) => {
 // Mark notification as read
 app.post('/api/notifications/:id/read', requireAuth, async (req, res) => {
     try {
-        const userId = req.user.user_id || req.user.id;
-
-        await new Promise((resolve, reject) => {
-            db.run(
-                'UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?',
-                [req.params.id, userId],
-                (err) => { if (err) reject(err); else resolve(); }
-            );
-        });
-
+        const userId = req.userId;
+        await DB.execute(
+            'UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?',
+            [req.params.id, userId]
+        );
         res.json({ success: true });
     } catch (error) {
         logger.error('Error marking notification:', error);
@@ -1233,16 +1361,11 @@ app.post('/api/notifications/:id/read', requireAuth, async (req, res) => {
 // Mark all notifications as read
 app.post('/api/notifications/read-all', requireAuth, async (req, res) => {
     try {
-        const userId = req.user.user_id || req.user.id;
-
-        await new Promise((resolve, reject) => {
-            db.run(
-                'UPDATE notifications SET is_read = 1 WHERE user_id = ?',
-                [userId],
-                (err) => { if (err) reject(err); else resolve(); }
-            );
-        });
-
+        const userId = req.userId;
+        await DB.execute(
+            'UPDATE notifications SET is_read = 1 WHERE user_id = ?',
+            [userId]
+        );
         res.json({ success: true });
     } catch (error) {
         logger.error('Error marking all notifications:', error);
@@ -1253,36 +1376,6 @@ app.post('/api/notifications/read-all', requireAuth, async (req, res) => {
 // ============================================================================
 // API UPLOADS
 // ============================================================================
-
-app.post('/api/upload/avatar', requireAuth, (req, res) => {
-    uploadAvatar(req, res, async (err) => {
-        if (err) return res.status(400).json({ success: false, error: err.message });
-        if (!req.file) return res.status(400).json({ success: false, error: 'Aucun fichier' });
-
-        const fileUrl = getFileUrl(req.file.path);
-        const userId = req.user.user_id || req.user.id;
-        const userRole = req.user.role;
-
-        try {
-            if (userRole === 'talent') {
-                await new Promise((resolve, reject) => {
-                    db.run('UPDATE talent_profiles SET profile_photo_path = ? WHERE user_id = ?',
-                        [req.file.path, userId], (err) => { if (err) reject(err); else resolve(); });
-                });
-            } else if (userRole === 'agency') {
-                await new Promise((resolve, reject) => {
-                    db.run('UPDATE agency_profiles SET profile_photo_path = ? WHERE user_id = ?',
-                        [req.file.path, userId], (err) => { if (err) reject(err); else resolve(); });
-                });
-            }
-
-            res.json({ success: true, data: { url: fileUrl, path: req.file.path } });
-        } catch (error) {
-            logger.error('Error saving avatar path:', error);
-            res.status(500).json({ success: false, error: error.message });
-        }
-    });
-});
 
 app.post('/api/upload/video', requireAuth, (req, res) => {
     uploadVideo(req, res, async (err) => {
@@ -1317,7 +1410,7 @@ if (stripe) {
             const paymentIntent = await stripe.paymentIntents.create({
                 amount,
                 currency,
-                metadata: { plan, userId: String(req.user.user_id || req.user.id) },
+                metadata: { plan, userId: String(req.userId) },
                 automatic_payment_methods: { enabled: true }
             });
 
@@ -1331,7 +1424,7 @@ if (stripe) {
     // Subscription status
     app.get('/api/billing/subscription-status', requireAuth, async (req, res) => {
         try {
-            const userId = req.user.user_id || req.user.id;
+            const userId = req.userId;
             const user = await getUserById(userId);
 
             if (user && user.stripe_customer_id) {
@@ -1446,13 +1539,10 @@ io.on('connection', (socket) => {
 // Fonction utilitaire: envoyer notification
 async function sendNotification(userId, type, title, message, data = null) {
     try {
-        await new Promise((resolve, reject) => {
-            db.run(
-                'INSERT INTO notifications (user_id, type, title, message, data) VALUES (?, ?, ?, ?, ?)',
-                [userId, type, title, message, JSON.stringify(data)],
-                (err) => { if (err) reject(err); else resolve(); }
-            );
-        });
+        await DB.execute(
+            'INSERT INTO notifications (user_id, type, title, message, data) VALUES (?, ?, ?, ?, ?)',
+            [userId, type, title, message, JSON.stringify(data)]
+        );
 
         const socketId = connectedUsers.get(String(userId));
         if (socketId) {
@@ -1489,7 +1579,7 @@ app.get('/api/stripe/config', (req, res) => {
 // Créer une session de checkout pour l'abonnement agency
 app.post('/api/stripe/create-checkout-session', requireAuth, async (req, res) => {
     try {
-        const userId = req.user.user_id || req.user.id;
+        const userId = req.userId;
         const { priceId, successUrl, cancelUrl } = req.body;
 
         if (!priceId) {
@@ -1538,7 +1628,7 @@ app.post('/api/stripe/create-checkout-session', requireAuth, async (req, res) =>
 // Créer une session de portail client pour gérer l'abonnement
 app.post('/api/stripe/create-portal-session', requireAuth, async (req, res) => {
     try {
-        const userId = req.user.user_id || req.user.id;
+        const userId = req.userId;
         const { returnUrl } = req.body;
 
         // Récupérer les infos utilisateur
@@ -1646,7 +1736,7 @@ try {
 // Obtenir le statut de l'abonnement
 app.get('/api/stripe/subscription-status', requireAuth, async (req, res) => {
     try {
-        const userId = req.user.user_id || req.user.id;
+        const userId = req.userId;
         const user = await getUserById(userId);
 
         if (!user) {
@@ -1681,6 +1771,262 @@ app.get('/api/stripe/subscription-status', requireAuth, async (req, res) => {
 
     } catch (error) {
         logger.error('Erreur statut abonnement:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Avatar upload endpoint
+app.post('/api/upload/avatar', requireAuth, upload.single('avatar'), async (req, res) => {
+    try {
+        console.log('Avatar upload request received');
+        
+        if (!req.file) {
+            console.log('No file uploaded');
+            return res.status(400).json({ success: false, error: 'No file uploaded' });
+        }
+
+        const userId = req.userId;
+        const avatarFile = req.file;
+        
+        console.log('File received:', avatarFile.originalname, avatarFile.mimetype, avatarFile.size);
+        
+        // Rename file with proper user ID
+        const oldPath = avatarFile.path;
+        const newFilename = `avatar_${userId}_${Date.now()}_${avatarFile.originalname}`;
+        const newPath = path.join(avatarFile.destination, newFilename);
+        
+        // Rename the file
+        fs.renameSync(oldPath, newPath);
+        
+        // Generate avatar URL
+        const avatarUrl = `/uploads/avatars/${newFilename}`;
+        console.log('Avatar URL:', avatarUrl);
+        
+        // Save avatar URL to database
+        await DB.execute(
+            'UPDATE users SET avatar_url = ? WHERE id = ?',
+            [avatarUrl, userId]
+        );
+
+        console.log('Database updated successfully');
+
+        res.json({
+            success: true,
+            avatar_url: avatarUrl
+        });
+
+    } catch (error) {
+        console.error('Avatar upload error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Post media upload endpoint
+app.post('/api/upload/post-media', requireAuth, upload.single('media'), async (req, res) => {
+    try {
+        console.log('Post media upload request received');
+        
+        if (!req.file) {
+            console.log('No media file uploaded');
+            return res.status(400).json({ success: false, error: 'No file uploaded' });
+        }
+
+        const userId = req.userId;
+        const mediaFile = req.file;
+        
+        console.log('Media file received:', mediaFile.originalname, mediaFile.mimetype, mediaFile.size);
+        
+        // Rename file with proper user ID
+        const oldPath = mediaFile.path;
+        const newFilename = `post_${userId}_${Date.now()}_${mediaFile.originalname}`;
+        const newPath = path.join(mediaFile.destination, newFilename);
+        
+        // Rename the file
+        fs.renameSync(oldPath, newPath);
+        
+        // Generate media URL
+        const mediaUrl = `/uploads/posts/${newFilename}`;
+        console.log('Media URL:', mediaUrl);
+
+        res.json({
+            success: true,
+            media_url: mediaUrl
+        });
+
+    } catch (error) {
+        console.error('Post media upload error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Posts API endpoints
+app.post('/api/posts', requireAuth, async (req, res) => {
+    try {
+        const postErrors = validateInput({
+            content: { maxLength: 5000 },
+            type: req.body.type ? { isIn: ['text', 'photo', 'video', 'mixed'] } : {}
+        }, req.body);
+        if (postErrors.length > 0) {
+            return res.status(400).json({ success: false, error: postErrors[0] });
+        }
+        const userId = req.userId;
+        const { content, type, media_url } = req.body;
+
+        if (!content && !media_url) {
+            return res.status(400).json({ success: false, error: 'Content or media required' });
+        }
+
+        // Create post in database
+        const result = await DB.execute(
+            'INSERT INTO posts (user_id, content, type, media_url, created_at) VALUES (?, ?, ?, ?, ?)',
+            [userId, content, type || 'text', media_url, new Date().toISOString()]
+        );
+
+        res.json({
+            success: true,
+            post_id: result.lastID
+        });
+
+    } catch (error) {
+        logger.error('Create post error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.get('/api/posts/user/:userId', async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        
+        const posts = await DB.queryAll(`
+            SELECT p.*, u.first_name, u.last_name, u.avatar_url
+            FROM posts p
+            JOIN users u ON p.user_id = u.id
+            WHERE p.user_id = ?
+            ORDER BY p.created_at DESC
+        `, [userId]);
+
+        res.json({
+            success: true,
+            data: posts
+        });
+
+    } catch (error) {
+        logger.error('Get user posts error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// API endpoints for manage-subscription page
+app.get('/api/subscription', requireAuth, async (req, res) => {
+    try {
+        const userId = req.userId;
+        console.log('🔍 Getting subscription for user ID:', userId);
+        
+        const user = await getUserById(userId);
+        console.log('👤 User data from DB:', user);
+        
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'User not found' });
+        }
+
+        // Update user if subscription fields are missing
+        if (user.subscription_active === undefined || user.plan_type === undefined || user.subscription_status === undefined) {
+            console.log('🔧 Updating missing subscription fields for user:', userId);
+            await DB.execute(
+                'UPDATE users SET subscription_active = ?, plan_type = ?, subscription_status = ? WHERE id = ?',
+                [false, 'free', 'inactive', userId]
+            );
+            
+            // Fetch updated user data
+            const updatedUser = await getUserById(userId);
+            console.log('✅ Updated user data:', updatedUser);
+            
+            res.json({
+                success: true,
+                data: {
+                    subscription_status: updatedUser.subscription_status || 'inactive',
+                    plan_type: updatedUser.plan_type || 'free',
+                    subscription_active: updatedUser.subscription_active || false
+                }
+            });
+        } else {
+            // Special case: if user is agency but subscription is not active AND NOT cancelled, update it
+            if (user.role === 'agency' && 
+                (!user.subscription_active || user.plan_type === 'free') && 
+                user.subscription_status !== 'cancelled') {
+                console.log('🔧 Updating agency user subscription to active:', userId);
+                await DB.execute(
+                    'UPDATE users SET subscription_active = ?, plan_type = ?, subscription_status = ? WHERE id = ?',
+                    [true, 'premium', 'active', userId]
+                );
+                
+                // Fetch updated user data
+                const updatedUser = await getUserById(userId);
+                console.log('✅ Updated agency subscription data:', updatedUser);
+                
+                res.json({
+                    success: true,
+                    data: {
+                        subscription_status: updatedUser.subscription_status || 'active',
+                        plan_type: updatedUser.plan_type || 'premium',
+                        subscription_active: updatedUser.subscription_active || true
+                    }
+                });
+            } else {
+                console.log('📊 Subscription data:', {
+                    subscription_status: user.subscription_status,
+                    plan_type: user.plan_type,
+                    subscription_active: user.subscription_active,
+                    role: user.role
+                });
+                
+                res.json({
+                    success: true,
+                    data: {
+                        subscription_status: user.subscription_status || 'inactive',
+                        plan_type: user.plan_type || 'free',
+                        subscription_active: user.subscription_active || false
+                    }
+                });
+            }
+        }
+    } catch (error) {
+        logger.error('Error getting subscription:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.post('/api/user/subscription/cancel', requireAuth, async (req, res) => {
+    try {
+        const userId = req.userId;
+        console.log('🔴 Cancelling subscription for user ID:', userId);
+        
+        // Get current user data before update
+        const currentUser = await getUserById(userId);
+        console.log('👤 Current user data before cancel:', currentUser);
+        
+        // Update subscription to cancelled state
+        await DB.execute(
+            'UPDATE users SET subscription_status = ?, subscription_active = ?, plan_type = ? WHERE id = ?',
+            ['cancelled', false, 'free', userId]
+        );
+        
+        // Verify the update
+        const updatedUser = await getUserById(userId);
+        console.log('✅ Updated user data after cancel:', updatedUser);
+        
+        res.json({ 
+            success: true,
+            message: 'Subscription cancelled successfully',
+            data: {
+                subscription_status: updatedUser.subscription_status,
+                subscription_active: updatedUser.subscription_active,
+                plan_type: updatedUser.plan_type
+            }
+        });
+    } catch (error) {
+        logger.error('Error cancelling subscription:', error);
+        console.error('❌ Cancel subscription error:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
@@ -1735,6 +2081,280 @@ app.get('/health', async (req, res) => {
             timestamp: new Date().toISOString(),
             error: error.message
         });
+    }
+});
+
+// ============================================================================
+// LIKES SUR LES POSTS
+// ============================================================================
+
+app.post('/api/posts/:id/like', requireAuth, async (req, res) => {
+    try {
+        const postId = parseInt(req.params.id);
+        const existing = await DB.queryOne('SELECT id FROM post_likes WHERE post_id = ? AND user_id = ?', [postId, req.userId]);
+        if (existing) {
+            await DB.execute('DELETE FROM post_likes WHERE post_id = ? AND user_id = ?', [postId, req.userId]);
+            await DB.execute('UPDATE posts SET likes = MAX(0, likes - 1) WHERE id = ?', [postId]);
+        } else {
+            await DB.execute('INSERT INTO post_likes (post_id, user_id) VALUES (?, ?)', [postId, req.userId]);
+            await DB.execute('UPDATE posts SET likes = likes + 1 WHERE id = ?', [postId]);
+        }
+        const post = await DB.queryOne('SELECT likes FROM posts WHERE id = ?', [postId]);
+        res.json({ success: true, liked: !existing, likes: post?.likes || 0 });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.get('/api/posts/:id/liked', requireAuth, async (req, res) => {
+    try {
+        const postId = parseInt(req.params.id);
+        const existing = await DB.queryOne('SELECT id FROM post_likes WHERE post_id = ? AND user_id = ?', [postId, req.userId]);
+        res.json({ success: true, liked: !!existing });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// ============================================================================
+// SIGNALEMENT DE PROFIL
+// ============================================================================
+
+app.post('/api/reports', requireAuth, async (req, res) => {
+    try {
+        const reporterId = req.userId;
+        const { reported_user_id, reason, details } = req.body;
+        if (!reported_user_id || !reason) return res.status(400).json({ success: false, error: 'Champs manquants' });
+        if (reporterId === parseInt(reported_user_id)) return res.status(400).json({ success: false, error: 'Impossible de se signaler soi-même' });
+        const existing = await DB.queryOne(
+            'SELECT id FROM reports WHERE reporter_id = ? AND reported_user_id = ? AND status = ?',
+            [reporterId, reported_user_id, 'pending']
+        );
+        if (existing) return res.status(400).json({ success: false, error: 'Signalement déjà envoyé' });
+        await DB.execute(
+            'INSERT INTO reports (reporter_id, reported_user_id, reason, details) VALUES (?, ?, ?, ?)',
+            [reporterId, reported_user_id, reason, details || '']
+        );
+        res.json({ success: true, message: 'Signalement envoyé' });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// ============================================================================
+// MESSAGES — STATUT LU/NON LU
+// ============================================================================
+
+app.get('/api/messages/unread-count', requireAuth, async (req, res) => {
+    try {
+        const row = await DB.queryOne(
+            'SELECT COUNT(*) as count FROM messages WHERE receiver_id = ? AND read = 0',
+            [req.userId]
+        );
+        res.json({ success: true, count: row?.count || 0 });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.post('/api/messages/:id/read', requireAuth, async (req, res) => {
+    try {
+        await DB.execute('UPDATE messages SET read = 1 WHERE id = ? AND receiver_id = ?', [req.params.id, req.userId]);
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.post('/api/messages/read-all', requireAuth, async (req, res) => {
+    try {
+        const { sender_id } = req.body;
+        if (sender_id) {
+            await DB.execute('UPDATE messages SET read = 1 WHERE receiver_id = ? AND sender_id = ?', [req.userId, sender_id]);
+        } else {
+            await DB.execute('UPDATE messages SET read = 1 WHERE receiver_id = ?', [req.userId]);
+        }
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// ============================================================================
+// VÉRIFICATION D'ÂGE
+// ============================================================================
+
+app.post('/api/user/verify-age', requireAuth, async (req, res) => {
+    try {
+        await DB.execute('UPDATE users SET age_verified = 1 WHERE id = ?', [req.userId]);
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// ============================================================================
+// PROFIL PUBLIC (accessible sans connexion)
+// ============================================================================
+
+app.get('/api/profile/:id/public', async (req, res) => {
+    try {
+        const profileId = parseInt(req.params.id);
+        const user = await DB.queryOne(
+            `SELECT u.id, u.first_name, u.last_name, u.role, u.verified, u.avatar_url, u.created_at,
+                    tp.bio, tp.platforms, tp.country, tp.display_name, tp.social_media, tp.languages, tp.specialty,
+                    ap.description, ap.platforms as agency_platforms, ap.talent_count, ap.agency_name
+             FROM users u
+             LEFT JOIN talent_profiles tp ON u.id = tp.user_id
+             LEFT JOIN agency_profiles ap ON u.id = ap.user_id
+             WHERE u.id = ? AND COALESCE(u.is_banned, 0) = 0`, [profileId]
+        );
+        if (!user) return res.status(404).json({ success: false, error: 'Profil non trouvé' });
+        // Pour les agences : ne pas exposer revenue sans auth
+        if (user.role === 'agency') delete user.total_revenue;
+        res.json({ success: true, data: user });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Route page profil public
+app.get('/profile/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages', 'public-profile.html'));
+});
+
+// ============================================================================
+// PARTAGE DE PROFIL — génère un lien partageable
+// ============================================================================
+
+app.get('/api/profile/:id/share', async (req, res) => {
+    try {
+        const profileId = parseInt(req.params.id);
+        const user = await DB.queryOne('SELECT id, first_name, last_name, role FROM users WHERE id = ?', [profileId]);
+        if (!user) return res.status(404).json({ success: false, error: 'Profil non trouvé' });
+        const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3001}`;
+        const shareUrl = `${baseUrl}/profile/${profileId}`;
+        res.json({ success: true, url: shareUrl, name: `${user.first_name} ${user.last_name}` });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// ============================================================================
+// ADMIN DASHBOARD
+// ============================================================================
+
+function requireAdmin(req, res, next) {
+    if (!req.user || !req.user.is_admin) return res.status(403).json({ success: false, error: 'Accès admin requis' });
+    next();
+}
+
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages', 'admin.html'));
+});
+
+app.get('/api/admin/stats', requireAuth, requireAdmin, async (req, res) => {
+    try {
+        const [users, talents, agencies, messages, reports, verifiedUsers] = await Promise.all([
+            DB.queryOne('SELECT COUNT(*) as count FROM users'),
+            DB.queryOne('SELECT COUNT(*) as count FROM users WHERE role = ?', ['talent']),
+            DB.queryOne('SELECT COUNT(*) as count FROM users WHERE role = ?', ['agency']),
+            DB.queryOne('SELECT COUNT(*) as count FROM messages'),
+            DB.queryOne('SELECT COUNT(*) as count FROM reports WHERE status = ?', ['pending']),
+            DB.queryOne('SELECT COUNT(*) as count FROM users WHERE verified = 1'),
+        ]);
+        res.json({
+            success: true,
+            stats: {
+                totalUsers: users?.count || 0,
+                talents: talents?.count || 0,
+                agencies: agencies?.count || 0,
+                messages: messages?.count || 0,
+                pendingReports: reports?.count || 0,
+                verifiedUsers: verifiedUsers?.count || 0,
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.get('/api/admin/users', requireAuth, requireAdmin, async (req, res) => {
+    try {
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = parseInt(req.query.limit) || 20;
+        const offset = (page - 1) * limit;
+        const search = req.query.search ? `%${req.query.search}%` : '%';
+        const users = await DB.queryAll(
+            `SELECT id, email, first_name, last_name, role, verified, is_banned, is_admin, age_verified, created_at
+             FROM users WHERE (email LIKE ? OR first_name LIKE ? OR last_name LIKE ?)
+             ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+            [search, search, search, limit, offset]
+        );
+        const total = await DB.queryOne(
+            `SELECT COUNT(*) as count FROM users WHERE email LIKE ? OR first_name LIKE ? OR last_name LIKE ?`,
+            [search, search, search]
+        );
+        res.json({ success: true, data: users, total: total?.count || 0, page, limit });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.put('/api/admin/users/:id/verify', requireAuth, requireAdmin, async (req, res) => {
+    try {
+        const user = await DB.queryOne('SELECT verified FROM users WHERE id = ?', [req.params.id]);
+        if (!user) return res.status(404).json({ success: false, error: 'Utilisateur non trouvé' });
+        const newVal = user.verified ? 0 : 1;
+        await DB.execute('UPDATE users SET verified = ? WHERE id = ?', [newVal, req.params.id]);
+        res.json({ success: true, verified: !!newVal });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.put('/api/admin/users/:id/ban', requireAuth, requireAdmin, async (req, res) => {
+    try {
+        const user = await DB.queryOne('SELECT is_banned FROM users WHERE id = ?', [req.params.id]);
+        if (!user) return res.status(404).json({ success: false, error: 'Utilisateur non trouvé' });
+        const newVal = user.is_banned ? 0 : 1;
+        await DB.execute('UPDATE users SET is_banned = ? WHERE id = ?', [newVal, req.params.id]);
+        res.json({ success: true, is_banned: !!newVal });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.get('/api/admin/reports', requireAuth, requireAdmin, async (req, res) => {
+    try {
+        const reports = await DB.queryAll(
+            `SELECT r.*,
+                    u1.email as reporter_email, u1.first_name as reporter_first, u1.last_name as reporter_last,
+                    u2.email as reported_email, u2.first_name as reported_first, u2.last_name as reported_last
+             FROM reports r
+             JOIN users u1 ON r.reporter_id = u1.id
+             JOIN users u2 ON r.reported_user_id = u2.id
+             WHERE r.status = 'pending'
+             ORDER BY r.created_at DESC LIMIT 50`
+        );
+        res.json({ success: true, data: reports });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.put('/api/admin/reports/:id/resolve', requireAuth, requireAdmin, async (req, res) => {
+    try {
+        const { action, reported_user_id } = req.body; // 'dismiss' | 'ban'; reported_user_id passed by client to avoid extra query
+        const status = action === 'ban' ? 'resolved_ban' : 'dismissed';
+        const promises = [DB.execute('UPDATE reports SET status = ? WHERE id = ?', [status, req.params.id])];
+        if (action === 'ban' && reported_user_id) {
+            promises.push(DB.execute('UPDATE users SET is_banned = 1 WHERE id = ?', [reported_user_id]));
+        }
+        await Promise.all(promises);
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 

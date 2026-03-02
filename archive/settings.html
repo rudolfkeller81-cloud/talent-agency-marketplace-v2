@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Talent Agency</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        
+        .settings-card {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-card:hover {
+            border-color: #333;
+            transform: translateY(-2px);
+        }
+        
+        .settings-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+            width: 100%;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .settings-btn:active {
+            transform: translateY(0px);
+        }
+        
+        .arrow-icon {
+            transition: transform 0.2s ease;
+        }
+        
+        .settings-btn:hover .arrow-icon {
+            transform: translateX(4px);
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        
+        .section-description {
+            color: #666;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            margin-bottom: 24px;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Back Button -->
+        <a href="../discover.html" class="back-btn">
+            ← Retour
+        </a>
+        
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="section-title">Paramètres</h1>
+            <p class="section-description">Gérez vos préférences et votre compte</p>
+        </div>
+        
+        <!-- Preferences Section -->
+        <div class="settings-card">
+            <h2 class="text-xl font-semibold mb-4">Préférences</h2>
+            <p class="text-gray-400 mb-6">Personnalisez votre expérience utilisateur</p>
+            
+            <div class="space-y-3">
+                <button class="settings-btn" onclick="openLanguageSettings()">
+                    <span>Langue et region</span>
+                    <span class="arrow-icon">→</span>
+                </button>
+                
+            </div>
+        </div>
+        
+        <!-- Privacy Section -->
+        <div class="settings-card">
+            <h2 class="text-xl font-semibold mb-4">Confidentialité</h2>
+            <p class="text-gray-400 mb-6">Contrôlez vos informations personnelles</p>
+            
+            <div class="space-y-3">
+                <button class="settings-btn" onclick="openDataControl()">
+                    <span>Controle des donnees</span>
+                    <span class="arrow-icon">→</span>
+                </button>
+                
+            </div>
+        </div>
+        
+        <!-- Management Section -->
+        <div class="settings-card">
+            <h2 class="text-xl font-semibold mb-4">Gestion</h2>
+            <p class="text-gray-400 mb-6">Outils de gestion de votre compte</p>
+            
+            <div class="space-y-3">
+                <button class="settings-btn" onclick="openSubscriptionManagement()">
+                    <span>Abonnement et facturation</span>
+                    <span class="arrow-icon">→</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Security Section -->
+        <div class="settings-card">
+            <h2 class="text-xl font-semibold mb-4">Securite</h2>
+            <p class="text-gray-400 mb-6">Protegez votre compte et vos donnees</p>
+            
+            <div class="space-y-3">
+                <button class="settings-btn" onclick="openPasswordSettings()">
+                    <span>Mot de passe</span>
+                    <span class="arrow-icon">→</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Data Section -->
+        <div class="settings-card">
+            <h2 class="text-xl font-semibold mb-4">Donnees</h2>
+            <p class="text-gray-400 mb-6">Gérez vos données personnelles</p>
+            
+            <div class="space-y-3">
+                <button class="settings-btn" onclick="downloadData()">
+                    <span>Telecharger mes donnees</span>
+                    <span class="arrow-icon">→</span>
+                </button>
+                
+                <button class="settings-btn" onclick="deleteAccount()">
+                    <span>Supprimer le compte</span>
+                    <span class="arrow-icon">→</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Preferences Functions
+        function openPreferences() {
+            console.log('openPreferences appelé');
+            
+            // Créer une vraie interface de préférences
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: #111; border: 1px solid #333; border-radius: 16px; padding: 2rem; max-width: 500px; width: 90%;">
+                    <h3 style="color: #fff; margin-bottom: 1.5rem;">⚙️ Préférences</h3>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Mode :</label>
+                        <select id="theme-select" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
+                            <option value="dark">🌙 Sombre</option>
+                            <option value="light">☀️ Clair</option>
+                            <option value="auto">🔄 Auto</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Taille du texte :</label>
+                        <select id="font-size-select" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
+                            <option value="small">Petit</option>
+                            <option value="medium" selected>Moyen</option>
+                            <option value="large">Grand</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Langue :</label>
+                        <select id="language-select" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
+                            <option value="fr" selected>Français</option>
+                            <option value="en">English</option>
+                            <option value="es">Español</option>
+                        </select>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <button onclick="savePreferences()" style="flex: 1; padding: 0.75rem; background: #3b82f6; color: #fff; border: none; border-radius: 8px; cursor: pointer;">💾 Sauvegarder</button>
+                        <button onclick="this.closest('div[style*=fixed]').remove()" style="flex: 1; padding: 0.75rem; background: #666; color: #fff; border: none; border-radius: 8px; cursor: pointer;">Fermer</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Charger les préférences existantes
+            const savedPrefs = localStorage.getItem('userPreferences');
+            if (savedPrefs) {
+                const prefs = JSON.parse(savedPrefs);
+                document.getElementById('theme-select').value = prefs.theme || 'dark';
+                document.getElementById('font-size-select').value = prefs.fontSize || 'medium';
+                document.getElementById('language-select').value = prefs.language || 'fr';
+            }
+        }
+        
+        function savePreferences() {
+            const preferences = {
+                theme: document.getElementById('theme-select').value,
+                fontSize: document.getElementById('font-size-select').value,
+                language: document.getElementById('language-select').value
+            };
+            
+            localStorage.setItem('userPreferences', JSON.stringify(preferences));
+            console.log('✅ Préférences sauvegardées:', preferences);
+            
+            // Appliquer les préférences
+            applyPreferences(preferences);
+            
+            // Fermer le modal
+            document.querySelector('div[style*="position: fixed"]').remove();
+            
+            alert('✅ Préférences sauvegardées avec succès !');
+        }
+        
+        function applyPreferences(preferences) {
+            // Appliquer le thème
+            if (preferences.theme === 'light') {
+                document.body.style.background = '#fff';
+                document.body.style.color = '#000';
+            } else {
+                document.body.style.background = '#000';
+                document.body.style.color = '#fff';
+            }
+            
+            // Appliquer la taille du texte
+            const fontSizeMap = {
+                small: '14px',
+                medium: '16px',
+                large: '18px'
+            };
+            document.body.style.fontSize = fontSizeMap[preferences.fontSize] || '16px';
+        }
+        
+        function openLanguageSettings() {
+            console.log('openLanguageSettings appelé');
+            alert('Langue et region\n\nOptions disponibles:\n- Francais (par defaut)\n- English\n- Espanol\n- Deutsch\n- Format de date/heure\n- Fuseau horaire');
+        }
+        
+        function openNotificationSettings() {
+            console.log('openNotificationSettings appelé');
+            alert('Notifications\n\nOptions disponibles:\n- Notifications par email\n- Notifications push\n- Notifications SMS\n- Frequence des notifications\n- Types de notifications');
+        }
+        
+        
+        // Privacy Functions
+        function openPrivacySettings() {
+            console.log('openPrivacySettings appelé');
+            alert('Confidentialite - Visibilite du profil\n\nOptions disponibles:\n- Profil public/prive\n- Informations visibles\n- Recherche par nom\n- Visibilite des statistiques');
+        }
+        
+        function openDataControl() {
+            console.log('openDataControl appelé');
+            alert('Controle des donnees\n\nOptions disponibles:\n- Collecte de donnees\n- Partage avec tiers\n- Cookies et suivi\n- Historique des activites');
+        }
+        
+        
+        
+        // Management Functions
+        function openAccountManagement() {
+            console.log('openAccountManagement appelé');
+            
+            // Récupérer les données du profil
+            const profileData = JSON.parse(localStorage.getItem('userProfile') || '{}');
+            
+            // Créer une interface de gestion du compte
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: #111; border: 1px solid #333; border-radius: 16px; padding: 2rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                    <h3 style="color: #fff; margin-bottom: 1.5rem;">👤 Gestion du compte</h3>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Prénom :</label>
+                        <input type="text" id="first-name-input" value="${profileData.first_name || ''}" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Nom :</label>
+                        <input type="text" id="last-name-input" value="${profileData.last_name || ''}" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Email :</label>
+                        <input type="email" id="email-input" value="${profileData.email || ''}" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Bio :</label>
+                        <textarea id="bio-input" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px; min-height: 80px; resize: vertical;">${profileData.bio || ''}</textarea>
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Statut de vérification :</label>
+                        <div style="padding: 0.5rem; background: #222; border: 1px solid #444; border-radius: 4px; color: #888;">
+                            ${profileData.verified ? '✅ Vérifié' : '⏳ Non vérifié'}
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <button onclick="saveAccountInfo()" style="flex: 1; padding: 0.75rem; background: #10b981; color: #fff; border: none; border-radius: 8px; cursor: pointer;">💾 Sauvegarder</button>
+                        <button onclick="this.closest('div[style*=fixed]').remove()" style="flex: 1; padding: 0.75rem; background: #666; color: #fff; border: none; border-radius: 8px; cursor: pointer;">Fermer</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+        
+        function saveAccountInfo() {
+            const updatedProfile = {
+                ...JSON.parse(localStorage.getItem('userProfile') || '{}'),
+                first_name: document.getElementById('first-name-input').value,
+                last_name: document.getElementById('last-name-input').value,
+                email: document.getElementById('email-input').value,
+                bio: document.getElementById('bio-input').value
+            };
+            
+            // Sauvegarder dans les deux emplacements
+            localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+            localStorage.setItem('userData', JSON.stringify(updatedProfile));
+            
+            console.log('✅ Informations du compte sauvegardées:', updatedProfile);
+            
+            // Fermer le modal
+            document.querySelector('div[style*="position: fixed"]').remove();
+            
+            alert('✅ Informations du compte mises à jour avec succès !');
+        }
+        
+        function openSubscriptionManagement() {
+            console.log('openSubscriptionManagement appelé');
+            
+            // Vérifier si l'utilisateur est une agence
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+            const userRole = userData.role || userProfile.role || 'talent';
+            
+            if (userRole !== 'agency') {
+                alert('🏢 Abonnement et facturation\n\nCette fonctionnalité est réservée aux agences.\n\nEn tant que talent, vous bénéficiez d\'un accès gratuit à toutes les fonctionnalités de base.');
+                return;
+            }
+            
+            // Créer une interface d'abonnement pour les agences
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: #111; border: 1px solid #333; border-radius: 16px; padding: 2rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                    <h3 style="color: #fff; margin-bottom: 1.5rem;">🏢 Abonnement Agency</h3>
+                    
+                    <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                        <h4 style="color: #fff; margin-bottom: 0.5rem;">Plan actuel : Agency Pro</h4>
+                        <p style="color: #888; font-size: 0.9rem;">299€/mois - Illimité talents, analytics avancées</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="color: #fff; margin-bottom: 1rem;">Historique des paiements</h4>
+                        <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: #fff;">
+                                <span>21/02/2026</span>
+                                <span>299€</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: #fff;">
+                                <span>21/01/2026</span>
+                                <span>299€</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; color: #fff;">
+                                <span>21/12/2025</span>
+                                <span>299€</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="color: #fff; margin-bottom: 1rem;">Mode de paiement</h4>
+                        <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 1rem;">
+                            <div style="color: #fff; margin-bottom: 0.5rem;">💳 Carte bancaire **** **** **** 1234</div>
+                            <div style="color: #888; font-size: 0.8rem;">Expire : 12/2025</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <button onclick="alert('📧 Factures envoyées par email')" style="flex: 1; padding: 0.75rem; background: #3b82f6; color: #fff; border: none; border-radius: 8px; cursor: pointer;">📧 Factures</button>
+                        <button onclick="alert('💳 Mode de paiement mis à jour')" style="flex: 1; padding: 0.75rem; background: #10b981; color: #fff; border: none; border-radius: 8px; cursor: pointer;">💳 Modifier</button>
+                        <button onclick="this.closest('div[style*=fixed]').remove()" style="flex: 1; padding: 0.75rem; background: #666; color: #fff; border: none; border-radius: 8px; cursor: pointer;">Fermer</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+        
+        
+        
+        // Security Functions
+        function openPasswordSettings() {
+            console.log('openPasswordSettings appelé');
+            
+            // Créer une interface de gestion du mot de passe
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: #111; border: 1px solid #333; border-radius: 16px; padding: 2rem; max-width: 500px; width: 90%;">
+                    <h3 style="color: #fff; margin-bottom: 1.5rem;">🔐 Gestion du mot de passe</h3>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="color: #fff; margin-bottom: 1rem;">Options de sécurité</h4>
+                        
+                        <button onclick="changePassword()" style="width: 100%; padding: 0.75rem; background: #3b82f6; color: #fff; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 0.5rem;">
+                            🔑 Changer le mot de passe
+                        </button>
+                        
+                        <button onclick="window.location.href='/forgot-password'" style="width: 100%; padding: 0.75rem; background: #f59e0b; color: #fff; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 0.5rem;">
+                            🔴 Mot de passe oublié
+                        </button>
+                        
+                        <button onclick="showPasswordRequirements()" style="width: 100%; padding: 0.75rem; background: #6b7280; color: #fff; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 0.5rem;">
+                            📋 Exigences de sécurité
+                        </button>
+                        
+                        <button onclick="showPasswordHistory()" style="width: 100%; padding: 0.75rem; background: #6b7280; color: #fff; border: none; border-radius: 8px; cursor: pointer;">
+                            📜 Historique des mots de passe
+                        </button>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <button onclick="this.closest('div[style*=fixed]').remove()" style="flex: 1; padding: 0.75rem; background: #666; color: #fff; border: none; border-radius: 8px; cursor: pointer;">
+                            Fermer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+        
+        function changePassword() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1001;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: #111; border: 1px solid #333; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%;">
+                    <h3 style="color: #fff; margin-bottom: 1.5rem;">🔑 Changer le mot de passe</h3>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Mot de passe actuel :</label>
+                        <input type="password" id="current-password" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Nouveau mot de passe :</label>
+                        <input type="password" id="new-password" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Confirmer le nouveau mot de passe :</label>
+                        <input type="password" id="confirm-password" style="width: 100%; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <button onclick="savePasswordChange()" style="flex: 1; padding: 0.75rem; background: #10b981; color: #fff; border: none; border-radius: 8px; cursor: pointer;">💾 Sauvegarder</button>
+                        <button onclick="this.closest('div[style*=fixed]').remove(); document.querySelector('div[style*=fixed]').remove();" style="flex: 1; padding: 0.75rem; background: #666; color: #fff; border: none; border-radius: 8px; cursor: pointer;">Annuler</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+        
+        function savePasswordChange() {
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                alert('❌ Veuillez remplir tous les champs');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                alert('❌ Les nouveaux mots de passe ne correspondent pas');
+                return;
+            }
+            
+            if (newPassword.length < 8) {
+                alert('❌ Le mot de passe doit contenir au moins 8 caractères');
+                return;
+            }
+            
+            // Simuler la sauvegarde
+            console.log('✅ Mot de passe changé avec succès');
+            alert('✅ Mot de passe mis à jour avec succès !');
+            
+            // Fermer les deux modals
+            document.querySelectorAll('div[style*="position: fixed"]').forEach(el => el.remove());
+        }
+        
+        function showPasswordRequirements() {
+            alert('📋 Exigences de sécurité\n\nVotre mot de passe doit contenir :\n• Au moins 8 caractères\n• Au moins une lettre majuscule\n• Au moins une lettre minuscule\n• Au moins un chiffre\n• Au moins un caractère spécial (!@#$%^&*)\n\nNe pas utiliser :\n• Votre nom ou prénom\n• Des informations personnelles\n• Des mots de passe communs');
+        }
+        
+        function showPasswordHistory() {
+            alert('📜 Historique des mots de passe\n\nDerniers changements :\n• 21/02/2026 - Mot de passe mis à jour\n• 15/01/2026 - Mot de passe mis à jour\n• 01/12/2025 - Première création\n\nPour des raisons de sécurité, les mots de passe précédents ne sont pas affichés.');
+        }
+        
+        // Data Functions
+        function downloadData() {
+            console.log('downloadData appelé');
+            
+            // Récupérer toutes les données de l'utilisateur
+            const userData = {
+                profile: JSON.parse(localStorage.getItem('userProfile') || '{}'),
+                user: JSON.parse(localStorage.getItem('userData') || '{}'),
+                preferences: JSON.parse(localStorage.getItem('userPreferences') || '{}'),
+                posts: JSON.parse(localStorage.getItem('userProfile') || '{}').posts || [],
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            // Créer un fichier JSON
+            const dataStr = JSON.stringify(userData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            // Créer un lien de téléchargement
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `my-data-${new Date().toISOString().split('T')[0]}.json`;
+            
+            // Déclencher le téléchargement
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            console.log('✅ Données téléchargées:', userData);
+            
+            alert('✅ Vos données ont été téléchargées avec succès !\n\nFichier: my-data-' + new Date().toISOString().split('T')[0] + '.json');
+        }
+        
+        
+        
+        function deleteAccount() {
+            console.log('deleteAccount appelé');
+            const confirmDelete = confirm('⚠️ SUPPRIMER LE COMPTE\n\nCette action est IRREVERSIBLE.\n\nToutes vos données seront définitivement supprimées:\n- Profil et informations personnelles\n- Posts et contenus\n- Préférences et paramètres\n- Historique d\'activité\n\nEtes-vous sûr de vouloir continuer?');
+            
+            if (confirmDelete) {
+                const userConfirmation = prompt('🔒 CONFIRMATION FINALE\n\nTapez "SUPPRIMER" en majuscules pour confirmer:');
+                
+                if (userConfirmation === 'SUPPRIMER') {
+                    // Supprimer toutes les données
+                    localStorage.removeItem('userProfile');
+                    localStorage.removeItem('userData');
+                    localStorage.removeItem('userPreferences');
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('cookieConsent');
+                    localStorage.removeItem('cookieConsentDate');
+                    
+                    // Vider le sessionStorage
+                    sessionStorage.clear();
+                    
+                    console.log('🗑️ Compte et données supprimés');
+                    
+                    alert('✅ Compte supprimé avec succès\n\nToutes vos données ont été définitivement effacées.\n\nRedirection vers la page d\'accueil...');
+                    
+                    // Rediriger vers la page d'accueil
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else if (userConfirmation !== null) {
+                    alert('❌ Confirmation incorrecte. La suppression a été annulée.');
+                }
+            }
+        }
+        
+        // Test simple
+        function testClick() {
+            console.log('Test click fonctionne!');
+            alert('Test click OK!');
+        }
+        
+        // Cookie Functions
+        function openCookieSettings() {
+            console.log('openCookieSettings appelé');
+            
+            const consent = localStorage.getItem('cookieConsent');
+            const consentDate = localStorage.getItem('cookieConsentDate');
+            
+            let message = '🍪 Paramètres des Cookies\n\n';
+            message += 'Statut actuel: ' + (consent || 'Non défini') + '\n';
+            
+            if (consentDate) {
+                const date = new Date(consentDate);
+                message += 'Date du consentement: ' + date.toLocaleDateString('fr-FR') + ' ' + date.toLocaleTimeString('fr-FR') + '\n';
+            }
+            
+            message += '\nOptions disponibles:\n';
+            message += '✅ Accepter tous les cookies\n';
+            message += '❌ Refuser les cookies non essentiels\n';
+            message += '🔧 Personnaliser les préférences\n';
+            message += '\n\nNote: Les modifications prendront effet lors de votre prochaine visite.';
+            
+            if (confirm(message + '\n\nVoulez-vous réinitialiser vos préférences cookies ?')) {
+                // Réinitialiser et forcer la bannière
+                localStorage.removeItem('cookieConsent');
+                localStorage.removeItem('cookieConsentDate');
+                
+                // Rediriger vers la page d'accueil pour voir la bannière
+                if (confirm('Rediriger vers la page d\'accueil pour voir la bannière ?')) {
+                    window.location.href = '../index.html';
+                }
+            }
+        }
+        
+        // Add event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Page Settings chargée - Boutons prêts');
+            
+            // Vérifier le rôle de l'utilisateur et cacher/montrer l'abonnement
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+            const userRole = userData.role || userProfile.role || 'talent';
+            
+            // Cacher la section abonnement si ce n'est pas une agence
+            if (userRole !== 'agency') {
+                const managementSection = document.querySelector('.settings-card h2');
+                if (managementSection && managementSection.textContent.includes('Gestion')) {
+                    const card = managementSection.closest('.settings-card');
+                    if (card) {
+                        card.style.display = 'none';
+                        console.log('🏢 Section abonnement cachée - utilisateur de type:', userRole);
+                    }
+                }
+            }
+            
+            // Tester si les fonctions sont bien définies
+            console.log('Fonctions disponibles:', {
+                openLanguageSettings: typeof openLanguageSettings,
+                openDataControl: typeof openDataControl,
+                openSubscriptionManagement: typeof openSubscriptionManagement,
+                downloadData: typeof downloadData,
+                deleteAccount: typeof deleteAccount
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-/* Production CSS - No CDN dependencies */
+/* Production CSS - Complete solution */
 
 /* Base styles */
 * {
@@ -14,8 +14,152 @@ body {
   line-height: 1.6;
 }
 
-/* Container */
+/* Register page styles */
 .container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 3rem;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+              0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.2),
+              0 15px 15px -5px rgba(0, 0, 0, 0.08);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+  margin-bottom: 1rem;
+  letter-spacing: -0.025em;
+}
+
+.subtitle {
+  text-align: center;
+  color: #a1a1aa;
+  font-size: 1.125rem;
+  margin-bottom: 3rem;
+  line-height: 1.6;
+}
+
+.buttons-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.register-btn {
+  width: 48%;
+  padding: 2rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  color: #fff;
+  min-height: 160px;
+}
+
+.agency-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.agency-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.5);
+}
+
+.talent-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.talent-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.5);
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+}
+
+.btn-text {
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.divider {
+  text-align: center;
+  margin: 2rem 0;
+  position: relative;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.divider span {
+  background: #000;
+  padding: 0 1rem;
+  color: #a1a1aa;
+  font-size: 0.875rem;
+}
+
+.login-link {
+  text-align: center;
+  color: #a1a1aa;
+}
+
+.login-link a {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+/* Container */
+.container-max {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;

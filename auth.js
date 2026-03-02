@@ -13,6 +13,21 @@ async function initDatabase() {
     logger.info('Base de données initialisée');
 }
 
+// Valider la robustesse du mot de passe
+// Retourne un message d'erreur ou null si valide
+function validatePassword(password) {
+    if (!password || password.length < 8) {
+        return 'Le mot de passe doit contenir au moins 8 caractères';
+    }
+    if (!/[A-Z]/.test(password)) {
+        return 'Le mot de passe doit contenir au moins une majuscule';
+    }
+    if (!/[0-9]/.test(password)) {
+        return 'Le mot de passe doit contenir au moins un chiffre';
+    }
+    return null;
+}
+
 // Hash password
 async function hashPassword(password) {
     const saltRounds = 10;
@@ -36,16 +51,21 @@ async function registerUser(userData) {
     const passwordHash = await hashPassword(password);
     
     let userId;
+    // Set default subscription values based on role
+    const defaultSubscriptionActive = role === 'agency';
+    const defaultPlanType = role === 'agency' ? 'premium' : 'free';
+    const defaultSubscriptionStatus = role === 'agency' ? 'active' : 'inactive';
+    
     if (DB.isPostgres) {
         const result = await DB.queryOne(
-            'INSERT INTO users (email, first_name, last_name, password_hash, role) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-            [email, firstName, lastName, passwordHash, role || 'talent']
+            'INSERT INTO users (email, first_name, last_name, password_hash, role, subscription_active, plan_type, subscription_status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
+            [email, firstName, lastName, passwordHash, role || 'talent', defaultSubscriptionActive, defaultPlanType, defaultSubscriptionStatus]
         );
         userId = result.id;
     } else {
         const result = await DB.execute(
-            'INSERT INTO users (email, first_name, last_name, password_hash, role) VALUES (?, ?, ?, ?, ?)',
-            [email, firstName, lastName, passwordHash, role || 'talent']
+            'INSERT INTO users (email, first_name, last_name, password_hash, role, subscription_active, plan_type, subscription_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [email, firstName, lastName, passwordHash, role || 'talent', defaultSubscriptionActive, defaultPlanType, defaultSubscriptionStatus]
         );
         userId = result.lastID;
     }
@@ -127,9 +147,9 @@ async function createSession(sessionId, userId, expiresAt) {
 async function getSession(sessionId) {
     const expireCheck = DB.isPostgres ? 'NOW()' : "datetime('now')";
     return DB.queryOne(
-        `SELECT s.*, u.id as user_id, u.email, u.first_name, u.last_name, u.role, u.subscription_active, u.plan_type 
-         FROM sessions s 
-         JOIN users u ON s.user_id = u.id 
+        `SELECT s.*, u.id as user_id, u.email, u.first_name, u.last_name, u.role, u.subscription_active, u.plan_type, u.is_admin, u.age_verified, u.verified, u.email_verified
+         FROM sessions s
+         JOIN users u ON s.user_id = u.id
          WHERE s.id = ? AND s.expires_at > ${expireCheck}`,
         [sessionId]
     );
@@ -189,25 +209,44 @@ async function getAgencyProfile(userId) {
     return DB.queryOne('SELECT * FROM agency_profiles WHERE user_id = ?', [userId]);
 }
 
-// Récupérer tous les talents
-async function getTalents() {
-    return DB.queryAll(`
-        SELECT u.id, u.email, u.first_name, u.last_name, u.role, u.created_at,
-               tp.bio, tp.platforms, tp.country, tp.revenue, tp.display_name
-        FROM users u LEFT JOIN talent_profiles tp ON u.id = tp.user_id
-        WHERE u.role = 'talent' ORDER BY u.created_at DESC
-    `);
+// Récupérer des utilisateurs par rôle (avec pagination et recommandations)
+const ROLE_CONFIG = {
+    talent: {
+        select: `u.id, u.email, u.first_name, u.last_name, u.role, u.created_at,
+                   u.verified, u.avatar_url, u.is_banned,
+                   tp.bio, tp.platforms, tp.country, tp.revenue, tp.display_name,
+                   tp.age, tp.has_manager, tp.languages, tp.social_media, tp.total_followers`,
+        join: `LEFT JOIN talent_profiles tp ON u.id = tp.user_id`,
+        recommendedOrder: `(COALESCE(tp.revenue, 0) * 0.4 + COALESCE(tp.total_followers, 0) * 0.0001 + CASE WHEN u.verified = 1 THEN 500 ELSE 0 END) DESC, u.created_at DESC`,
+    },
+    agency: {
+        select: `u.id, u.email, u.first_name, u.last_name, u.role, u.created_at,
+                   u.verified, u.avatar_url, u.is_banned,
+                   ap.talent_count, ap.description, ap.platforms, ap.total_revenue, ap.agency_name`,
+        join: `LEFT JOIN agency_profiles ap ON u.id = ap.user_id`,
+        recommendedOrder: `(COALESCE(ap.total_revenue, 0) * 0.3 + COALESCE(ap.talent_count, 0) * 10 + CASE WHEN u.verified = 1 THEN 500 ELSE 0 END) DESC, u.created_at DESC`,
+    },
+};
+
+async function _getUsers(role, { page = 1, limit = 12, recommended = false } = {}) {
+    const offset = (page - 1) * limit;
+    const { select, join, recommendedOrder } = ROLE_CONFIG[role];
+    const order = recommended ? recommendedOrder : `u.created_at DESC`;
+    const [rows, countRow] = await Promise.all([
+        DB.queryAll(`
+            SELECT ${select}
+            FROM users u ${join}
+            WHERE u.role = ? AND COALESCE(u.is_banned, 0) = 0
+            ORDER BY ${order}
+            LIMIT ? OFFSET ?
+        `, [role, limit, offset]),
+        DB.queryOne(`SELECT COUNT(*) as total FROM users WHERE role = ? AND COALESCE(is_banned, 0) = 0`, [role])
+    ]);
+    return { data: rows, total: countRow?.total || 0, page, limit };
 }
 
-// Récupérer toutes les agences
-async function getAgencies() {
-    return DB.queryAll(`
-        SELECT u.id, u.email, u.first_name, u.last_name, u.role, u.created_at,
-               ap.talent_count, ap.description, ap.platforms, ap.total_revenue
-        FROM users u LEFT JOIN agency_profiles ap ON u.id = ap.user_id
-        WHERE u.role = 'agency' ORDER BY u.created_at DESC
-    `);
-}
+async function getTalents(opts) { return _getUsers('talent', opts); }
+async function getAgencies(opts) { return _getUsers('agency', opts); }
 
 // Récupérer le profil d'un talent
 async function getTalentProfile(userId) {
@@ -215,15 +254,15 @@ async function getTalentProfile(userId) {
 }
 
 // Profile management functions
-const USER_SAFE_COLS = 'u.id, u.email, u.first_name, u.last_name, u.role, u.plan_type, u.subscription_active, u.created_at';
+const USER_SAFE_COLS = 'u.id, u.email, u.first_name, u.last_name, u.role, u.plan_type, u.subscription_active, u.created_at, u.avatar_url, u.verified, u.age_verified, u.is_admin, u.is_banned';
 
 async function getUserProfile(userId) {
     return DB.queryOne(`
-        SELECT ${USER_SAFE_COLS}, 
-               tp.bio as talent_bio, tp.platforms as talent_platforms, tp.country as talent_country,
-               tp.revenue as talent_revenue, tp.display_name as talent_display_name, tp.talent_type as talent_specialty,
-               tp.age, tp.has_manager, tp.other_platform, tp.languages, tp.social_media,
-               ap.talent_count, ap.description as agency_description, ap.platforms as agency_platforms, 
+        SELECT ${USER_SAFE_COLS},
+               tp.bio, tp.platforms, tp.country, tp.languages, tp.social_media,
+               tp.revenue as monthly_revenue, tp.display_name, tp.specialty,
+               tp.age, tp.has_manager, tp.other_platform, tp.total_followers,
+               ap.talent_count, ap.description as agency_description, ap.platforms as agency_platforms,
                ap.total_revenue, ap.agency_name
         FROM users u
         LEFT JOIN talent_profiles tp ON u.id = tp.user_id
@@ -343,7 +382,7 @@ async function getUserFavorites(userId) {
     return DB.queryAll(`
         SELECT ${USER_SAFE_COLS}, f.favorited_at,
                tp.bio as talent_bio, tp.platforms as talent_platforms, tp.country as talent_country,
-               tp.revenue as talent_revenue, tp.display_name as talent_display_name, tp.talent_type as talent_specialty,
+               tp.revenue as talent_revenue, tp.display_name as talent_display_name, tp.specialty as talent_specialty,
                ap.talent_count, ap.description as agency_description, ap.platforms as agency_platforms, ap.total_revenue
         FROM favorites f
         JOIN users u ON f.favorited_user_id = u.id
@@ -432,5 +471,6 @@ module.exports = {
     deleteUserAccount,
     getUserMessages,
     sendMessage,
+    validatePassword,
     db
 };
