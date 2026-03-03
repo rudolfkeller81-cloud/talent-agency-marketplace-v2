@@ -255,7 +255,7 @@
             </div>
             
             <div class="login-link">
-                Already have an account? <a href="/login">Sign in</a>
+                Already have an account? <a href="/login.html">Sign in</a>
             </div>
         </div>
     </div>
@@ -264,13 +264,13 @@
         function registerAsAgency() {
             const btn = document.querySelector('.agency-btn');
             if (btn) { btn.disabled = true; btn.querySelector('.btn-text').textContent = 'Chargement...'; }
-            window.location.href = '/signup/agency';
+            window.location.href = '/register-agency.html';
         }
 
         function registerAsTalent() {
             const btn = document.querySelector('.talent-btn');
             if (btn) { btn.disabled = true; btn.querySelector('.btn-text').textContent = 'Chargement...'; }
-            window.location.href = '/signup/talent';
+            window.location.href = '/register-talent.html';
         }
     </script>
 </body>
