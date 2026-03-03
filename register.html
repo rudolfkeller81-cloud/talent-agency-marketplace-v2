@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration - Talent Agency</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             background: #000;
             color: #fff;
@@ -36,8 +37,8 @@
             position: relative;
             z-index: 1;
             width: 100%;
-            max-width: 480px;
-            padding: 2rem;
+            max-width: 600px;
+            padding: 3rem;
         }
         
         .card {
@@ -129,18 +130,18 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             margin-right: 0.5rem;
         }
-        
+
         .agency-btn:hover {
             background: rgba(255, 255, 255, 0.08);
             border-color: rgba(255, 255, 255, 0.2);
         }
-        
+
         .talent-btn {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             margin-left: 0.5rem;
         }
-        
+
         .talent-btn:hover {
             background: rgba(255, 255, 255, 0.08);
             border-color: rgba(255, 255, 255, 0.2);
@@ -261,19 +262,16 @@
 
     <script>
         function registerAsAgency() {
-            console.log('Register as agency clicked');
+            const btn = document.querySelector('.agency-btn');
+            if (btn) { btn.disabled = true; btn.querySelector('.btn-text').textContent = 'Chargement...'; }
             window.location.href = '/signup/agency';
         }
-        
+
         function registerAsTalent() {
-            console.log('Register as talent clicked');
+            const btn = document.querySelector('.talent-btn');
+            if (btn) { btn.disabled = true; btn.querySelector('.btn-text').textContent = 'Chargement...'; }
             window.location.href = '/signup/talent';
         }
-        
-        // Animation au chargement
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Register page loaded');
-        });
     </script>
 </body>
 </html>
